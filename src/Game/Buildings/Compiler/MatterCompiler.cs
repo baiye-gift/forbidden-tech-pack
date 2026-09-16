@@ -188,11 +188,11 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
                 return true;
             }
             var inputCell = Grid.OffsetCell(building.NaturalBuildingCell(), new CellOffset(-2, 0));
-            var contents = Game.Instance.solidConduitFlow.GetContents(inputCell);
+            var contents = global::Game.Instance.solidConduitFlow.GetContents(inputCell);
             if (!contents.pickupableHandle.IsValid()) {
                 return true;
             }
-            var pickupable = Game.Instance.solidConduitFlow.GetPickupable(contents.pickupableHandle);
+            var pickupable = global::Game.Instance.solidConduitFlow.GetPickupable(contents.pickupableHandle);
             return pickupable == null || pickupable.PrimaryElement == null ||
                 pickupable.PrimaryElement.ElementID == ProtoMatterRegistration.Hash;
         }

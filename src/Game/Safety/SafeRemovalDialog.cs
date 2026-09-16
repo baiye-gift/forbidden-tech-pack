@@ -69,7 +69,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 Text = message,
                 Margin = new RectOffset(12, 12, 12, 12)
             });
-            dialog.AddButton("close", STRINGS.UI.SAFEREMOVAL.CLOSE);
+            dialog.AddButton("close", STRINGS.UI.SAFEREMOVAL.CLOSE, null, PUITuning.Colors.ButtonBlueStyle);
             dialog.Show();
         }
     }
