@@ -1,1 +1,7 @@
 .worktrees/
+/artifacts/
+/lib/
+/tools/
+/obj/
+/dist/
+/test-artifacts/
