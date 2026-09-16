@@ -11,7 +11,8 @@ internal static class CoreTestProgram {
                 { "MaterialClassifierTests", MaterialClassifierTests.Run },
                 { "ConversionMathTests", ConversionMathTests.Run },
                 { "UnlockStateTests", UnlockStateTests.Run },
-                { "RecipeRegistryTests", RecipeRegistryTests.Run }
+                { "RecipeRegistryTests", RecipeRegistryTests.Run },
+                { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 

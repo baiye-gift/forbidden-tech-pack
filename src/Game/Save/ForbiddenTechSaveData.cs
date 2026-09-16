@@ -53,6 +53,11 @@ namespace ForbiddenTechnologyPack.Game.Save {
             return elementTag.IsValid && unlockState.IsUnlocked(elementTag.Name);
         }
 
+        public UnlockState GetUnlockState() {
+            EnsureState();
+            return UnlockState.FromSerialized(unlockState.Version, unlockState.ToSerialized());
+        }
+
         private void EnsureState() {
             if (unlockState == null) {
                 unlockState = UnlockState.FromSerialized(dataVersion, unlockedElementIds);

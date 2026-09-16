@@ -5,3 +5,31 @@ msgstr "原质"
 msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC"
 msgid "A compact, transportable substrate produced by forbidden matter processing."
 msgstr "由禁忌物质处理生成的紧凑、可运输基质。"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.NAME"
+msgid "Matter Analyzer"
+msgstr "物质分析仪"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.DESC"
+msgid "Studies a physical material sample to unlock forbidden matter recipes."
+msgstr "研究实体材料样本，以解锁禁忌物质配方。"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.EFFECT"
+msgid "Consumes a material sample, then unlocks it for Matter Compilation."
+msgstr "消耗一份材料样本，并将其解锁用于物质编译。"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.SAMPLE_ALREADY_ANALYZED"
+msgid "This material has already been analyzed."
+msgstr "该材料已完成分析。"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.NAME"
+msgid "Enable Analyzer"
+msgstr "启用分析仪"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.ACTIVE"
+msgid "When receiving a Green signal, the Matter Analyzer may operate."
+msgstr "收到绿信号时，物质分析仪可以运行。"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.INACTIVE"
+msgid "When receiving a Red signal, the Matter Analyzer is disabled."
+msgstr "收到红信号时，物质分析仪停止运行。"
