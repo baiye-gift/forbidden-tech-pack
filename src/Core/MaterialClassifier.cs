@@ -64,13 +64,15 @@ namespace ForbiddenTechnologyPack.Core {
                 tier = MaterialTier.Industrial;
                 return true;
             }
-            if (element.Tags.Contains("OreOrOrganic") || element.Tags.Contains("MetalOre") ||
-                    element.Tags.Contains("Organic")) {
+            if (element.Tags.Contains("OreOrOrganic") ||
+                    (element.Tags.Contains("Metal") && element.Tags.Contains("Ore")) ||
+                    element.Tags.Contains("Organics") || element.Tags.Contains("ConsumableOre")) {
                 tier = MaterialTier.OreOrOrganic;
                 return true;
             }
-            if (element.Tags.Contains("Common") || element.Tags.Contains("Agricultural") ||
-                    element.Tags.Contains("BuildableRaw")) {
+            if (element.Tags.Contains("Common") || element.Tags.Contains("Farmable") ||
+                    element.Tags.Contains("Agriculture") || element.Tags.Contains("BuildableRaw") ||
+                    element.Tags.Contains("RawMineral")) {
                 tier = MaterialTier.Common;
                 return true;
             }

@@ -4,18 +4,36 @@ internal static class MaterialClassifierTests {
     public static void Run() {
         var strong = PackOptions.Resolve(new RawOptions { Preset = BalancePreset.Strong });
 
-        var dirt = ElementDescriptor.Solid("Dirt", "Agricultural", "BuildableRaw");
+        var dirt = ElementDescriptor.Solid("Dirt", "Farmable");
         MaterialRule dirtRule;
         AssertEx.True(MaterialClassifier.TryCreateRule(dirt, strong, out dirtRule), "dirt allowed");
         AssertEx.Equal(MaterialTier.Common, dirtRule.Tier, "dirt tier");
         AssertEx.Near(1.25f, dirtRule.ProtoMatterPerKg, 0.0001f, "dirt cost");
 
-        var copperOre = ElementDescriptor.Solid("Cuprite", "Metal", "MetalOre");
+        var copperOre = ElementDescriptor.Solid("Cuprite", "Metal", "Ore");
         AssertEx.Equal(MaterialTier.OreOrOrganic,
             MaterialClassifier.CreateRule(copperOre, strong).Tier, "ore tier");
+        AssertEx.Equal(MaterialTier.OreOrOrganic,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("IronOre", "Metal", "Ore"), strong).Tier,
+            "iron ore tier");
 
         AssertEx.True(MaterialClassifier.TryCreateRule(
-            ElementDescriptor.Solid("Algae", "Organic"), strong, out _), "organic allowed");
+            ElementDescriptor.Solid("Algae", "Organics"), strong, out _), "algae allowed");
+        AssertEx.Equal(MaterialTier.OreOrOrganic,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("SlimeMold", "Organics"), strong).Tier,
+            "slime tier");
+        AssertEx.Equal(MaterialTier.OreOrOrganic,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("Phosphorite", "ConsumableOre"), strong).Tier,
+            "consumable ore tier");
+        AssertEx.Equal(MaterialTier.Common,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("Fertilizer", "Agriculture"), strong).Tier,
+            "fertilizer tier");
+        AssertEx.Equal(MaterialTier.Common,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("SandStone", "RawMineral"), strong).Tier,
+            "raw mineral tier");
+        AssertEx.Equal(MaterialTier.Common,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("Granite", "BuildableRaw"), strong).Tier,
+            "buildable raw tier");
         AssertEx.True(MaterialClassifier.TryCreateRule(
             ElementDescriptor.Solid("Steel", "Industrial"), strong, out _), "industrial allowed");
         AssertEx.True(MaterialClassifier.TryCreateRule(

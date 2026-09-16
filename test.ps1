@@ -8,6 +8,7 @@ $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $powerShellSuites = @{
     'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
+    'ElementCatalogRuntimeTests' = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
     'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
     'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
     'ResearchRegistrationRuntimeTests' = (Join-Path $projectRoot 'tests\ResearchRegistrationRuntimeTests.ps1')

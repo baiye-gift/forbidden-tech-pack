@@ -19,10 +19,10 @@ namespace ForbiddenTechnologyPack.Game.Elements {
             "RefinedMetal", "ManufacturedMaterial", "Plastic", "Rubber", "Glass", "Steel"
         };
         private static readonly ISet<string> OreOrOrganicTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "MetalOre", "Organic", "ConsumableOre"
+            "Organics", "ConsumableOre"
         };
         private static readonly ISet<string> CommonTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "BuildableRaw", "Agricultural", "RawMineral"
+            "Farmable", "Agriculture", "BuildableRaw", "RawMineral"
         };
         private static IReadOnlyDictionary<string, MaterialRule> rules =
             new ReadOnlyDictionary<string, MaterialRule>(new Dictionary<string, MaterialRule>(StringComparer.Ordinal));
@@ -94,6 +94,9 @@ namespace ForbiddenTechnologyPack.Game.Elements {
                 tags.Add("Rare");
             }
             AddCanonicalTag(tags, IndustrialTags, "Industrial");
+            if (tags.Contains("Metal") && tags.Contains("Ore")) {
+                tags.Add("OreOrOrganic");
+            }
             AddCanonicalTag(tags, OreOrOrganicTags, "OreOrOrganic");
             AddCanonicalTag(tags, CommonTags, "Common");
         }
@@ -108,9 +111,7 @@ namespace ForbiddenTechnologyPack.Game.Elements {
         }
 
         private static bool IsDlcActive(string dlcId) {
-#pragma warning disable 0618
-            return string.IsNullOrEmpty(dlcId) || DlcManager.IsContentActive(dlcId);
-#pragma warning restore 0618
+            return string.IsNullOrEmpty(dlcId) || DlcManager.IsContentSubscribed(dlcId);
         }
 
         private static bool IsSpecial(Element element) {
