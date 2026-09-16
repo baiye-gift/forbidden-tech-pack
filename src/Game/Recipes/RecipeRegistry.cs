@@ -56,8 +56,11 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
         private static ComplexRecipe CreateAnalyzerRecipe(RecipePlan plan, int sortOrder) {
             var input = new ComplexRecipe.RecipeElement(new Tag(plan.ElementId), plan.AnalyzerInputKg);
             input.doNotConsume = plan.AnalyzerInputDoNotConsume;
-            return CreateRecipe(plan.AnalyzerId, new[] { input }, new ComplexRecipe.RecipeElement[0],
+            var metadataResult = new ComplexRecipe.RecipeElement(new Tag(plan.ElementId), 1f);
+            var recipe = CreateRecipe(plan.AnalyzerId, new[] { input }, new[] { metadataResult },
                 ModIdentity.MatterAnalyzerId, plan.AnalyzerTimeSeconds, sortOrder);
+            recipe.nameDisplay = ComplexRecipe.RecipeNameDisplay.Ingredient;
+            return recipe;
         }
 
         private static ComplexRecipe CreateCrusherRecipe(RecipePlan plan, int sortOrder) {

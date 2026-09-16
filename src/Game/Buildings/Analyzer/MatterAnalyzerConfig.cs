@@ -36,6 +36,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             fabricator.inStorage = FabricatorSupport.CreateSealedStorage(gameObject, 100f, true);
             fabricator.buildStorage = FabricatorSupport.CreateSealedStorage(gameObject, 100f, false);
             fabricator.outStorage = FabricatorSupport.CreateSealedStorage(gameObject, 100f, true);
+            fabricator.outStorage.allowItemRemoval = true;
+            fabricator.outStorage.allowUIItemRemoval = true;
 
             gameObject.AddOrGet<FabricatorIngredientStatusManager>();
             gameObject.AddOrGet<CopyBuildingSettings>();

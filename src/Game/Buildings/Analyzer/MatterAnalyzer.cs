@@ -7,6 +7,7 @@ using ForbiddenTechnologyPack.Game.Save;
 using ForbiddenTechnologyPack.Game.Elements;
 using HarmonyLib;
 using ForbiddenTechnologyPack.Game.Buildings.Common;
+using UnityEngine;
 
 namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     public sealed class MatterAnalyzer : ComplexFabricator {
@@ -33,6 +34,24 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             var visibleIds = AnalyzerPolicy.VisibleRuleIds(rules, saveData.GetUnlockState(), activeIds);
             MatterAnalyzerRecipeList.Set(this, visibleIds.Where(RecipeRegistry.AnalyzerRecipes.ContainsKey)
                 .Select(id => RecipeRegistry.AnalyzerRecipes[id]).ToArray());
+        }
+
+        protected override List<GameObject> SpawnOrderProduct(ComplexRecipe recipe) {
+            var spawnedProducts = new List<GameObject>();
+            if (recipe == null || recipe.ingredients == null) {
+                return spawnedProducts;
+            }
+
+            foreach (var ingredient in recipe.ingredients) {
+                if (ingredient.doNotConsume) {
+                    buildStorage.TransferMass(outStorage, ingredient.material, ingredient.amount,
+                        true, true, true);
+                } else {
+                    buildStorage.ConsumeIgnoringDisease(ingredient.material, ingredient.amount);
+                }
+            }
+
+            return spawnedProducts;
         }
 
         private void SubscribeToUnlocks() {
