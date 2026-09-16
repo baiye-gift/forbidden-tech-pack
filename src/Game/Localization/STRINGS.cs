@@ -56,5 +56,15 @@ namespace ForbiddenTechnologyPack.Game {
                 }
             }
         }
+
+        public static class RESEARCH {
+            public static class TECHS {
+                public static class BAIYEFORBIDDENMATTERENGINEERING {
+                    public static LocString NAME = "Forbidden Matter Engineering";
+                    public static LocString DESC = "Reverse-engineer matter itself and build machines that analyze, deconstruct, and compile solid materials.";
+                    public static LocString SEARCH_TERMS = "forbidden matter proto-matter analyzer crusher compiler";
+                }
+            }
+        }
     }
 }
