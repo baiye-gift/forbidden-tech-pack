@@ -12,6 +12,12 @@ namespace ForbiddenTechnologyPack.Game.Safety {
         internal static readonly Operational.Flag SafeRemovalAllowed =
             new Operational.Flag("ForbiddenTechSafeRemovalAllowed", Operational.Flag.Type.Requirement);
 
+        private static readonly string[] ForbiddenBuildingIds = {
+            ModIdentity.MatterAnalyzerId,
+            ModIdentity.MassCrusherId,
+            ModIdentity.MatterCompilerId
+        };
+
         public static SafeRemovalReport Execute() {
             var report = new SafeRemovalReport();
             var saveData = ForbiddenTechSaveData.Instance;
@@ -27,7 +33,28 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ProcessBuildings(Object.FindObjectsOfType<MatterCompiler>(), report);
             ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects());
+            saveData.SetSafeRemovalCompleted(report.IsComplete);
+            if (report.IsComplete) {
+                ApplyCompletedVisibility();
+            }
             return report;
+        }
+
+        public static void ApplyCompletedVisibility() {
+            for (var index = 0; index < ForbiddenBuildingIds.Length; index++) {
+                var buildingDef = Assets.GetBuildingDef(ForbiddenBuildingIds[index]);
+                if (buildingDef != null) {
+                    buildingDef.ShowInBuildMenu = false;
+                }
+            }
+
+            var db = Db.Get();
+            if (db != null && db.Techs != null) {
+                var tech = db.Techs.TryGet(ModIdentity.ResearchId);
+                if (tech != null) {
+                    tech.unlockedItemIDs.Clear();
+                }
+            }
         }
 
         internal static bool IsForbiddenFabricator(ComplexFabricator fabricator) {
