@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ForbiddenTechnologyPack.Core;
+using ForbiddenTechnologyPack.Game.Safety;
 using HarmonyLib;
 using KSerialization;
 
@@ -16,6 +17,9 @@ namespace ForbiddenTechnologyPack.Game.Save {
         [Serialize]
         private bool safeRemovalStarted;
 
+        [Serialize]
+        private bool safeRemovalCompleted;
+
         private UnlockState unlockState;
 
         public static ForbiddenTechSaveData Instance { get; private set; }
@@ -27,12 +31,19 @@ namespace ForbiddenTechnologyPack.Game.Save {
             get { return safeRemovalStarted; }
         }
 
+        public bool SafeRemovalCompleted {
+            get { return safeRemovalCompleted; }
+        }
+
         protected override void OnSpawn() {
             base.OnSpawn();
             unlockState = UnlockState.FromSerialized(dataVersion, unlockedElementIds);
             dataVersion = unlockState.Version;
             unlockedElementIds = new List<string>(unlockState.ToSerialized());
             Instance = this;
+            if (safeRemovalCompleted) {
+                SafeRemovalController.ApplyCompletedVisibility();
+            }
         }
 
         protected override void OnCleanUp() {
@@ -71,11 +82,24 @@ namespace ForbiddenTechnologyPack.Game.Save {
                 return false;
             }
             safeRemovalStarted = true;
+            safeRemovalCompleted = false;
+            NotifySafeRemovalChanged();
+            return true;
+        }
+
+        public void SetSafeRemovalCompleted(bool complete) {
+            if (safeRemovalCompleted == complete) {
+                return;
+            }
+            safeRemovalCompleted = complete;
+            NotifySafeRemovalChanged();
+        }
+
+        private void NotifySafeRemovalChanged() {
             var handler = SafeRemovalChanged;
             if (handler != null) {
                 handler();
             }
-            return true;
         }
 
         private void EnsureState() {
