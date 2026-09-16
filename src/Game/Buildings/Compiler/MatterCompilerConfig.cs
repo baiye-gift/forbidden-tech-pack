@@ -22,7 +22,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
 
         public override BuildingDef CreateBuildingDef() {
             var buildingDef = BuildingTemplates.CreateBuildingDef(ModIdentity.MatterCompilerId,
-                5, 5, "supermaterial_refinery_kanim", 60, 240f,
+                5, 5, "baiye_matter_compiler_kanim", 60, 240f,
                 new[] { 800f, 400f, 200f }, new[] { "RefinedMetal", "Ceramic", "Glass" },
                 2400f, BuildLocationRule.OnFloor, BUILDINGS.DECOR.PENALTY.TIER2,
                 NOISE_POLLUTION.NOISY.TIER6, 0.2f);

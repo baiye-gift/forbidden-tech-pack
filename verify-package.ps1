@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not (Test-Path -LiteralPath $PackagePath -PathType Container)) {
     throw "Package directory was not found: '$PackagePath'."
 }
@@ -21,6 +22,45 @@ foreach ($metadataFile in @('mod.yaml', 'mod_info.yaml')) {
 
 if (Get-ChildItem -LiteralPath $PackagePath -Filter 'PLib.dll' -File -Recurse) {
     throw 'Package must not contain a standalone PLib.dll.'
+}
+
+$manifestPath = Join-Path $projectRoot 'assets\animation-manifest.json'
+if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+    throw "Animation manifest is missing: '$manifestPath'."
+}
+$manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+$animDirectory = Join-Path $PackagePath 'anim'
+if (-not (Test-Path -LiteralPath $animDirectory -PathType Container)) {
+    throw "Package animation directory is missing: '$animDirectory'."
+}
+
+foreach ($name in $manifest.PSObject.Properties.Name) {
+    foreach ($suffix in @('.png', '_anim.bytes', '_build.bytes')) {
+        $assetPath = Join-Path $animDirectory ($name + $suffix)
+        if (-not (Test-Path -LiteralPath $assetPath -PathType Leaf)) {
+            throw "Package is missing required KAnim asset '$($name + $suffix)'."
+        }
+    }
+}
+
+$baseGameAnimationNames = @(
+    'supermaterial_refinery_kanim',
+    'rockrefinery_kanim',
+    'tungsten_kanim'
+)
+foreach ($assetFile in Get-ChildItem -LiteralPath $animDirectory -File -Recurse) {
+    foreach ($baseName in $baseGameAnimationNames) {
+        if ($assetFile.Name -like "*$baseName*") {
+            throw "Package contains a base-game animation filename: '$($assetFile.Name)'."
+        }
+    }
+}
+
+foreach ($language in @('en', 'zh')) {
+    $translation = Join-Path $PackagePath ("translations\$language.po")
+    if (-not (Test-Path -LiteralPath $translation -PathType Leaf)) {
+        throw "Package translation is missing: '$language.po'."
+    }
 }
 
 $textFiles = Get-ChildItem -LiteralPath $PackagePath -File -Recurse | Where-Object { $_.Extension -in '.yaml', '.json', '.po', '.txt' }

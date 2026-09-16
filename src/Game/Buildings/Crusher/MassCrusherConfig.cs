@@ -14,7 +14,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
 
         public override BuildingDef CreateBuildingDef() {
             var buildingDef = BuildingTemplates.CreateBuildingDef(ModIdentity.MassCrusherId,
-                4, 4, "rockrefinery_kanim", 30, 120f,
+                4, 4, "baiye_mass_crusher_kanim", 30, 120f,
                 new[] { 400f, 200f }, new[] { "RefinedMetal", "Ceramic" },
                 1600f, BuildLocationRule.OnFloor, BUILDINGS.DECOR.NONE, NOISE_POLLUTION.NONE,
                 0.2f);

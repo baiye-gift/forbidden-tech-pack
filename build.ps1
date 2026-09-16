@@ -24,6 +24,11 @@ foreach ($requiredPath in @($managedDirectory, $plib, $ilRepack)) {
     }
 }
 
+& (Join-Path $projectRoot 'build-assets.ps1')
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+
 $sources = @(Get-ChildItem -LiteralPath $sourceDirectory -Filter '*.cs' -Recurse -File | ForEach-Object { $_.FullName })
 if ($sources.Count -eq 0) {
     throw 'No C# sources were found under src.'

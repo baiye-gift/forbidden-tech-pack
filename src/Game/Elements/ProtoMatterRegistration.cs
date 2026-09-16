@@ -30,7 +30,7 @@ namespace ForbiddenTechnologyPack.Game.Elements {
 
             var purple = new Color32(177, 77, 255, 255);
             var substance = ModUtil.CreateSubstance(SubstanceKey, Element.State.Solid,
-                Assets.GetAnim(new HashedString("tungsten_kanim")), vanillaTable.solidMaterial,
+                Assets.GetAnim(new HashedString("baiye_proto_matter_kanim")), vanillaTable.solidMaterial,
                 purple, purple, purple);
             substanceList.Add(SubstanceKey, substance);
             vanillaTable.GetList().Add(substance);

@@ -1,145 +1,145 @@
 msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME"
 msgid "Proto-Matter"
-msgstr "原质"
+msgstr "Proto-Matter"
 
 msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC"
 msgid "A compact, transportable substrate produced by forbidden matter processing."
-msgstr "由禁忌物质处理生成的紧凑、可运输基质。"
+msgstr "A compact, transportable substrate produced by forbidden matter processing."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.NAME"
 msgid "Mass Crusher"
-msgstr "质量粉碎机"
+msgstr "Mass Crusher"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.DESC"
 msgid "Breaks solid materials into transportable Proto-Matter."
-msgstr "将固体材料分解为可运输的原质。"
+msgstr "Breaks solid materials into transportable Proto-Matter."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.EFFECT"
 msgid "Consumes solid materials and produces Proto-Matter. Supports solid conveyor rails."
-msgstr "消耗固体材料并生成原质，支持固体运输轨道。"
+msgstr "Consumes solid materials and produces Proto-Matter. Supports solid conveyor rails."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.LOGIC_PORT.NAME"
 msgid "Enable Mass Crusher"
-msgstr "启用质量粉碎机"
+msgstr "Enable Mass Crusher"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.LOGIC_PORT.ACTIVE"
 msgid "When receiving a Green signal, the Mass Crusher may operate."
-msgstr "收到绿信号时，质量粉碎机可以运行。"
+msgstr "When receiving a Green signal, the Mass Crusher may operate."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMASSCRUSHER.LOGIC_PORT.INACTIVE"
 msgid "When receiving a Red signal, the Mass Crusher is disabled."
-msgstr "收到红信号时，质量粉碎机停止运行。"
+msgstr "When receiving a Red signal, the Mass Crusher is disabled."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.NAME"
 msgid "Matter Analyzer"
-msgstr "物质分析仪"
+msgstr "Matter Analyzer"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.DESC"
 msgid "Studies a physical material sample to unlock forbidden matter recipes."
-msgstr "研究实体材料样本，以解锁禁忌物质配方。"
+msgstr "Studies a physical material sample to unlock forbidden matter recipes."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.EFFECT"
 msgid "Consumes a material sample, then unlocks it for Matter Compilation."
-msgstr "消耗一份材料样本，并将其解锁用于物质编译。"
+msgstr "Consumes a material sample, then unlocks it for Matter Compilation."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.SAMPLE_ALREADY_ANALYZED"
 msgid "This material has already been analyzed."
-msgstr "该材料已完成分析。"
+msgstr "This material has already been analyzed."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.NAME"
 msgid "Enable Analyzer"
-msgstr "启用分析仪"
+msgstr "Enable Analyzer"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.ACTIVE"
 msgid "When receiving a Green signal, the Matter Analyzer may operate."
-msgstr "收到绿信号时，物质分析仪可以运行。"
+msgstr "When receiving a Green signal, the Matter Analyzer may operate."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANALYZER.LOGIC_PORT.INACTIVE"
 msgid "When receiving a Red signal, the Matter Analyzer is disabled."
-msgstr "收到红信号时，物质分析仪停止运行。"
+msgstr "When receiving a Red signal, the Matter Analyzer is disabled."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.NAME"
 msgid "Matter Compiler"
-msgstr "物质编译器"
+msgstr "Matter Compiler"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.DESC"
 msgid "Reassembles Proto-Matter into analyzed solid materials."
-msgstr "将原质重新组装为已分析的固体材料。"
+msgstr "Reassembles Proto-Matter into analyzed solid materials."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.EFFECT"
 msgid "Consumes Proto-Matter and a safe liquid coolant loop to compile unlocked materials."
-msgstr "消耗原质并利用安全液体冷却回路编译已解锁材料。"
+msgstr "Consumes Proto-Matter and a safe liquid coolant loop to compile unlocked materials."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.LOGIC_PORT.NAME"
 msgid "Enable Matter Compiler"
-msgstr "启用物质编译器"
+msgstr "Enable Matter Compiler"
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.LOGIC_PORT.ACTIVE"
 msgid "When receiving a Green signal, the Matter Compiler may operate."
-msgstr "收到绿信号时，物质编译器可以运行。"
+msgstr "When receiving a Green signal, the Matter Compiler may operate."
 
 msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.LOGIC_PORT.INACTIVE"
 msgid "When receiving a Red signal, the Matter Compiler is disabled."
-msgstr "收到红信号时，物质编译器停止运行。"
+msgstr "When receiving a Red signal, the Matter Compiler is disabled."
 
 msgctxt "STRINGS.BUILDING.STATUSITEMS.BAIYEMATTERCOMPILERUNSAFECOOLANT.NAME"
 msgid "Waiting for Safe Coolant"
-msgstr "等待安全冷却液"
+msgstr "Waiting for Safe Coolant"
 
 msgctxt "STRINGS.BUILDING.STATUSITEMS.BAIYEMATTERCOMPILERUNSAFECOOLANT.TOOLTIP"
 msgid "A liquid packet that can absorb the process heat and an open coolant output are required."
-msgstr "需要能够吸收工艺热量的液体包，并确保冷却液出口畅通。"
+msgstr "A liquid packet that can absorb the process heat and an open coolant output are required."
 
 msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMATTERENGINEERING.NAME"
 msgid "Forbidden Matter Engineering"
-msgstr "禁忌物质工程"
+msgstr "Forbidden Matter Engineering"
 
 msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMATTERENGINEERING.DESC"
 msgid "Reverse-engineer matter itself and build machines that analyze, deconstruct, and compile solid materials."
-msgstr "逆向解析物质本身，并建造能够分析、分解和编译固体材料的机器。"
+msgstr "Reverse-engineer matter itself and build machines that analyze, deconstruct, and compile solid materials."
 
 msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMATTERENGINEERING.SEARCH_TERMS"
 msgid "forbidden matter proto-matter analyzer crusher compiler"
-msgstr "禁忌 物质 原质 分析仪 粉碎机 编译器"
+msgstr "forbidden matter proto-matter analyzer crusher compiler"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.TITLE"
 msgid "Safe Removal - Forbidden Technology Pack"
-msgstr "安全移除 - 禁忌科技包"
+msgstr "Safe Removal - Forbidden Technology Pack"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.FIRST_WARNING"
 msgid "This workflow permanently prepares the current colony for disabling this mod. It will stop the forbidden matter machines, return their stored inputs, and remove the custom buildings. Continue only after making a normal save first."
-msgstr "此流程会永久准备当前殖民地以停用本模组：停止禁忌物质设备、返还已存输入并移除自定义建筑。请先正常保存后再继续。"
+msgstr "This workflow permanently prepares the current colony for disabling this mod. It will stop the forbidden matter machines, return their stored inputs, and remove the custom buildings. Continue only after making a normal save first."
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.SECOND_WARNING"
 msgid "Final confirmation: convert every Proto-Matter object to Igneous Rock and stop/remove all forbidden matter buildings now? Completed ordinary outputs are preserved. This action cannot be undone except by reloading an earlier save."
-msgstr "最终确认：现在将所有原质转换为火成岩，并停止/移除全部禁忌物质建筑？已完成的普通产物会保留。除非读取更早存档，否则无法撤销。"
+msgstr "Final confirmation: convert every Proto-Matter object to Igneous Rock and stop/remove all forbidden matter buildings now? Completed ordinary outputs are preserved. This action cannot be undone except by reloading an earlier save."
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.CONTINUE"
 msgid "Continue"
-msgstr "继续"
+msgstr "Continue"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.CONVERT_AND_STOP"
 msgid "Convert Proto-Matter and Stop Buildings"
-msgstr "转换原质并停止建筑"
+msgstr "Convert Proto-Matter and Stop Buildings"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.CANCEL"
 msgid "Cancel"
-msgstr "取消"
+msgstr "Cancel"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.CLOSE"
 msgid "Close"
-msgstr "关闭"
+msgstr "Close"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.NO_ACTIVE_GAME"
 msgid "Load the colony you want to prepare before starting safe removal."
-msgstr "开始安全移除前，请先载入需要处理的殖民地。"
+msgstr "Load the colony you want to prepare before starting safe removal."
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.SUCCESS"
 msgid "Safe removal scan is complete. Converted {0} Proto-Matter objects ({1:0.##} kg), removed {2} custom buildings, and returned {3} stored input objects. Save the colony under a new name, reload that save once, verify it opens normally, and only then disable the mod."
-msgstr "安全移除扫描完成。已转换 {0} 个原质对象（{1:0.##} kg），移除 {2} 个自定义建筑，并返还 {3} 个已存输入对象。请以新名称保存殖民地，重新载入一次并确认可正常打开后，再停用本模组。"
+msgstr "Safe removal scan is complete. Converted {0} Proto-Matter objects ({1:0.##} kg), removed {2} custom buildings, and returned {3} stored input objects. Save the colony under a new name, reload that save once, verify it opens normally, and only then disable the mod."
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.INCOMPLETE"
 msgid "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
-msgstr "安全移除尚未完成，仍有 {0} 个自定义对象。请保持模组启用，必要时重新载入殖民地并再次执行安全移除。暂时不要停用本模组。"
+msgstr "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
 
 

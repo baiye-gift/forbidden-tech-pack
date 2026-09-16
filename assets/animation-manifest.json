@@ -1,0 +1,27 @@
+{
+  "baiye_proto_matter": [
+    "idle"
+  ],
+  "baiye_matter_analyzer": [
+    "off",
+    "idle",
+    "working_loop",
+    "working_pst",
+    "overheat"
+  ],
+  "baiye_mass_crusher": [
+    "off",
+    "idle",
+    "working_loop",
+    "working_pst",
+    "blocked"
+  ],
+  "baiye_matter_compiler": [
+    "off",
+    "idle",
+    "working_loop",
+    "working_pst",
+    "no_coolant",
+    "blocked"
+  ]
+}

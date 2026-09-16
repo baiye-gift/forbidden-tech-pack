@@ -8,7 +8,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     public sealed class BaiyeMatterAnalyzerConfig : IBuildingConfig {
         public override BuildingDef CreateBuildingDef() {
             var buildingDef = BuildingTemplates.CreateBuildingDef(ModIdentity.MatterAnalyzerId,
-                3, 3, "supermaterial_refinery_kanim", 30, 120f,
+                3, 3, "baiye_matter_analyzer_kanim", 30, 120f,
                 new[] { 400f, 100f }, new[] { "RefinedMetal", "Glass" },
                 1600f, BuildLocationRule.OnFloor, BUILDINGS.DECOR.NONE, NOISE_POLLUTION.NONE,
                 0.2f);
