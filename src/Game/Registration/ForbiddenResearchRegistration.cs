@@ -25,6 +25,10 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             };
             var tech = new Tech(ModIdentity.ResearchId,
                 new List<string>(plan.BuildingIds), __instance, costs);
+            tech.costsByResearchTypeID.Clear();
+            foreach (var cost in costs) {
+                tech.costsByResearchTypeID[cost.Key] = cost.Value;
+            }
 
             var prerequisite = __instance.TryGet("MatterDeconstruction");
             if (prerequisite == null) {
