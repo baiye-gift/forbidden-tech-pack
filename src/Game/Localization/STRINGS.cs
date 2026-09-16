@@ -33,6 +33,27 @@ namespace ForbiddenTechnologyPack.Game {
                         public static LocString INACTIVE = "When receiving a Red signal, the Matter Analyzer is disabled.";
                     }
                 }
+
+                public static class BAIYEMATTERCOMPILER {
+                    public static LocString NAME = "Matter Compiler";
+                    public static LocString DESC = "Reassembles Proto-Matter into analyzed solid materials.";
+                    public static LocString EFFECT = "Consumes Proto-Matter and a safe liquid coolant loop to compile unlocked materials.";
+
+                    public static class LOGIC_PORT {
+                        public static LocString NAME = "Enable Matter Compiler";
+                        public static LocString ACTIVE = "When receiving a Green signal, the Matter Compiler may operate.";
+                        public static LocString INACTIVE = "When receiving a Red signal, the Matter Compiler is disabled.";
+                    }
+                }
+            }
+        }
+
+        public static class BUILDING {
+            public static class STATUSITEMS {
+                public static class BAIYEMATTERCOMPILERUNSAFECOOLANT {
+                    public static LocString NAME = "Waiting for Safe Coolant";
+                    public static LocString TOOLTIP = "A liquid packet that can absorb the process heat and an open coolant output are required.";
+                }
             }
         }
     }

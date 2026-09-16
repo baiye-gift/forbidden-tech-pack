@@ -13,7 +13,9 @@ internal static class CoreTestProgram {
                 { "CrusherPolicyTests", CrusherPolicyTests.Run },
                 { "UnlockStateTests", UnlockStateTests.Run },
                 { "RecipeRegistryTests", RecipeRegistryTests.Run },
-                { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run }
+                { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run },
+                { "CoolingMathTests", CoolingMathTests.Run },
+                { "CompilerPolicyTests", CompilerPolicyTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 
