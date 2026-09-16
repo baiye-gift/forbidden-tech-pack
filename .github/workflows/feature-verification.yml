@@ -1,0 +1,22 @@
+name: Feature verification
+
+on:
+  push:
+    branches:
+      - feature/forbidden-technology-pack
+  workflow_dispatch:
+
+jobs:
+  core-and-asset-contracts:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore pinned dependencies
+        shell: pwsh
+        run: ./restore-deps.ps1
+
+      - name: Run core and contract tests
+        shell: pwsh
+        run: ./test.ps1 -Suite All
