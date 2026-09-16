@@ -3,6 +3,7 @@ using System.Linq;
 using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Common;
 using ForbiddenTechnologyPack.Game.Elements;
+using ForbiddenTechnologyPack.Game.Options;
 using UnityEngine;
 using TUNING;
 
@@ -18,8 +19,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
                 1600f, BuildLocationRule.OnFloor, BUILDINGS.DECOR.NONE, NOISE_POLLUTION.NONE,
                 0.2f);
             buildingDef.RequiresPowerInput = true;
-            buildingDef.EnergyConsumptionWhenActive = 2400f;
-            buildingDef.SelfHeatKilowattsWhenActive = 40f;
+            buildingDef.EnergyConsumptionWhenActive = 2400f * ForbiddenTechOptions.Current.PowerMultiplier;
+            buildingDef.SelfHeatKilowattsWhenActive = 40f * ForbiddenTechOptions.Current.HeatMultiplier;
             buildingDef.ExhaustKilowattsWhenActive = 0f;
             buildingDef.ViewMode = OverlayModes.Power.ID;
             buildingDef.PowerInputOffset = new CellOffset(0, 0);
@@ -45,6 +46,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
             fabricator.inStorage = FabricatorSupport.CreateSealedStorage(gameObject, InputCapacityKg, true);
             fabricator.buildStorage = FabricatorSupport.CreateSealedStorage(gameObject, InputCapacityKg, false);
             fabricator.outStorage = FabricatorSupport.CreateSealedStorage(gameObject, OutputCapacityKg, true);
+            fabricator.outStorage.allowItemRemoval = true;
+            fabricator.outStorage.allowUIItemRemoval = true;
             FabricatorSupport.SetStorageFilters(fabricator.inStorage, ElementCatalogAdapter.Rules.Keys
                 .Where(CrusherPolicy.CanCrush).Select(id => new Tag(id)));
             FabricatorSupport.SetStorageFilters(fabricator.outStorage, new[] { ProtoMatterRegistration.Tag });

@@ -9,6 +9,7 @@ $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $powerShellSuites = @{
     'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
     'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
+    'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
 }
 $runAll = @($Suite | Where-Object { $_ -ieq 'All' }).Count -gt 0
 $requestedPowerShellSuites = if ($runAll) {
