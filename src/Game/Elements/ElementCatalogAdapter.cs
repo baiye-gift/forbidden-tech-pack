@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Options;
+using ForbiddenTechnologyPack.Game.Recipes;
 using HarmonyLib;
 using UnityEngine;
 
@@ -122,6 +123,7 @@ namespace ForbiddenTechnologyPack.Game.Elements {
         [HarmonyPostfix]
         public static void Postfix() {
             ElementCatalogAdapter.Build();
+            RecipeRegistry.Build();
         }
     }
 }

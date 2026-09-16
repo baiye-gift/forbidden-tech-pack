@@ -9,7 +9,9 @@ internal static class CoreTestProgram {
                 { "Harness", HarnessTests.Run },
                 { "PackOptionsTests", PackOptionsTests.Run },
                 { "MaterialClassifierTests", MaterialClassifierTests.Run },
-                { "ConversionMathTests", ConversionMathTests.Run }
+                { "ConversionMathTests", ConversionMathTests.Run },
+                { "UnlockStateTests", UnlockStateTests.Run },
+                { "RecipeRegistryTests", RecipeRegistryTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 
