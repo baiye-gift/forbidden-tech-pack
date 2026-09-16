@@ -5,17 +5,33 @@ using HarmonyLib;
 using UnityEngine;
 
 namespace ForbiddenTechnologyPack.Game.Registration {
-    [HarmonyPatch(typeof(Database.Techs), "Init")]
+    [HarmonyPatch(typeof(Database.Techs), "Load")]
     internal static class ForbiddenResearchRegistration {
-        private static bool registered;
-
-        private static void Postfix(Database.Techs __instance) {
-            if (registered || __instance == null) {
+        private static void Prefix(Database.Techs __instance, TextAsset tree_file) {
+            if (__instance == null || tree_file == null ||
+                    __instance.TryGet(ModIdentity.ResearchId) != null) {
                 return;
             }
 
             var plan = RegistrationPolicy.Create(ForbiddenTechOptions.Current);
             if (!plan.HasAnyBuildings) {
+                return;
+            }
+
+            var prerequisite = __instance.TryGet("MatterDeconstruction");
+            if (prerequisite == null) {
+                prerequisite = __instance.TryGet("HighTempForging");
+                Debug.LogWarning("[ForbiddenTechnologyPack] MatterDeconstruction tech was not found; falling back to HighTempForging.");
+            }
+            if (prerequisite == null) {
+                Debug.LogError("[ForbiddenTechnologyPack] Could not find a valid prerequisite for forbidden matter engineering.");
+                return;
+            }
+
+            var tree = new ResourceTreeLoader<ResourceTreeNode>(tree_file);
+            var node = CreateNode(tree, prerequisite.Id);
+            if (node == null) {
+                Debug.LogError("[ForbiddenTechnologyPack] Could not create a research node beside the selected prerequisite.");
                 return;
             }
 
@@ -30,20 +46,72 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 tech.costsByResearchTypeID[cost.Key] = cost.Value;
             }
 
-            var prerequisite = __instance.TryGet("MatterDeconstruction");
-            if (prerequisite == null) {
-                prerequisite = __instance.TryGet("HighTempForging");
-                Debug.LogWarning("[ForbiddenTechnologyPack] MatterDeconstruction tech was not found; falling back to HighTempForging.");
+            tech.SetNode(node, string.Empty);
+            tech.requiredTech.Add(prerequisite);
+            prerequisite.unlockedTech.Add(tech);
+        }
+
+        private static void Postfix(Database.Techs __instance) {
+            var tech = __instance == null ? null : __instance.TryGet(ModIdentity.ResearchId);
+            var techNode = GetNode(tech);
+            if (techNode == null) {
+                return;
             }
 
-            if (prerequisite != null) {
+            var prerequisite = __instance.TryGet("MatterDeconstruction") ??
+                __instance.TryGet("HighTempForging");
+            var prerequisiteNode = GetNode(prerequisite);
+            if (prerequisiteNode == null) {
+                return;
+            }
+
+            tech.SetNode(techNode, prerequisite.category);
+            if (!tech.requiredTech.Contains(prerequisite)) {
                 tech.requiredTech.Add(prerequisite);
+            }
+            if (!prerequisite.unlockedTech.Contains(tech)) {
                 prerequisite.unlockedTech.Add(tech);
-            } else {
-                Debug.LogError("[ForbiddenTechnologyPack] Could not find a valid prerequisite for forbidden matter engineering.");
+            }
+            if (!prerequisiteNode.references.Contains(techNode)) {
+                prerequisiteNode.references.Add(techNode);
+            }
+            if (!prerequisiteNode.edges.Exists(edge => edge.target == techNode)) {
+                prerequisiteNode.edges.Add(new ResourceTreeNode.Edge(prerequisiteNode, techNode,
+                    ResourceTreeNode.Edge.EdgeType.BezierEdge));
+            }
+        }
+
+        private static ResourceTreeNode GetNode(Tech tech) {
+            return tech == null ? null : Traverse.Create(tech).Field<ResourceTreeNode>("node").Value;
+        }
+
+        private static ResourceTreeNode CreateNode(ResourceTreeLoader<ResourceTreeNode> tree,
+                string prerequisiteId) {
+            ResourceTreeNode prerequisiteNode = null;
+            var rightEdge = float.MinValue;
+            foreach (var existingNode in tree) {
+                if (existingNode == null) {
+                    continue;
+                }
+
+                rightEdge = System.Math.Max(rightEdge, existingNode.nodeX + existingNode.width);
+                if (existingNode.Id == prerequisiteId) {
+                    prerequisiteNode = existingNode;
+                }
             }
 
-            registered = true;
+            if (prerequisiteNode == null) {
+                return null;
+            }
+
+            return new ResourceTreeNode {
+                Id = ModIdentity.ResearchId,
+                Name = ModIdentity.ResearchId,
+                nodeX = rightEdge + prerequisiteNode.width,
+                nodeY = prerequisiteNode.nodeY,
+                width = prerequisiteNode.width,
+                height = prerequisiteNode.height
+            };
         }
     }
 }

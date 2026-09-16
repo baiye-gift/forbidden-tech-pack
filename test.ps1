@@ -10,6 +10,7 @@ $powerShellSuites = @{
     'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
     'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
     'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
+    'ResearchRegistrationRuntimeTests' = (Join-Path $projectRoot 'tests\ResearchRegistrationRuntimeTests.ps1')
     'OptionsLocalizationRuntimeTests' = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
     'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
     'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
