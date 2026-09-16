@@ -8,7 +8,16 @@ namespace ForbiddenTechnologyPack.Game.Registration {
     [HarmonyPatch(typeof(Database.Techs), "Load")]
     internal static class ForbiddenResearchRegistration {
         private static void Prefix(Database.Techs __instance, TextAsset tree_file) {
-            if (__instance == null || tree_file == null ||
+            if (__instance == null || tree_file == null) {
+                return;
+            }
+
+            Register(__instance, new ResourceTreeLoader<ResourceTreeNode>(tree_file));
+        }
+
+        private static void Register(Database.Techs __instance,
+                ResourceTreeLoader<ResourceTreeNode> tree) {
+            if (__instance == null || tree == null ||
                     __instance.TryGet(ModIdentity.ResearchId) != null) {
                 return;
             }
@@ -28,7 +37,6 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 return;
             }
 
-            var tree = new ResourceTreeLoader<ResourceTreeNode>(tree_file);
             var node = CreateNode(tree, prerequisite.Id);
             if (node == null) {
                 Debug.LogError("[ForbiddenTechnologyPack] Could not create a research node beside the selected prerequisite.");
