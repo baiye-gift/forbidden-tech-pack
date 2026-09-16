@@ -7,7 +7,9 @@ internal static class CoreTestProgram {
             var suites = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase) {
                 { "Identity", IdentityTests.Run },
                 { "Harness", HarnessTests.Run },
-                { "PackOptionsTests", PackOptionsTests.Run }
+                { "PackOptionsTests", PackOptionsTests.Run },
+                { "MaterialClassifierTests", MaterialClassifierTests.Run },
+                { "ConversionMathTests", ConversionMathTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 
