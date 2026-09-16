@@ -23,17 +23,18 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 { "basic", 120f },
                 { "advanced", 80f }
             };
-            var tech = new Tech(ModIdentity.ResearchId, plan.BuildingIds, __instance, costs);
+            var tech = new Tech(ModIdentity.ResearchId,
+                new List<string>(plan.BuildingIds), __instance, costs);
 
-            var prerequisiteId = __instance.TryGet("MatterDeconstruction") != null
-                ? "MatterDeconstruction"
-                : "HighTempForging";
-            if (prerequisiteId == "HighTempForging") {
+            var prerequisite = __instance.TryGet("MatterDeconstruction");
+            if (prerequisite == null) {
+                prerequisite = __instance.TryGet("HighTempForging");
                 Debug.LogWarning("[ForbiddenTechnologyPack] MatterDeconstruction tech was not found; falling back to HighTempForging.");
             }
 
-            if (__instance.TryGet(prerequisiteId) != null) {
-                __instance.AddPrerequisite(tech, prerequisiteId);
+            if (prerequisite != null) {
+                tech.requiredTech.Add(prerequisite);
+                prerequisite.unlockedTech.Add(tech);
             } else {
                 Debug.LogError("[ForbiddenTechnologyPack] Could not find a valid prerequisite for forbidden matter engineering.");
             }
