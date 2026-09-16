@@ -5,7 +5,8 @@ internal static class CoreTestProgram {
     public static int Main(string[] args) {
         try {
             var suites = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase) {
-                { "Identity", IdentityTests.Run }
+                { "Identity", IdentityTests.Run },
+                { "Harness", HarnessTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 
@@ -37,6 +38,11 @@ internal static class CoreTestProgram {
             throw new ArgumentException("Expected --suite All or a comma-separated suite list.");
         }
 
-        return new List<string>(args[1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+        var suites = new List<string>(args[1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+        if (suites.Count == 0) {
+            throw new ArgumentException("At least one suite name is required.");
+        }
+
+        return suites;
     }
 }

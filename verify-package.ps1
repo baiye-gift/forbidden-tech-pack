@@ -26,7 +26,7 @@ if (Get-ChildItem -LiteralPath $PackagePath -Filter 'PLib.dll' -File -Recurse) {
 $textFiles = Get-ChildItem -LiteralPath $PackagePath -File -Recurse | Where-Object { $_.Extension -in '.yaml', '.json', '.po', '.txt' }
 foreach ($textFile in $textFiles) {
     $content = Get-Content -LiteralPath $textFile.FullName -Raw
-    if ($content -match '(?i)([a-z]:\\|/users/|/home/)') {
+    if ($content -match '(?i)([a-z]:[\\/]|\\\\[^\\/]+[\\/][^\\/]+|//[^/]+/[^/]+|/users/|/home/)') {
         throw "Package text file contains an absolute local path: '$($textFile.FullName)'."
     }
 }

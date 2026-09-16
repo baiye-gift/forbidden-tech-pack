@@ -5,13 +5,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+. (Join-Path $projectRoot 'scripts\Get-CSharpCompiler.ps1')
+$csc = Get-ForbiddenTechnologyCSharpCompiler -ProjectRoot $projectRoot
 $outputDirectory = Join-Path $projectRoot 'test-artifacts'
 $outputAssembly = Join-Path $outputDirectory 'ForbiddenTechnologyPack.CoreTests.exe'
-
-if (-not (Test-Path -LiteralPath $csc)) {
-    throw "C# compiler was not found at '$csc'."
-}
 
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 $sources = @(
@@ -23,7 +20,7 @@ if ($sources.Count -eq 0) {
     throw 'No C# test sources were found.'
 }
 
-& $csc /nologo /target:exe /warn:4 "/out:$outputAssembly" @sources
+& $csc /nologo /target:exe /langversion:7.3 /warn:4 "/out:$outputAssembly" @sources
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }

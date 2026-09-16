@@ -11,7 +11,8 @@ $toolDirectory = Join-Path $projectRoot 'tools'
 $packages = @(
     @{ Name='PLib'; Uri='https://api.nuget.org/v3-flatcontainer/plib/4.25.0/plib.4.25.0.nupkg'; Sha256='5E0042E65BA9401682E9FFDA4E637E5083D4433814A26E52804FBE9BC1758324' },
     @{ Name='ILRepack'; Uri='https://api.nuget.org/v3-flatcontainer/ilrepack/2.0.48/ilrepack.2.0.48.nupkg'; Sha256='799017B829A6ED69FAC0D4FC0A874A4A6A9951F46D73A3CCE20BA016796B949F' },
-    @{ Name='kanimal'; Uri='https://github.com/skairunner/kanimal-SE/releases/download/1.3.31/Windows.NET.dependent.zip'; Sha256='363C62CD38B7FDD5E14FAD7AF7D187CB94BCD61D5FA0EC7FAEBB4A9FB5413AAE' }
+    @{ Name='kanimal'; Uri='https://github.com/skairunner/kanimal-SE/releases/download/1.3.31/Windows.NET.dependent.zip'; Sha256='363C62CD38B7FDD5E14FAD7AF7D187CB94BCD61D5FA0EC7FAEBB4A9FB5413AAE' },
+    @{ Name='Roslyn'; Uri='https://api.nuget.org/v3-flatcontainer/microsoft.net.compilers.toolset/4.8.0/microsoft.net.compilers.toolset.4.8.0.nupkg'; Sha256='37333F4F1E2CE55E621355D6DA651DC23D4CB5F94A8F76B9478816E87F110AD9' }
 )
 
 function Get-VerifiedArchive([hashtable]$package) {
@@ -65,5 +66,13 @@ Copy-Item -Path (Join-Path $ilRepack.Directory.FullName '*') -Destination $toolD
 
 $kanimal = Get-RequiredFile (Join-Path $workingDirectory 'kanimal') 'kanimal-cli.exe'
 Copy-Item -Path (Join-Path $kanimal.Directory.FullName '*') -Destination $toolDirectory -Recurse -Force
+
+$roslyn = Get-RequiredFile (Join-Path $workingDirectory 'Roslyn') 'csc.exe'
+$roslynDirectory = Join-Path $toolDirectory 'roslyn'
+if (Test-Path -LiteralPath $roslynDirectory) {
+    Remove-Item -LiteralPath $roslynDirectory -Recurse -Force
+}
+New-Item -ItemType Directory -Force -Path $roslynDirectory | Out-Null
+Copy-Item -Path (Join-Path $roslyn.Directory.FullName '*') -Destination $roslynDirectory -Recurse -Force
 
 Write-Host 'Dependencies restored and verified.'

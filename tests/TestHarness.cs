@@ -56,6 +56,12 @@ internal static class AssertEx {
     }
 
     public static void Near(double expected, double actual, double tolerance, string message) {
+        if (double.IsNaN(expected) || double.IsInfinity(expected) ||
+            double.IsNaN(actual) || double.IsInfinity(actual) ||
+            double.IsNaN(tolerance) || double.IsInfinity(tolerance) || tolerance < 0.0) {
+            throw new ArgumentOutOfRangeException("tolerance", message + ": expected, actual, and tolerance must be finite; tolerance must be non-negative.");
+        }
+
         if (Math.Abs(expected - actual) > tolerance) {
             throw new InvalidOperationException(message + ": expected '" + expected + "' +/- " + tolerance + ", got '" + actual + "'.");
         }

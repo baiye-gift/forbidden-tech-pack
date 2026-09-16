@@ -15,9 +15,10 @@ $toolDirectory = Join-Path $projectRoot 'tools'
 $ilRepack = Join-Path $toolDirectory 'ILRepack.exe'
 $packageDirectory = Join-Path $projectRoot 'dist\ForbiddenTechnologyPack'
 $packageAssembly = Join-Path $packageDirectory 'ForbiddenTechnologyPack.dll'
-$frameworkCsc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+. (Join-Path $projectRoot 'scripts\Get-CSharpCompiler.ps1')
+$compiler = Get-ForbiddenTechnologyCSharpCompiler -ProjectRoot $projectRoot
 
-foreach ($requiredPath in @($managedDirectory, $plib, $frameworkCsc, $ilRepack)) {
+foreach ($requiredPath in @($managedDirectory, $plib, $ilRepack)) {
     if (-not (Test-Path -LiteralPath $requiredPath)) {
         throw "Required build input was not found: '$requiredPath'. Run .\\restore-deps.ps1 before building."
     }
@@ -53,15 +54,10 @@ if (Test-Path -LiteralPath $packageDirectory) {
 }
 New-Item -ItemType Directory -Force -Path $packageDirectory | Out-Null
 
-# ONI mods target C# 7.3. Some older Windows installations expose only the legacy
-# framework compiler; fall back to its highest compatible language mode so this
-# package remains buildable there until a modern SDK is installed.
-$compilerHelp = (& $frameworkCsc /nologo /help 2>&1) -join "`n"
-$languageArgument = if ($compilerHelp -match '7\.3') { '/langversion:7.3' } else { '/langversion:5' }
-$compilerArguments = @('/nologo', '/target:library', $languageArgument, '/warn:4', "/out:$rawAssembly")
+$compilerArguments = @('/nologo', '/target:library', '/langversion:7.3', '/warn:4', "/out:$rawAssembly")
 $compilerArguments += $references | ForEach-Object { "/reference:$_" }
 $compilerArguments += $sources
-& $frameworkCsc @compilerArguments
+& $compiler @compilerArguments
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
