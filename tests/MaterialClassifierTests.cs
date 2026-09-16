@@ -59,6 +59,14 @@ internal static class MaterialClassifierTests {
         AssertEx.False(MaterialClassifier.TryCreateRule(
             ElementDescriptor.Solid("Thermium", "Endgame"), noAdvanced, out _), "endgame switch");
         AssertEx.False(MaterialClassifier.TryCreateRule(
+            ElementDescriptor.Solid("Tungsten", "Endgame", "Rare", "Industrial", "Common"),
+            PackOptions.Resolve(new RawOptions {
+                Preset = BalancePreset.Custom,
+                AllowIndustrial = true,
+                AllowRare = true,
+                AllowEndgame = false
+            }), out _), "higher disabled tier does not downgrade");
+        AssertEx.False(MaterialClassifier.TryCreateRule(
             ElementDescriptor.Solid("Mystery", "Metal"), strong, out _), "unknown tier denied");
     }
 }

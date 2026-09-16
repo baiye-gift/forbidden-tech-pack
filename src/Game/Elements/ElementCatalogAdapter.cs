@@ -9,10 +9,10 @@ using UnityEngine;
 namespace ForbiddenTechnologyPack.Game.Elements {
     public static class ElementCatalogAdapter {
         private static readonly ISet<string> EndgameIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "Thermium", "SuperInsulator", "Fullerene", "Isoresin", "Niobium"
+            "TempConductorSolid", "Tungsten", "SuperInsulator", "Isoresin"
         };
         private static readonly ISet<string> RareIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "Diamond", "EnrichedUranium", "Radium", "UraniumOre", "Iridium"
+            "Diamond", "EnrichedUranium", "Radium", "UraniumOre", "Iridium", "Niobium", "Fullerene"
         };
         private static readonly ISet<string> IndustrialTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
             "RefinedMetal", "ManufacturedMaterial", "Plastic", "Rubber", "Glass", "Steel"

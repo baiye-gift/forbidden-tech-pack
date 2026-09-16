@@ -1,5 +1,7 @@
-msgid "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME"
+msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME"
+msgid "Proto-Matter"
 msgstr "原质"
 
-msgid "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC"
+msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC"
+msgid "A compact, transportable substrate produced by forbidden matter processing."
 msgstr "由禁忌物质处理生成的紧凑、可运输基质。"
