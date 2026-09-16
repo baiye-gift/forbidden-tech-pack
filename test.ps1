@@ -10,6 +10,7 @@ $powerShellSuites = @{
     'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
     'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
     'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
+    'OptionsLocalizationRuntimeTests' = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
     'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
     'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
     'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
@@ -23,7 +24,10 @@ $requestedPowerShellSuites = if ($runAll) {
 }
 if ($requestedPowerShellSuites.Count -gt 0) {
     foreach ($suiteName in $requestedPowerShellSuites) {
-        & $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
+        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
     }
 }
 
