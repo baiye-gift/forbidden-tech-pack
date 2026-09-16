@@ -35,12 +35,20 @@ if (-not (Test-Path -LiteralPath $animDirectory -PathType Container)) {
 }
 
 foreach ($name in $manifest.PSObject.Properties.Name) {
+    $animationPackage = Join-Path $animDirectory ("forbidden_technology\$name")
+    if (-not (Test-Path -LiteralPath $animationPackage -PathType Container)) {
+        throw "Package is missing loadable KAnim directory 'anim\forbidden_technology\$name'."
+    }
     foreach ($suffix in @('.png', '_anim.bytes', '_build.bytes')) {
-        $assetPath = Join-Path $animDirectory ($name + $suffix)
+        $assetPath = Join-Path $animationPackage ($name + $suffix)
         if (-not (Test-Path -LiteralPath $assetPath -PathType Leaf)) {
             throw "Package is missing required KAnim asset '$($name + $suffix)'."
         }
     }
+}
+
+if (Get-ChildItem -LiteralPath $animDirectory -File) {
+    throw 'Package contains KAnim files directly in anim; ONI only scans anim/<group>/<resource>/ directories.'
 }
 
 $baseGameAnimationNames = @(
