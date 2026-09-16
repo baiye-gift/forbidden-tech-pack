@@ -31,7 +31,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
                 StringComparer.Ordinal);
             var visibleIds = AnalyzerPolicy.VisibleRuleIds(rules, saveData.GetUnlockState(), activeIds);
             MatterAnalyzerRecipeList.Set(this, visibleIds.Where(RecipeRegistry.AnalyzerRecipes.ContainsKey)
-                .Select(id => RecipeRegistry.AnalyzerRecipes[id]).ToList());
+                .Select(id => RecipeRegistry.AnalyzerRecipes[id]).ToArray());
         }
 
         private void SubscribeToUnlocks() {
@@ -71,7 +71,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
         private static readonly System.Reflection.FieldInfo RecipeListField =
             AccessTools.Field(typeof(ComplexFabricator), "recipe_list");
 
-        internal static void Set(ComplexFabricator fabricator, List<ComplexRecipe> recipes) {
+        internal static void Set(ComplexFabricator fabricator, ComplexRecipe[] recipes) {
             if (RecipeListField == null) {
                 throw new MissingFieldException(typeof(ComplexFabricator).FullName, "recipe_list");
             }
