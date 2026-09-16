@@ -12,6 +12,7 @@ $powerShellSuites = @{
     'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
     'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
     'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
+    'ReleaseWorkflowContractTests' = (Join-Path $projectRoot 'tests\ReleaseWorkflowContractTests.ps1')
 }
 $runAll = @($Suite | Where-Object { $_ -ieq 'All' }).Count -gt 0
 $requestedPowerShellSuites = if ($runAll) {
