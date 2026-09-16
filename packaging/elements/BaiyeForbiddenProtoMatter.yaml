@@ -1,0 +1,26 @@
+elements:
+  - elementId: BaiyeForbiddenProtoMatter
+    maxMass: 20000
+    specificHeatCapacity: 1.0
+    thermalConductivity: 0.1
+    solidSurfaceAreaMultiplier: 1
+    liquidSurfaceAreaMultiplier: 1
+    gasSurfaceAreaMultiplier: 1
+    lowTemp: 1
+    highTemp: 9999
+    lowTempTransitionTarget: SolidCarbonDioxide
+    highTempTransitionTarget: MoltenTungsten
+    defaultTemperature: 293.15
+    defaultMass: 100
+    molarMass: 100
+    toxicity: 0
+    lightAbsorptionFactor: 0.5
+    radiationAbsorptionFactor: 0.5
+    radiationPer1000Mass: 0
+    tags:
+      - BaiyeProtoMatter
+    isDisabled: false
+    state: Solid
+    localizationID: STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME
+    description: STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC
+    dlcId: ""

@@ -70,7 +70,7 @@ if ($LASTEXITCODE -ne 0) {
 Copy-Item -LiteralPath (Join-Path $projectRoot 'packaging\mod.yaml') -Destination $packageDirectory
 Copy-Item -LiteralPath (Join-Path $projectRoot 'packaging\mod_info.yaml') -Destination $packageDirectory
 foreach ($assetDirectory in @('elements', 'anim', 'translations')) {
-    $assetSource = Join-Path $projectRoot $assetDirectory
+    $assetSource = Join-Path (Join-Path $projectRoot 'packaging') $assetDirectory
     if (Test-Path -LiteralPath $assetSource) {
         Copy-Item -LiteralPath $assetSource -Destination (Join-Path $packageDirectory $assetDirectory) -Recurse -Force
     }

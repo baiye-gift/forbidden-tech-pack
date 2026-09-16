@@ -5,6 +5,31 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+$powerShellSuites = @{
+    'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
+}
+$runAll = @($Suite | Where-Object { $_ -ieq 'All' }).Count -gt 0
+$requestedPowerShellSuites = if ($runAll) {
+    @($powerShellSuites.Keys)
+} else {
+    @($Suite | Where-Object { $powerShellSuites.ContainsKey($_) })
+}
+if ($requestedPowerShellSuites.Count -gt 0) {
+    foreach ($suiteName in $requestedPowerShellSuites) {
+        & $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
+    }
+}
+
+$csharpSuites = if ($runAll) {
+    @('All')
+} else {
+    @($Suite | Where-Object { -not $powerShellSuites.ContainsKey($_) })
+}
+if ($csharpSuites.Count -eq 0) {
+    exit 0
+}
+
 . (Join-Path $projectRoot 'scripts\Get-CSharpCompiler.ps1')
 $csc = Get-ForbiddenTechnologyCSharpCompiler -ProjectRoot $projectRoot
 $outputDirectory = Join-Path $projectRoot 'test-artifacts'
@@ -25,5 +50,5 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-& $outputAssembly --suite ($Suite -join ',')
+& $outputAssembly --suite ($csharpSuites -join ',')
 exit $LASTEXITCODE
