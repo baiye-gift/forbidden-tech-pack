@@ -10,6 +10,7 @@ internal static class CoreTestProgram {
                 { "PackOptionsTests", PackOptionsTests.Run },
                 { "MaterialClassifierTests", MaterialClassifierTests.Run },
                 { "ConversionMathTests", ConversionMathTests.Run },
+                { "CrusherPolicyTests", CrusherPolicyTests.Run },
                 { "UnlockStateTests", UnlockStateTests.Run },
                 { "RecipeRegistryTests", RecipeRegistryTests.Run },
                 { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run }

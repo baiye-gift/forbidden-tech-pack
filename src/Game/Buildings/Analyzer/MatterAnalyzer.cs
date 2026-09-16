@@ -6,6 +6,7 @@ using ForbiddenTechnologyPack.Game.Recipes;
 using ForbiddenTechnologyPack.Game.Save;
 using ForbiddenTechnologyPack.Game.Elements;
 using HarmonyLib;
+using ForbiddenTechnologyPack.Game.Buildings.Common;
 
 namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     public sealed class MatterAnalyzer : ComplexFabricator {
@@ -68,14 +69,9 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     }
 
     internal static class MatterAnalyzerRecipeList {
-        private static readonly System.Reflection.FieldInfo RecipeListField =
-            AccessTools.Field(typeof(ComplexFabricator), "recipe_list");
-
         internal static void Set(ComplexFabricator fabricator, ComplexRecipe[] recipes) {
-            if (RecipeListField == null) {
-                throw new MissingFieldException(typeof(ComplexFabricator).FullName, "recipe_list");
-            }
-            RecipeListField.SetValue(fabricator, recipes);
+            FabricatorSupport.SetRecipeList(fabricator, recipes);
         }
     }
+
 }
