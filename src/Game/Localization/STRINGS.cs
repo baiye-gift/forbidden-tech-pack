@@ -66,5 +66,20 @@ namespace ForbiddenTechnologyPack.Game {
                 }
             }
         }
+
+        public static class UI {
+            public static class SAFEREMOVAL {
+                public static LocString TITLE = "Safe Removal - Forbidden Technology Pack";
+                public static LocString FIRST_WARNING = "This workflow permanently prepares the current colony for disabling this mod. It will stop the forbidden matter machines, return their stored inputs, and remove the custom buildings. Continue only after making a normal save first.";
+                public static LocString SECOND_WARNING = "Final confirmation: convert every Proto-Matter object to Igneous Rock and stop/remove all forbidden matter buildings now? Completed ordinary outputs are preserved. This action cannot be undone except by reloading an earlier save.";
+                public static LocString CONTINUE = "Continue";
+                public static LocString CONVERT_AND_STOP = "Convert Proto-Matter and Stop Buildings";
+                public static LocString CANCEL = "Cancel";
+                public static LocString CLOSE = "Close";
+                public static LocString NO_ACTIVE_GAME = "Load the colony you want to prepare before starting safe removal.";
+                public static LocString SUCCESS = "Safe removal scan is complete. Converted {0} Proto-Matter objects ({1:0.##} kg), removed {2} custom buildings, and returned {3} stored input objects. Save the colony under a new name, reload that save once, verify it opens normally, and only then disable the mod.";
+                public static LocString INCOMPLETE = "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet.";
+            }
+        }
     }
 }

@@ -13,11 +13,19 @@ namespace ForbiddenTechnologyPack.Game.Save {
         [Serialize]
         private List<string> unlockedElementIds = new List<string>();
 
+        [Serialize]
+        private bool safeRemovalStarted;
+
         private UnlockState unlockState;
 
         public static ForbiddenTechSaveData Instance { get; private set; }
 
         public event System.Action UnlocksChanged;
+        public event System.Action SafeRemovalChanged;
+
+        public bool SafeRemovalStarted {
+            get { return safeRemovalStarted; }
+        }
 
         protected override void OnSpawn() {
             base.OnSpawn();
@@ -36,7 +44,7 @@ namespace ForbiddenTechnologyPack.Game.Save {
 
         public bool Unlock(Tag elementTag) {
             EnsureState();
-            if (!elementTag.IsValid || !unlockState.Unlock(elementTag.Name)) {
+            if (safeRemovalStarted || !elementTag.IsValid || !unlockState.Unlock(elementTag.Name)) {
                 return false;
             }
 
@@ -56,6 +64,18 @@ namespace ForbiddenTechnologyPack.Game.Save {
         public UnlockState GetUnlockState() {
             EnsureState();
             return UnlockState.FromSerialized(unlockState.Version, unlockState.ToSerialized());
+        }
+
+        public bool BeginSafeRemoval() {
+            if (safeRemovalStarted) {
+                return false;
+            }
+            safeRemovalStarted = true;
+            var handler = SafeRemovalChanged;
+            if (handler != null) {
+                handler();
+            }
+            return true;
         }
 
         private void EnsureState() {

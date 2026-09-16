@@ -1,4 +1,5 @@
 using ForbiddenTechnologyPack.Core;
+using ForbiddenTechnologyPack.Game.Safety;
 using Newtonsoft.Json;
 using PeterHan.PLib.Options;
 
@@ -64,6 +65,11 @@ namespace ForbiddenTechnologyPack.Game.Options {
         [JsonProperty]
         [Option("Consume Analyzer Samples", "Custom preset only.")]
         public bool ConsumeSamples { get; set; } = true;
+
+        [Option("Prepare Safe Removal", "Use this before disabling the mod in a colony. It converts Proto-Matter and removes custom buildings only after two confirmations.")]
+        public System.Action<object> PrepareSafeRemoval {
+            get { return SafeRemovalDialog.ShowFirstConfirmation; }
+        }
 
         public static void Load() {
             var settings = POptions.ReadSettings<ForbiddenTechOptions>();

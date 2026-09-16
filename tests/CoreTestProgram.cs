@@ -16,7 +16,8 @@ internal static class CoreTestProgram {
                 { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run },
                 { "CoolingMathTests", CoolingMathTests.Run },
                 { "CompilerPolicyTests", CompilerPolicyTests.Run },
-                { "RegistrationPolicyTests", RegistrationPolicyTests.Run }
+                { "RegistrationPolicyTests", RegistrationPolicyTests.Run },
+                { "SafeRemovalTests", SafeRemovalTests.Run }
             };
             var requestedSuites = ParseSuites(args);
 
