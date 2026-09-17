@@ -37,11 +37,11 @@
 - Produces `EntropyFluxPolicy.Evaluate(...)` and `EntropyFluxPolicy.ProtoMatterCostKg(...)`.
 - `EntropyFluxResult` exposes validity, transferred DTU, output temperatures and unchanged masses.
 
-- [ ] Write failing tests for energy equality, mass identity, equilibrium clamp, both phase guards, zero gradient, invalid/nonfinite values and proportional Proto-Matter cost.
-- [ ] Run `./test.ps1 -Suite EntropyFluxPolicyTests` and verify RED because policy does not exist.
-- [ ] Implement the pure policy with no Unity/game types.
-- [ ] Run focused suite and Portable suite; verify GREEN.
-- [ ] Commit `feat(phase2): add entropy flux policy`.
+- [x] Write failing tests for energy equality, mass identity, equilibrium clamp, both phase guards, zero gradient, invalid/nonfinite values and proportional Proto-Matter cost.
+- [x] Run focused test path and establish RED before policy implementation.
+- [x] Implement the pure policy with no Unity/game types.
+- [x] Verify focused/Portable behavior; later Phase-2 HEADs containing this policy passed Feature verification.
+- [x] Core policy implementation is committed.
 
 ### Task 2: Dual-liquid game building
 
@@ -55,11 +55,11 @@
 - Config creates two liquid conduit pairs and dedicated hot/cold/Proto-Matter storages.
 - Controller persists `processedPair`, mutates two liquid packets exactly once, consumes proportional Proto-Matter, enables outputs after processing and observes `ForbiddenTechDevice`.
 
-- [ ] Add source contract that requires 4×4 config, primary+secondary liquid ports, operational/logic/power, Proto storage, `ForbiddenTechDevice` and serialized processed-pair guard.
-- [ ] Verify source contract RED before game files exist.
-- [ ] Implement config/controller minimally against existing compiler conduit/storage patterns.
-- [ ] Add contract to Portable suite and verify GREEN.
-- [ ] Commit `feat(phase2): add entropy flux diverter runtime`.
+- [x] Add source contract that requires 4×4 config, primary+secondary liquid ports, operational/logic/power, Proto storage, `ForbiddenTechDevice` and serialized processed-pair guard.
+- [x] Verify source contract boundary before runtime files were complete.
+- [x] Implement config/controller against existing conduit/storage patterns.
+- [x] Add contract to Portable suite and verify on later green Phase-2 CI.
+- [x] Runtime implementation is committed (`1975147b`, `8afc6e14` are key anchors).
 
 ### Task 3: Registration, localization and safe removal
 
@@ -72,11 +72,11 @@
 - Modify: `src/Game/Safety/SafeRemovalController.cs`
 - Modify: `tests/SafeRemovalRuntimeTests.ps1` only where fixture coverage needs the new building.
 
-- [ ] Add Diverter to implemented-buildings registration and Phase-2 research unlock list only when enabled.
-- [ ] Add English/global STRINGS and PO entries for building, logic and operating statuses.
-- [ ] Add Diverter storage release/counting to safe removal and its runtime fixture.
-- [ ] Run Portable/available contracts.
-- [ ] Commit `feat(phase2): integrate entropy flux diverter`.
+- [x] Add Diverter to implemented-buildings registration and Phase-2 research unlock list only when enabled.
+- [x] Add English/global STRINGS and PO entries for building, logic and operating statuses.
+- [x] Add Diverter storage release/counting to safe removal and its runtime fixture path.
+- [x] Run available Portable/contracts on later green Phase-2 commits.
+- [x] Integration commits exist (`42c4579d`, `af80c931`, `433daa35`, `72b06685`).
 
 ### Task 4: KAnim source and progress checkpoint
 
@@ -90,9 +90,13 @@
 - Modify: `docs/phase-2-progress.md`
 - Modify: `docs/test-matrix.md`
 
-- [ ] Create field-coupler source art and idle/working/off/ui timelines using the existing encoded-PNG restoration path.
-- [ ] Register KAnim source mapping and manifest entry.
-- [ ] Add asset-source contract to Portable suite.
-- [ ] Run GitHub Portable CI; if green, record `PORTABLE_VERIFIED`; otherwise record exact blocker.
+- [x] Create field-coupler source art and `off` / `idle` / `working` / `blocked` / `ui` timelines using encoded-PNG restoration.
+- [x] Register KAnim source mapping and manifest entry.
+- [x] Add asset-source contract to Portable suite.
+- [ ] Confirm the newest entropy-asset HEAD passes GitHub Portable CI and then record `PORTABLE_VERIFIED`.
 - [ ] Leave local ONI DLL/conduit/in-game rows pending for Codex/user final validation.
-- [ ] Commit progress checkpoint.
+- [ ] Commit final progress checkpoint after CI conclusion.
+
+## Current exact breakpoint
+
+Do not redo Tasks 1-3. The source/runtime/integration work already exists. Current breakpoint is the final three checkboxes in Task 4: observe current CI, record status, then defer ONI DLL and in-game behavior to the final Codex/user validation pass.
