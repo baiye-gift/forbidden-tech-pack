@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/forbidden-technology-pack
+      - feature/baiye-20260917-phase2-protomatter-field
   workflow_dispatch:
 
 jobs:
