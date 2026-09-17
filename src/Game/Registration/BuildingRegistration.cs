@@ -12,7 +12,8 @@ namespace ForbiddenTechnologyPack.Game.Registration {
         private static readonly string[] AllBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
-            ModIdentity.MatterCompilerId
+            ModIdentity.MatterCompilerId,
+            ModIdentity.MatterReconstructorId
         };
 
         private static readonly HashSet<string> AddedMenuEntries =
