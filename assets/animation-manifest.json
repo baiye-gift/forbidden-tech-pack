@@ -42,5 +42,12 @@
     "working_pst_complete",
     "blocked",
     "ui"
+  ],
+  "baiye_entropy_flux_diverter": [
+    "off",
+    "idle",
+    "working",
+    "blocked",
+    "ui"
   ]
 }
