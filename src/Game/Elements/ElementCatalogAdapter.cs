@@ -19,10 +19,10 @@ namespace ForbiddenTechnologyPack.Game.Elements {
             "RefinedMetal", "ManufacturedMaterial", "Plastic", "Rubber", "Glass", "Steel"
         };
         private static readonly ISet<string> OreOrOrganicTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "Organics", "ConsumableOre"
+            "Organics", "ConsumableOre", "MetalOre", "Organic"
         };
         private static readonly ISet<string> CommonTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "Farmable", "Agriculture", "BuildableRaw", "RawMineral"
+            "Farmable", "Agriculture", "BuildableRaw", "RawMineral", "Agricultural"
         };
         private static IReadOnlyDictionary<string, MaterialRule> rules =
             new ReadOnlyDictionary<string, MaterialRule>(new Dictionary<string, MaterialRule>(StringComparer.Ordinal));

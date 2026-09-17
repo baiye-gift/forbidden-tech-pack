@@ -21,7 +21,6 @@ if ($LASTEXITCODE -ne 0) {
 New-Item -ItemType Directory -Force -Path $probeDirectory | Out-Null
 $source = @'
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -76,6 +75,51 @@ internal static class ElementCatalogRuntimeProbe {
         }
     }
 
+    private static IEnumerable<string> InlineStrings(MethodInfo caller) {
+        var body = caller.GetMethodBody();
+        if (body == null) {
+            yield break;
+        }
+
+        var il = body.GetILAsByteArray();
+        for (var offset = 0; offset < il.Length;) {
+            short value = il[offset++];
+            if (value == 0xfe) {
+                value = (short)(0xfe00 | il[offset++]);
+            }
+
+            OpCode opCode;
+            if (!OpCodesByValue.TryGetValue(value, out opCode)) {
+                throw new InvalidOperationException("Unknown IL opcode: " + value);
+            }
+
+            if (opCode.OperandType == OperandType.InlineString) {
+                var token = BitConverter.ToInt32(il, offset);
+                yield return caller.Module.ResolveString(token);
+            }
+            offset += OperandSize(opCode.OperandType, il, offset);
+        }
+    }
+
+    private static bool EndsWithFalseReturn(MethodInfo method) {
+        var body = method.GetMethodBody();
+        if (body == null) {
+            return false;
+        }
+        var il = body.GetILAsByteArray();
+        return il.Length >= 2 && il[il.Length - 2] == OpCodes.Ldc_I4_0.Value &&
+            il[il.Length - 1] == OpCodes.Ret.Value;
+    }
+
+    private static void AssertCanonicalTag(MethodInfo addClassificationTags, string sourceTag,
+            string expectedCanonicalTag) {
+        var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { sourceTag };
+        addClassificationTags.Invoke(null, new object[] { tags, "LegacyFixture" });
+        if (!tags.Contains(expectedCanonicalTag)) {
+            throw new InvalidOperationException(sourceTag + " must canonicalize to " + expectedCanonicalTag + ".");
+        }
+    }
+
     private static int OperandSize(OperandType operandType, byte[] il, int offset) {
         switch (operandType) {
         case OperandType.InlineNone:
@@ -106,14 +150,6 @@ internal static class ElementCatalogRuntimeProbe {
         }
     }
 
-    private static bool Rejects(MethodInfo method, string contentId) {
-        try {
-            return !(bool)method.Invoke(null, new object[] { contentId });
-        } catch (Exception) {
-            return true;
-        }
-    }
-
     private static int Main(string[] args) {
         if (args.Length != 3) {
             Console.Error.WriteLine("Expected game-managed, mod-assembly, and library-directory arguments.");
@@ -134,6 +170,8 @@ internal static class ElementCatalogRuntimeProbe {
                 throw new InvalidOperationException("The current game assembly must expose both DLC query APIs.");
             }
 
+            var expansion1Id = (string)manager.GetField("EXPANSION1_ID",
+                BindingFlags.Public | BindingFlags.Static).GetValue(null);
             for (var number = 2; number <= 5; number++) {
                 var fieldName = "DLC" + number + "_ID";
                 var field = manager.GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
@@ -144,9 +182,23 @@ internal static class ElementCatalogRuntimeProbe {
                 if (string.IsNullOrEmpty(id)) {
                     throw new InvalidOperationException(fieldName + " must have a non-empty value.");
                 }
-                if (!Rejects(obsolete, id)) {
-                    throw new InvalidOperationException("IsContentActive must reject newer DLC: " + id);
+                if (string.Equals(id, expansion1Id, StringComparison.Ordinal)) {
+                    throw new InvalidOperationException(fieldName + " must be distinct from EXPANSION1_ID.");
                 }
+            }
+
+            var obsoleteStrings = InlineStrings(obsolete).ToArray();
+            var obsoleteCalls = CalledMethods(obsolete).ToArray();
+            var equalityCount = obsoleteCalls.Count(method => method.DeclaringType == typeof(string) &&
+                string.Equals(method.Name, "op_Equality", StringComparison.Ordinal));
+            var callsSubscribedFromLegacyApi = obsoleteCalls.Any(method => method.DeclaringType == manager &&
+                string.Equals(method.Name, "IsContentSubscribed", StringComparison.Ordinal));
+            const string newerDlcError = "IsContentActive was called with a newer DLC which is not allowed.";
+            if (equalityCount != 2 || !obsoleteStrings.Contains(string.Empty) ||
+                    !obsoleteStrings.Contains(expansion1Id) || !obsoleteStrings.Contains(newerDlcError) ||
+                    !callsSubscribedFromLegacyApi || !EndsWithFalseReturn(obsolete)) {
+                throw new InvalidOperationException(
+                    "Current IsContentActive IL must permit only vanilla/EXPANSION1 before its explicit newer-DLC false path.");
             }
 
             Assembly.LoadFrom(Path.Combine(gameManaged, "Assembly-CSharp.dll"));
@@ -156,6 +208,14 @@ internal static class ElementCatalogRuntimeProbe {
             if (isDlcActive == null) {
                 throw new InvalidOperationException("ElementCatalogAdapter.IsDlcActive was not found.");
             }
+            var addClassificationTags = adapter.GetMethod("AddClassificationTags",
+                BindingFlags.Static | BindingFlags.NonPublic);
+            if (addClassificationTags == null) {
+                throw new InvalidOperationException("ElementCatalogAdapter.AddClassificationTags was not found.");
+            }
+            AssertCanonicalTag(addClassificationTags, "MetalOre", "OreOrOrganic");
+            AssertCanonicalTag(addClassificationTags, "Organic", "OreOrOrganic");
+            AssertCanonicalTag(addClassificationTags, "Agricultural", "Common");
 
             var calls = CalledMethods(isDlcActive).ToArray();
             var callsSubscribed = calls.Any(method => method.DeclaringType == manager &&
@@ -170,6 +230,8 @@ internal static class ElementCatalogRuntimeProbe {
             if (!(bool)isDlcActive.Invoke(null, new object[] { string.Empty })) {
                 throw new InvalidOperationException("Vanilla elements with an empty DLC ID must remain active.");
             }
+            Console.WriteLine(
+                "DLC boolean invocation is limited to the initialization-free vanilla path; subscription semantics are characterized by real IL because Unity/platform initialization is unavailable in this probe.");
             Console.WriteLine("Element catalog runtime contract passed.");
             return 0;
         } catch (Exception exception) {

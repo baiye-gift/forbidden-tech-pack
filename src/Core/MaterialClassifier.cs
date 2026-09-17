@@ -66,13 +66,14 @@ namespace ForbiddenTechnologyPack.Core {
             }
             if (element.Tags.Contains("OreOrOrganic") ||
                     (element.Tags.Contains("Metal") && element.Tags.Contains("Ore")) ||
-                    element.Tags.Contains("Organics") || element.Tags.Contains("ConsumableOre")) {
+                    element.Tags.Contains("Organics") || element.Tags.Contains("ConsumableOre") ||
+                    element.Tags.Contains("MetalOre") || element.Tags.Contains("Organic")) {
                 tier = MaterialTier.OreOrOrganic;
                 return true;
             }
             if (element.Tags.Contains("Common") || element.Tags.Contains("Farmable") ||
                     element.Tags.Contains("Agriculture") || element.Tags.Contains("BuildableRaw") ||
-                    element.Tags.Contains("RawMineral")) {
+                    element.Tags.Contains("RawMineral") || element.Tags.Contains("Agricultural")) {
                 tier = MaterialTier.Common;
                 return true;
             }

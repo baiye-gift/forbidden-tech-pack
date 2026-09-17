@@ -34,6 +34,15 @@ internal static class MaterialClassifierTests {
         AssertEx.Equal(MaterialTier.Common,
             MaterialClassifier.CreateRule(ElementDescriptor.Solid("Granite", "BuildableRaw"), strong).Tier,
             "buildable raw tier");
+        AssertEx.Equal(MaterialTier.OreOrOrganic,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("LegacyCopperOre", "MetalOre"), strong).Tier,
+            "legacy metal ore tier");
+        AssertEx.Equal(MaterialTier.OreOrOrganic,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("LegacyOrganic", "Organic"), strong).Tier,
+            "legacy organic tier");
+        AssertEx.Equal(MaterialTier.Common,
+            MaterialClassifier.CreateRule(ElementDescriptor.Solid("LegacyAgricultural", "Agricultural"), strong).Tier,
+            "legacy agricultural tier");
         AssertEx.True(MaterialClassifier.TryCreateRule(
             ElementDescriptor.Solid("Steel", "Industrial"), strong, out _), "industrial allowed");
         AssertEx.True(MaterialClassifier.TryCreateRule(
@@ -45,6 +54,9 @@ internal static class MaterialClassifierTests {
             ElementDescriptor.SpecialSolid("Unobtanium"), strong, out _), "neutronium denied");
         AssertEx.False(MaterialClassifier.TryCreateRule(
             ElementDescriptor.NonSolid("Water"), strong, out _), "liquid denied");
+        AssertEx.False(MaterialClassifier.TryCreateRule(
+            new ElementDescriptor("Oxygen", "Gas", new[] { "Common" }, true, true, false), strong, out _),
+            "gas denied");
         AssertEx.False(MaterialClassifier.TryCreateRule(
             ElementDescriptor.Solid("MushBar", "Food"), strong, out _), "food denied");
         AssertEx.False(MaterialClassifier.TryCreateRule(
