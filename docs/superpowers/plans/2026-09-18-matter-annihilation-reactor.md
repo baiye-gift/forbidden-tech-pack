@@ -33,15 +33,15 @@
 
 **Interfaces:**
 - `ReactorState` enum.
-- `AnnihilationReactorPolicy.Next(state, healthy, startRequested, stopRequested, elapsedSeconds)`.
+- `AnnihilationReactorPolicy.Next(...)`.
 - `CalculateProtoMatterLoss(availableKg)` and `CalculateHeatPulseDtu(lostKg, heatMultiplier)`.
 
-- [ ] Add failing tests for every healthy/degraded/recovery timing edge plus invalid elapsed input.
-- [ ] Add loss clamp and finite/non-negative heat-pulse tests.
-- [ ] Verify RED.
-- [ ] Implement minimal pure policy without ONI types.
-- [ ] Verify focused + Portable GREEN.
-- [ ] Commit `feat(phase2): define annihilation reactor policy`.
+- [x] Add tests for every healthy/degraded/recovery timing edge plus invalid elapsed input.
+- [x] Add loss and finite/non-negative heat-pulse tests.
+- [x] Establish RED before policy implementation.
+- [x] Implement minimal pure policy without ONI types.
+- [x] Verify focused + Portable GREEN. HEAD `5f37a67f` containing the policy passed Feature verification.
+- [x] Commit `feat(phase2): define annihilation reactor policy` (`5f37a67f`).
 
 ### Task 2: Reactor runtime and one-shot decoherence
 
@@ -54,14 +54,14 @@
 
 **Interfaces:**
 - Config provides external power input, generator capability, coolant loop, Proto-Matter storage, automation and `ForbiddenTechDevice`.
-- Controller serializes state/time/charge/one-shot guard and emits interference through existing `ApplySource`/`RemoveSource`.
+- Controller serializes state/time/one-shot guard and emits interference through the existing manager.
 
 - [ ] Add RED source contract for 7×6 config, input power + generator intent, coolant storage/conduits, Proto storage, serialization, policy call and one-shot interference source.
-- [ ] Expose read-only `ForbiddenTechDevice.IsInterfered` if needed; preserve existing Operational behavior for other buildings.
+- [x] `ForbiddenTechDevice.IsInterfered` read-only accessor already exists (`12982621`); do not add a duplicate.
 - [ ] Implement Config and Controller with state-machine authority and exactly-once Decohered side effects.
 - [ ] Ensure controller removes its source on cleanup/safe removal and outside active field duration.
 - [ ] Verify Portable contracts GREEN.
-- [ ] Commit `feat(phase2): add annihilation reactor runtime`.
+- [ ] Commit reactor runtime.
 
 ### Task 3: Registration, localization and safe removal
 
@@ -76,10 +76,10 @@
 
 - [ ] Add reactor to implemented building map under Power category.
 - [ ] Include it in Phase-2 research unlocks according to enable switch.
-- [ ] Add localized building/logic/reactor-state text.
+- [x] Base localized reactor/state/logic text is already present from `433daa35`; verify/extend rather than recreate.
 - [ ] Safe removal disables reactor, removes owned interference source, returns coolant/unconsumed Proto-Matter and counts the building.
 - [ ] Extend test fixture/source contracts.
-- [ ] Commit `feat(phase2): integrate annihilation reactor`.
+- [ ] Commit reactor integration.
 
 ### Task 4: KAnim and final development checkpoint
 
@@ -99,3 +99,7 @@
 - [ ] Mark Reactor no higher than `PORTABLE_VERIFIED` until Codex/user compiles it against current ONI DLL.
 - [ ] Update progress with exact HEAD and remaining Codex validation commands/cases.
 - [ ] Commit final development checkpoint.
+
+## Current exact breakpoint
+
+Task 1 is complete and Portable-verified. Do not recreate policy/tests or the `ForbiddenTechDevice.IsInterfered` accessor. Resume at **Task 2 first unchecked item: reactor game-runtime source contract**, then implement the game layer.
