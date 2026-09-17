@@ -13,6 +13,7 @@ $powerShellSuites = @{
     'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
     'ResearchRegistrationRuntimeTests' = (Join-Path $projectRoot 'tests\ResearchRegistrationRuntimeTests.ps1')
     'OptionsLocalizationRuntimeTests' = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
+    'SafeRemovalRuntimeTests' = (Join-Path $projectRoot 'tests\SafeRemovalRuntimeTests.ps1')
     'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
     'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
     'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')

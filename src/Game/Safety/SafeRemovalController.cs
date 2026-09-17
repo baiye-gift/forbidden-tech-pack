@@ -28,9 +28,9 @@ namespace ForbiddenTechnologyPack.Game.Safety {
 
             saveData.BeginSafeRemoval();
 
-            ProcessBuildings(Object.FindObjectsOfType<MatterAnalyzer>(), report);
-            ProcessBuildings(Object.FindObjectsOfType<MassCrusher>(), report);
-            ProcessBuildings(Object.FindObjectsOfType<MatterCompiler>(), report);
+            ProcessBuildings(FindAllObjects<MatterAnalyzer>(), report);
+            ProcessBuildings(FindAllObjects<MassCrusher>(), report);
+            ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
             ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects());
             saveData.SetSafeRemovalCompleted(report.IsComplete);
@@ -126,22 +126,28 @@ namespace ForbiddenTechnologyPack.Game.Safety {
         }
 
         private static void ConvertProtoMatter(SafeRemovalReport report) {
-            var elements = Object.FindObjectsOfType<PrimaryElement>();
+            var elements = FindAllObjects<PrimaryElement>();
             for (var index = 0; index < elements.Length; index++) {
                 var primary = elements[index];
                 if (primary == null || primary.ElementID != ProtoMatterRegistration.Hash) {
                     continue;
                 }
 
+                var position = primary.transform.GetPosition();
                 var mass = primary.Mass;
-                primary.SetElement(SimHashes.IgneousRock, true);
+                var temperature = primary.Temperature;
+                var diseaseIndex = primary.DiseaseIdx;
+                var diseaseCount = primary.DiseaseCount;
+                ElementLoader.FindElementByHash(SimHashes.IgneousRock).substance.SpawnResource(
+                    position, mass, temperature, diseaseIndex, diseaseCount, prevent_merge: true);
+                Util.KDestroyGameObject(primary.gameObject);
                 report.RecordConvertedObject(mass);
             }
         }
 
         private static int CountRemainingCustomObjects() {
             var remaining = 0;
-            var elements = Object.FindObjectsOfType<PrimaryElement>();
+            var elements = FindAllObjects<PrimaryElement>();
             for (var index = 0; index < elements.Length; index++) {
                 if (elements[index] != null &&
                         elements[index].ElementID == ProtoMatterRegistration.Hash) {
@@ -149,10 +155,15 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 }
             }
 
-            remaining += CountLiveBuildings(Object.FindObjectsOfType<MatterAnalyzer>());
-            remaining += CountLiveBuildings(Object.FindObjectsOfType<MassCrusher>());
-            remaining += CountLiveBuildings(Object.FindObjectsOfType<MatterCompiler>());
+            remaining += CountLiveBuildings(FindAllObjects<MatterAnalyzer>());
+            remaining += CountLiveBuildings(FindAllObjects<MassCrusher>());
+            remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
             return remaining;
+        }
+
+        private static T[] FindAllObjects<T>() where T : Object {
+            return Object.FindObjectsByType<T>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
         }
 
         private static int CountLiveBuildings<T>(T[] buildings) where T : ComplexFabricator {
