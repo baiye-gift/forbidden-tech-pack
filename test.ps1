@@ -166,6 +166,11 @@ if ($DescribePlan) {
     exit 0
 }
 
+$restoreEncodedAssets = Join-Path $projectRoot 'scripts\Restore-EncodedAssetSources.ps1'
+if (Test-Path -LiteralPath $restoreEncodedAssets -PathType Leaf) {
+    & $restoreEncodedAssets -ProjectRoot $projectRoot
+}
+
 foreach ($invocation in $powerShellInvocations) {
     $invocationArguments = @($invocation.Arguments)
     & pwsh @invocationArguments
