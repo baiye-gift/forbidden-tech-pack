@@ -2,6 +2,7 @@ using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Analyzer;
 using ForbiddenTechnologyPack.Game.Buildings.Compiler;
 using ForbiddenTechnologyPack.Game.Buildings.Crusher;
+using ForbiddenTechnologyPack.Game.Buildings.Reconstructor;
 using ForbiddenTechnologyPack.Game.Elements;
 using ForbiddenTechnologyPack.Game.Save;
 using HarmonyLib;
@@ -15,7 +16,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
         private static readonly string[] ForbiddenBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
-            ModIdentity.MatterCompilerId
+            ModIdentity.MatterCompilerId,
+            ModIdentity.MatterReconstructorId
         };
 
         public static SafeRemovalReport Execute() {
@@ -31,6 +33,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ProcessBuildings(FindAllObjects<MatterAnalyzer>(), report);
             ProcessBuildings(FindAllObjects<MassCrusher>(), report);
             ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
+            ProcessBuildings(FindAllObjects<MatterReconstructor>(), report);
             var remainingProtoMatter = ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects(remainingProtoMatter));
             saveData.SetSafeRemovalCompleted(report.IsComplete);
@@ -50,16 +53,14 @@ namespace ForbiddenTechnologyPack.Game.Safety {
 
             var db = Db.Get();
             if (db != null && db.Techs != null) {
-                var tech = db.Techs.TryGet(ModIdentity.ResearchId);
-                if (tech != null) {
-                    tech.unlockedItemIDs.Clear();
-                }
+                ClearTechUnlocks(db.Techs.TryGet(ModIdentity.ResearchId));
+                ClearTechUnlocks(db.Techs.TryGet(ModIdentity.ProtoFieldResearchId));
             }
         }
 
         internal static bool IsForbiddenFabricator(ComplexFabricator fabricator) {
             return fabricator is MatterAnalyzer || fabricator is MassCrusher ||
-                fabricator is MatterCompiler;
+                fabricator is MatterCompiler || fabricator is MatterReconstructor;
         }
 
         internal static void Disable(ComplexFabricator fabricator) {
@@ -186,7 +187,14 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             remaining += CountLiveBuildings(FindAllObjects<MatterAnalyzer>());
             remaining += CountLiveBuildings(FindAllObjects<MassCrusher>());
             remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
+            remaining += CountLiveBuildings(FindAllObjects<MatterReconstructor>());
             return remaining;
+        }
+
+        private static void ClearTechUnlocks(Tech tech) {
+            if (tech != null) {
+                tech.unlockedItemIDs.Clear();
+            }
         }
 
         private static void LogReplacementFailure(PrimaryElement primary, string reason,
