@@ -48,7 +48,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 { "advanced", 80f }
             };
             var tech = new Tech(ModIdentity.ResearchId,
-                new List<string>(plan.BuildingIds), __instance, costs);
+                new List<string>(plan.Phase1BuildingIds), __instance, costs);
             tech.costsByResearchTypeID.Clear();
             foreach (var cost in costs) {
                 tech.costsByResearchTypeID[cost.Key] = cost.Value;
