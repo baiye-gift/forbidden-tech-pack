@@ -231,7 +231,8 @@ internal static class SafeRemovalRuntimeProbe {
             foreach (var typeName in new[] {
                     "ForbiddenTechnologyPack.Game.Buildings.Analyzer.MatterAnalyzer",
                     "ForbiddenTechnologyPack.Game.Buildings.Crusher.MassCrusher",
-                    "ForbiddenTechnologyPack.Game.Buildings.Compiler.MatterCompiler" }) {
+                    "ForbiddenTechnologyPack.Game.Buildings.Compiler.MatterCompiler",
+                    "ForbiddenTechnologyPack.Game.Buildings.Reconstructor.MatterReconstructor" }) {
                 var type = mod.GetType(typeName, true);
                 Check(CallsClosedGeneric(execute, finder, type),
                     "Execute must include inactive " + type.Name + " objects.");
@@ -472,7 +473,9 @@ namespace ForbiddenTechnologyPack.Core {
         public const string MatterAnalyzerId = "Analyzer";
         public const string MassCrusherId = "Crusher";
         public const string MatterCompilerId = "Compiler";
+        public const string MatterReconstructorId = "Reconstructor";
         public const string ResearchId = "Research";
+        public const string ProtoFieldResearchId = "ProtoFieldResearch";
     }
 }
 namespace ForbiddenTechnologyPack.Game.Elements {
@@ -497,6 +500,9 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
 namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
     public class MatterCompiler : ComplexFabricator {}
     public sealed class CoolantController : UnityEngine.Component { public Storage storage; }
+}
+namespace ForbiddenTechnologyPack.Game.Buildings.Reconstructor {
+    public class MatterReconstructor : ComplexFabricator {}
 }
 
 internal static class SafeRemovalBehavior {
