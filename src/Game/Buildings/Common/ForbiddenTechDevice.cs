@@ -10,6 +10,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Common {
             new HashSet<string>(StringComparer.Ordinal);
         private Operational operational;
 
+        public bool IsInterfered { get { return activeSources.Count > 0; } }
+
         protected override void OnSpawn() {
             base.OnSpawn();
             operational = GetComponent<Operational>();
