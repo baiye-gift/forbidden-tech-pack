@@ -30,7 +30,7 @@ namespace ForbiddenTechnologyPack.Game.Options {
         public LocalizedBalancePreset Preset { get; set; } = LocalizedBalancePreset.Strong;
 
         [JsonProperty]
-        [Option("启用物质编译模块", "关闭后隐藏本模组的研究和建造项目；已建建筑仍会保持存档安全。", "模块与建筑")]
+        [Option("启用禁忌科技模块", "关闭后隐藏本模组的研究和建造项目；已建建筑仍会保持存档安全。", "模块与建筑")]
         public bool ModuleEnabled { get; set; } = true;
 
         [JsonProperty]
@@ -44,6 +44,18 @@ namespace ForbiddenTechnologyPack.Game.Options {
         [JsonProperty]
         [Option("启用物质编译器", "关闭后隐藏物质编译器的建造项目。", "模块与建筑")]
         public bool CompilerEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用物质重构器", "关闭后隐藏第二阶段的物质重构器建造项目。", "模块与建筑")]
+        public bool ReconstructorEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用熵流偏转器", "关闭后隐藏第二阶段的熵流偏转器建造项目。", "模块与建筑")]
+        public bool EntropyDiverterEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用物质湮灭堆", "关闭后隐藏第二阶段的物质湮灭堆建造项目。", "模块与建筑")]
+        public bool AnnihilationReactorEnabled { get; set; } = true;
 
         [JsonProperty]
         [Option("原质回收率", "仅在选择“自定义”预设时生效。", "自定义参数")]
@@ -102,6 +114,9 @@ namespace ForbiddenTechnologyPack.Game.Options {
                 AnalyzerEnabled = AnalyzerEnabled,
                 CrusherEnabled = CrusherEnabled,
                 CompilerEnabled = CompilerEnabled,
+                ReconstructorEnabled = ReconstructorEnabled,
+                EntropyDiverterEnabled = EntropyDiverterEnabled,
+                AnnihilationReactorEnabled = AnnihilationReactorEnabled,
                 RecoveryRate = RecoveryRate,
                 CostMultiplier = CostMultiplier,
                 PowerMultiplier = PowerMultiplier,
