@@ -83,8 +83,34 @@ internal static class OptionsLocalizationRuntimeProbe {
                 })
                 .Where(item => item.Attribute != null)
                 .ToArray();
-            if (optionProperties.Length != 14) {
-                throw new InvalidOperationException("Expected all 14 user-facing options to have Option attributes.");
+            var expectedOptionNames = new[] {
+                "Preset",
+                "ModuleEnabled",
+                "AnalyzerEnabled",
+                "CrusherEnabled",
+                "CompilerEnabled",
+                "ReconstructorEnabled",
+                "EntropyDiverterEnabled",
+                "AnnihilationReactorEnabled",
+                "RecoveryRate",
+                "CostMultiplier",
+                "PowerMultiplier",
+                "HeatMultiplier",
+                "AllowIndustrial",
+                "AllowRare",
+                "AllowEndgame",
+                "ConsumeSamples",
+                "PrepareSafeRemoval"
+            };
+            var actualOptionNames = optionProperties.Select(item => item.Property.Name)
+                .OrderBy(name => name, StringComparer.Ordinal).ToArray();
+            var sortedExpectedOptionNames = expectedOptionNames
+                .OrderBy(name => name, StringComparer.Ordinal).ToArray();
+            if (!actualOptionNames.SequenceEqual(sortedExpectedOptionNames)) {
+                throw new InvalidOperationException(
+                    "User-facing option properties differ. Expected: " +
+                    string.Join(", ", sortedExpectedOptionNames) + "; actual: " +
+                    string.Join(", ", actualOptionNames) + ".");
             }
 
             foreach (var item in optionProperties) {
