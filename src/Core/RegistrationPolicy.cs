@@ -55,6 +55,15 @@ namespace ForbiddenTechnologyPack.Core {
             if (options.CompilerEnabled) {
                 buildingIds.Add(ModIdentity.MatterCompilerId);
             }
+            if (options.ReconstructorEnabled) {
+                buildingIds.Add(ModIdentity.MatterReconstructorId);
+            }
+            if (options.EntropyDiverterEnabled) {
+                buildingIds.Add(ModIdentity.EntropyFluxDiverterId);
+            }
+            if (options.AnnihilationReactorEnabled) {
+                buildingIds.Add(ModIdentity.MatterAnnihilationReactorId);
+            }
 
             return new RegistrationPlan(buildingIds);
         }
