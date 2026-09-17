@@ -32,5 +32,15 @@
     "no_coolant",
     "blocked",
     "ui"
+  ],
+  "baiye_matter_reconstructor": [
+    "off",
+    "idle",
+    "working_pre",
+    "working_loop",
+    "working_pst",
+    "working_pst_complete",
+    "blocked",
+    "ui"
   ]
 }
