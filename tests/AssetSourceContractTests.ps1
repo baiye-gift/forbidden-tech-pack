@@ -14,9 +14,9 @@ if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $expected = [ordered]@{
     'baiye_proto_matter' = @('idle')
-    'baiye_matter_analyzer' = @('off', 'idle', 'working_loop', 'working_pst', 'overheat')
-    'baiye_mass_crusher' = @('off', 'idle', 'working_loop', 'working_pst', 'blocked')
-    'baiye_matter_compiler' = @('off', 'idle', 'working_loop', 'working_pst', 'no_coolant', 'blocked')
+    'baiye_matter_analyzer' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'overheat')
+    'baiye_mass_crusher' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'blocked')
+    'baiye_matter_compiler' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'no_coolant', 'blocked')
 }
 $sourceFolders = @{
     'baiye_proto_matter' = 'proto_matter'
@@ -42,11 +42,21 @@ foreach ($name in $expected.Keys) {
     if (-not (Test-Path -LiteralPath $scmlPath -PathType Leaf)) {
         throw "SCML source is missing for '$name': '$scmlPath'."
     }
-    $scml = Get-Content -LiteralPath $scmlPath -Raw
+    [xml]$scml = Get-Content -LiteralPath $scmlPath -Raw
+    $sourceAnimations = @($scml.spriter_data.entity.animation)
     foreach ($animation in $expectedAnimations) {
-        if ($scml -notmatch ('name="' + [regex]::Escape($animation) + '"')) {
+        $sourceAnimation = @($sourceAnimations | Where-Object { $_.name -eq $animation })
+        if ($sourceAnimation.Count -ne 1) {
             throw "SCML '$scmlPath' is missing animation '$animation'."
         }
+        if ($animation -in @('working_pre', 'working_pst_complete') -and $sourceAnimation[0].looping -ne 'false') {
+            throw "SCML '$scmlPath' animation '$animation' must be non-looping."
+        }
+    }
+
+    $animationIds = @($sourceAnimations | ForEach-Object { $_.id })
+    if (@($animationIds | Select-Object -Unique).Count -ne $animationIds.Count) {
+        throw "SCML '$scmlPath' contains duplicate animation IDs."
     }
 }
 

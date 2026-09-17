@@ -20,7 +20,17 @@
         <key id="1" time="400"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.015" scale_y="1.015" a="0.88"/></key>
       </timeline>
     </animation>
-    <animation id="2" name="working_loop" length="2000" looping="true">
+    <animation id="2" name="working_pre" length="400" looping="false">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="400"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key>
+        <key id="1" time="400"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.025" scale_y="1.025" a="0.88"/></key>
+      </timeline>
+    </animation>
+    <animation id="3" name="working_loop" length="2000" looping="true">
       <mainline>
         <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
         <key id="1" time="1000"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
@@ -30,7 +40,7 @@
         <key id="1" time="1000"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.025" scale_y="1.025" a="0.88"/></key>
       </timeline>
     </animation>
-    <animation id="3" name="working_pst" length="800" looping="false">
+    <animation id="4" name="working_pst" length="800" looping="false">
       <mainline>
         <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
       </mainline>
@@ -38,7 +48,17 @@
         <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key>
       </timeline>
     </animation>
-    <animation id="4" name="blocked" length="1000" looping="true">
+    <animation id="5" name="working_pst_complete" length="400" looping="false">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="400"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.025" scale_y="1.025" a="0.88"/></key>
+        <key id="1" time="400"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key>
+      </timeline>
+    </animation>
+    <animation id="6" name="blocked" length="1000" looping="true">
       <mainline>
         <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
         <key id="1" time="500"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
