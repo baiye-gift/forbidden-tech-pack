@@ -1,5 +1,6 @@
 using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Analyzer;
+using ForbiddenTechnologyPack.Game.Buildings.AnnihilationReactor;
 using ForbiddenTechnologyPack.Game.Buildings.Compiler;
 using ForbiddenTechnologyPack.Game.Buildings.Crusher;
 using ForbiddenTechnologyPack.Game.Buildings.EntropyDiverter;
@@ -19,7 +20,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ModIdentity.MassCrusherId,
             ModIdentity.MatterCompilerId,
             ModIdentity.MatterReconstructorId,
-            ModIdentity.EntropyFluxDiverterId
+            ModIdentity.EntropyFluxDiverterId,
+            ModIdentity.MatterAnnihilationReactorId
         };
 
         public static SafeRemovalReport Execute() {
@@ -37,6 +39,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
             ProcessBuildings(FindAllObjects<MatterReconstructor>(), report);
             ProcessEntropyDiverters(FindAllObjects<EntropyFluxDiverterController>(), report);
+            ProcessAnnihilationReactors(
+                FindAllObjects<MatterAnnihilationReactorController>(), report);
             var remainingProtoMatter = ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects(remainingProtoMatter));
             saveData.SetSafeRemovalCompleted(report.IsComplete);
@@ -117,6 +121,24 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 controller.PrepareForSafeRemoval();
                 DropStorage(controller.hotStorage, report, true);
                 DropStorage(controller.coldStorage, report, true);
+                DropStorage(controller.protoMatterStorage, report, true);
+                DestroyBuilding(controller, report);
+            }
+        }
+
+        private static void ProcessAnnihilationReactors(
+                MatterAnnihilationReactorController[] buildings,
+                SafeRemovalReport report) {
+            if (buildings == null) {
+                return;
+            }
+            for (var index = 0; index < buildings.Length; index++) {
+                var controller = buildings[index];
+                if (controller == null) {
+                    continue;
+                }
+                controller.PrepareForSafeRemoval();
+                DropStorage(controller.coolantStorage, report, true);
                 DropStorage(controller.protoMatterStorage, report, true);
                 DestroyBuilding(controller, report);
             }
@@ -214,6 +236,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
             remaining += CountLiveBuildings(FindAllObjects<MatterReconstructor>());
             remaining += CountLiveBuildings(FindAllObjects<EntropyFluxDiverterController>());
+            remaining += CountLiveBuildings(
+                FindAllObjects<MatterAnnihilationReactorController>());
             return remaining;
         }
 
