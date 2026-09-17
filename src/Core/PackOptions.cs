@@ -13,6 +13,9 @@ namespace ForbiddenTechnologyPack.Core {
         public bool AnalyzerEnabled { get; set; } = true;
         public bool CrusherEnabled { get; set; } = true;
         public bool CompilerEnabled { get; set; } = true;
+        public bool ReconstructorEnabled { get; set; } = true;
+        public bool EntropyDiverterEnabled { get; set; } = true;
+        public bool AnnihilationReactorEnabled { get; set; } = true;
 
         public float RecoveryRate { get; set; } = 0.90f;
         public float CostMultiplier { get; set; } = 1.00f;
@@ -29,7 +32,8 @@ namespace ForbiddenTechnologyPack.Core {
         public ResolvedOptions(float recoveryRate, float costMultiplier, float powerMultiplier,
                 float heatMultiplier, bool allowIndustrial, bool allowRare, bool allowEndgame,
                 bool consumeSamples, bool moduleEnabled, bool analyzerEnabled, bool crusherEnabled,
-                bool compilerEnabled) {
+                bool compilerEnabled, bool reconstructorEnabled, bool entropyDiverterEnabled,
+                bool annihilationReactorEnabled) {
             RecoveryRate = recoveryRate;
             CostMultiplier = costMultiplier;
             PowerMultiplier = powerMultiplier;
@@ -42,6 +46,9 @@ namespace ForbiddenTechnologyPack.Core {
             AnalyzerEnabled = analyzerEnabled;
             CrusherEnabled = crusherEnabled;
             CompilerEnabled = compilerEnabled;
+            ReconstructorEnabled = reconstructorEnabled;
+            EntropyDiverterEnabled = entropyDiverterEnabled;
+            AnnihilationReactorEnabled = annihilationReactorEnabled;
         }
 
         public float RecoveryRate { get; private set; }
@@ -56,6 +63,9 @@ namespace ForbiddenTechnologyPack.Core {
         public bool AnalyzerEnabled { get; private set; }
         public bool CrusherEnabled { get; private set; }
         public bool CompilerEnabled { get; private set; }
+        public bool ReconstructorEnabled { get; private set; }
+        public bool EntropyDiverterEnabled { get; private set; }
+        public bool AnnihilationReactorEnabled { get; private set; }
     }
 
     public static class PackOptions {
@@ -87,7 +97,8 @@ namespace ForbiddenTechnologyPack.Core {
                 bool allowEndgame, bool consumeSamples) {
             return new ResolvedOptions(recoveryRate, costMultiplier, powerMultiplier, heatMultiplier,
                 allowIndustrial, allowRare, allowEndgame, consumeSamples, raw.ModuleEnabled,
-                raw.AnalyzerEnabled, raw.CrusherEnabled, raw.CompilerEnabled);
+                raw.AnalyzerEnabled, raw.CrusherEnabled, raw.CompilerEnabled, raw.ReconstructorEnabled,
+                raw.EntropyDiverterEnabled, raw.AnnihilationReactorEnabled);
         }
 
         private static float Clamp(float value, float minimum, float maximum) {
