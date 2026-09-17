@@ -82,6 +82,50 @@ msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERCOMPILER.LOGIC_PORT.INACTIVE"
 msgid "When receiving a Red signal, the Matter Compiler is disabled."
 msgstr "When receiving a Red signal, the Matter Compiler is disabled."
 
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.NAME"
+msgid "Matter Reconstructor"
+msgstr "Matter Reconstructor"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.DESC"
+msgid "Uses Proto-Matter to lever reality and rewrite an existing material substrate into an analyzed structure."
+msgstr "Uses Proto-Matter to lever reality and rewrite an existing material substrate into an analyzed structure."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.EFFECT"
+msgid "Consumes a tier-matched reality substrate and Proto-Matter to produce an equal mass of an analyzed target material."
+msgstr "Consumes a tier-matched reality substrate and Proto-Matter to produce an equal mass of an analyzed target material."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.NO_RECIPES"
+msgid "No analyzed reconstruction targets are available."
+msgstr "No analyzed reconstruction targets are available."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.WAITING_SUBSTRATE"
+msgid "Waiting for a compatible reality substrate."
+msgstr "Waiting for a compatible reality substrate."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.WAITING_PROTO_MATTER"
+msgid "Waiting for Proto-Matter."
+msgstr "Waiting for Proto-Matter."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.OUTPUT_BLOCKED"
+msgid "Reconstructed material output is blocked."
+msgstr "Reconstructed material output is blocked."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.INTERFERED"
+msgid "Proto-Matter interference has destabilized reality anchoring. Reconstruction is paused."
+msgstr "Proto-Matter interference has destabilized reality anchoring. Reconstruction is paused."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.LOGIC_PORT.NAME"
+msgid "Enable Matter Reconstructor"
+msgstr "Enable Matter Reconstructor"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.LOGIC_PORT.ACTIVE"
+msgid "When receiving a Green signal, the Matter Reconstructor may operate."
+msgstr "When receiving a Green signal, the Matter Reconstructor may operate."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.LOGIC_PORT.INACTIVE"
+msgid "When receiving a Red signal, the Matter Reconstructor is disabled."
+msgstr "When receiving a Red signal, the Matter Reconstructor is disabled."
+
 msgctxt "STRINGS.BUILDING.STATUSITEMS.BAIYEMATTERCOMPILERUNSAFECOOLANT.NAME"
 msgid "Waiting for Safe Coolant"
 msgstr "Waiting for Safe Coolant"
@@ -101,6 +145,18 @@ msgstr "Reverse-engineer matter itself and build machines that analyze, deconstr
 msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMATTERENGINEERING.SEARCH_TERMS"
 msgid "forbidden matter proto-matter analyzer crusher compiler"
 msgstr "forbidden matter proto-matter analyzer crusher compiler"
+
+msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENPROTOFIELDENGINEERING.NAME"
+msgid "Proto-Matter Field Engineering"
+msgstr "Proto-Matter Field Engineering"
+
+msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENPROTOFIELDENGINEERING.DESC"
+msgid "Use Proto-Matter as a dimensional coupling medium to lever reality itself and drive advanced forbidden machinery."
+msgstr "Use Proto-Matter as a dimensional coupling medium to lever reality itself and drive advanced forbidden machinery."
+
+msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENPROTOFIELDENGINEERING.SEARCH_TERMS"
+msgid "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden"
+msgstr "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.TITLE"
 msgid "Safe Removal - Forbidden Technology Pack"
@@ -141,5 +197,4 @@ msgstr "Safe removal scan is complete. Converted {0} Proto-Matter objects ({1:0.
 msgctxt "STRINGS.UI.SAFEREMOVAL.INCOMPLETE"
 msgid "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
 msgstr "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
-
 
