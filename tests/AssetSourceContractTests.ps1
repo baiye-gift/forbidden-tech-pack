@@ -35,17 +35,20 @@ $expected = [ordered]@{
     'baiye_matter_analyzer' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'overheat', 'ui')
     'baiye_mass_crusher' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'blocked', 'ui')
     'baiye_matter_compiler' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'no_coolant', 'blocked', 'ui')
+    'baiye_matter_reconstructor' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'blocked', 'ui')
 }
 $sourceFolders = @{
     'baiye_proto_matter' = 'proto_matter'
     'baiye_matter_analyzer' = 'matter_analyzer'
     'baiye_mass_crusher' = 'mass_crusher'
     'baiye_matter_compiler' = 'matter_compiler'
+    'baiye_matter_reconstructor' = 'matter_reconstructor'
 }
 $buildingCanvasSizes = @{
     'baiye_matter_analyzer' = 300
     'baiye_mass_crusher' = 400
     'baiye_matter_compiler' = 500
+    'baiye_matter_reconstructor' = 400
 }
 
 $actualNames = @($manifest.PSObject.Properties.Name | Sort-Object)
@@ -133,6 +136,7 @@ $stableReferences = @{
     'src\Game\Buildings\Analyzer\MatterAnalyzerConfig.cs' = 'baiye_matter_analyzer_kanim'
     'src\Game\Buildings\Crusher\MassCrusherConfig.cs' = 'baiye_mass_crusher_kanim'
     'src\Game\Buildings\Compiler\MatterCompilerConfig.cs' = 'baiye_matter_compiler_kanim'
+    'src\Game\Buildings\Reconstructor\MatterReconstructorConfig.cs' = 'baiye_matter_reconstructor_kanim'
 }
 foreach ($relativePath in $stableReferences.Keys) {
     $path = Join-Path $ProjectRoot $relativePath
