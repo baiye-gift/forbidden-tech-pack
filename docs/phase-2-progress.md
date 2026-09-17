@@ -48,7 +48,7 @@
 | Task 4 Matter Reconstructor 建筑与运行组件 | `PORTABLE_VERIFIED` | 4×4 BuildingConfig、4800 W、24 kDTU/s、输入/输出存储、固体轨道、电力、自动化、`ForbiddenTechDevice` | 用户本机 ONI DLL 编译 + 游戏内运行 |
 | Task 5 注册、二阶段研究、本地化、安全移除 | `PORTABLE_VERIFIED` | `BaiyeForbiddenProtoFieldEngineering`、菜单、本地化、配置标签、安全移除接入 | 本机 runtime tests + 游戏研究树/安全移除 |
 | Task 6 KAnim / 图标 / 资源链 | `PORTABLE_VERIFIED` | SCML、manifest、body/UI sprite Base64 源、自动恢复脚本、build-assets 映射、资源契约 | 本机 `build-assets.ps1` 实际 KAnim 编译 |
-| Task 7 完整集成验证 | `IN_PROGRESS` | GitHub Portable CI 已通过 | 本机 All、build、安装、实际游戏测试、更新 test matrix |
+| Task 7 完整集成验证 | `IN_PROGRESS` | GitHub Portable CI 已通过；本机完整 Mod 构建已能生成 DLL/包 | 重新执行本机 All，确认 safe-removal runtime fixture 修复；随后游戏内测试 |
 | 熵流偏转器 | `NOT_STARTED` | 已有稳定 ID / 配置规划 | 等物质重构器完成游戏验证后再开始 |
 | 物质湮灭堆 | `NOT_STARTED` | 已有稳定 ID / 原质干扰系统设计 | 等前两台建筑稳定后开发 |
 
@@ -86,6 +86,34 @@ TOTAL: 206 passed
 
 **这不等于本机 ONI DLL 编译通过，也不等于游戏内可用。**
 
+### 4.3 本机 Task 7 第一次 All 验证
+
+用户本机执行完整验证时，Mod 本体已经成功完成编译和打包：
+
+```text
+Wrote D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack\ForbiddenTechnologyPack.dll
+Built package: D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack
+Safe-removal compiled contract passed: inactive discovery, native spawn, state capture, and custom-prefab destruction.
+```
+
+随后 `SafeRemovalRuntimeTests.ps1` 的确定性行为模拟编译失败：
+
+```text
+src\Game\Safety\SafeRemovalController.cs(5,46): error CS0234:
+命名空间“ForbiddenTechnologyPack.Game.Buildings”中不存在类型或命名空间名“Reconstructor”
+```
+
+根因已经定位：**测试夹具仍停留在 Phase 1，只 stub 了 Analyzer / Crusher / Compiler；生产代码已经引用 MatterReconstructor。完整 Mod build 本身并未缺少 Reconstructor。**
+
+修复提交 `be657795` 已补齐：
+
+- Runtime probe 对 `MatterReconstructor` 的 safe-removal 反射覆盖；
+- behavior fixture 的 `MatterReconstructor` stub；
+- `MatterReconstructorId`；
+- `ProtoFieldResearchId`。
+
+该修复尚需用户本机重新执行 `test.ps1 -Suite All` 后才能升级验证状态。
+
 ---
 
 ## 5. 重要提交锚点
@@ -108,6 +136,8 @@ TOTAL: 206 passed
   - 恢复生成的 PNG 不污染 Git 工作区。
 - `aab2c641` — `docs(assets): document encoded reconstructor sprite sources`
   - 资源恢复链说明；其对应 Portable CI 已通过。
+- `be657795` — `test(phase2): cover reconstructor safe-removal runtime fixture`
+  - 修复 Task 7 首次本机 All 暴露的 Phase 1 safe-removal behavior fixture 过期问题，并把 Reconstructor 纳入 runtime probe。
 
 后续只有在新验证或新代码产生时继续追加关键锚点，不需要把每个微小提交都写入这里。
 
@@ -115,19 +145,20 @@ TOTAL: 206 passed
 
 ## 6. 当前精确下一步
 
-**从这里继续，不重新开发物质重构器。**
+**从这里继续，不重新开发物质重构器，也不重新跑已经成功的独立 build-assets 步骤。**
 
-用户本地先同步当前分支，然后依次运行：
+用户本地同步最新分支后，先重新执行完整 All：
 
 ```powershell
 git pull
 git log -1 --oneline
-git status
-
-.\build-assets.ps1
 
 .\test.ps1 -Suite All -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"
+```
 
+如果 All 通过，再执行最终独立 build：
+
+```powershell
 .\build.ps1 -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"
 ```
 
@@ -138,7 +169,7 @@ git status
 3. 修复后重新运行对应验证；
 4. 不回退重做已完成任务。
 
-如果三步全部通过：
+如果 All + build 全部通过：
 
 1. 把 Task 1–6 中需要 ONI DLL 的部分升级为 `LOCAL_VERIFIED`；
 2. 安装到本地 Mod；
@@ -178,14 +209,21 @@ git status
 
 ## 8. 当前阻塞
 
-当前没有已确认的代码阻塞。
+当前已知阻塞来自 **SafeRemovalRuntimeTests 的旧 Phase 1 behavior fixture**，不是 Mod 本体构建。
 
-**待执行验证不是“已通过”。** 目前物质重构器仍缺：
+状态：`FIX_COMMITTED / LOCAL_REVERIFY_PENDING`
 
-- 本机 `build-assets.ps1`；
-- 本机 `test.ps1 -Suite All`；
-- 本机 `build.ps1`；
-- 游戏内验证。
+失败：
+
+```text
+SafeRemovalController.cs(5,46): error CS0234: ... Buildings.Reconstructor ...
+```
+
+根因：Runtime behavior fixture 缺少 Phase 2 `MatterReconstructor` namespace/type 以及二阶段 `ModIdentity` 常量。
+
+修复：`be657795`。
+
+下一步：用户本机重新执行 `test.ps1 -Suite All`。在看到新鲜的 `TOTAL: ... passed` 之前，不把 Task 7 标记为 `LOCAL_VERIFIED`。
 
 ---
 
