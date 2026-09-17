@@ -236,8 +236,8 @@ internal static class SafeRemovalRuntimeProbe {
             var primaryElement = game.GetType("PrimaryElement", true);
             Check(CallsClosedGeneric(convert, finder, primaryElement),
                 "Proto-Matter conversion must include inactive loose, stored, and rail objects.");
-            Check(CallsClosedGeneric(count, finder, primaryElement),
-                "Completion counting must include inactive Proto-Matter objects.");
+            Check(!CallsClosedGeneric(count, finder, primaryElement),
+                "Same-invocation completion must use conversion outcomes instead of rescanning deferred-delete Proto-Matter.");
 
             var conversionInstructions = Read(convert);
             var conversionCalls = conversionInstructions
@@ -324,4 +324,233 @@ $runtimeConfigBody = @'
 '@
 [System.IO.File]::WriteAllText($runtimeConfig, $runtimeConfigBody, [System.Text.UTF8Encoding]::new($false))
 & dotnet $probeAssembly $managedDirectory $rawAssembly (Join-Path $ProjectRoot 'lib')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# Execute the actual controller source against a deterministic managed boundary.
+# Unity native objects cannot be instantiated in this CLI process, so this boundary
+# models the two relevant engine contracts: SpawnResource may return null, and
+# KDestroyGameObject leaves an object discoverable until the end of the frame.
+$behaviorSource = Join-Path $probeDirectory 'SafeRemovalBehavior.cs'
+$behaviorAssembly = Join-Path $probeDirectory 'SafeRemovalBehavior.exe'
+$behavior = @'
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ForbiddenTechnologyPack.Core;
+
+namespace UnityEngine {
+    public enum FindObjectsInactive { Exclude = 0, Include = 1 }
+    public enum FindObjectsSortMode { None = 0, InstanceID = 1 }
+    public struct Vector3 {
+        public float x, y, z;
+        public Vector3(float x, float y, float z) { this.x = x; this.y = y; this.z = z; }
+        public static readonly Vector3 zero = new Vector3();
+    }
+    public class Object {
+        public static readonly List<Object> Registry = new List<Object>();
+        public static T[] FindObjectsByType<T>(FindObjectsInactive inactive, FindObjectsSortMode sort)
+                where T : Object {
+            return Registry.OfType<T>().ToArray();
+        }
+    }
+    public class Transform {
+        public Vector3 position;
+    }
+    public class GameObject : Object {
+        private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
+        public string name;
+        public readonly Transform transform = new Transform();
+        public T GetComponent<T>() where T : class {
+            Component value;
+            return components.TryGetValue(typeof(T), out value) ? value as T : null;
+        }
+        public void Add(Component component) {
+            component.gameObject = this;
+            components[component.GetType()] = component;
+        }
+    }
+    public class Component : Object {
+        public GameObject gameObject;
+        public Transform transform { get { return gameObject.transform; } }
+        public T GetComponent<T>() where T : class { return gameObject.GetComponent<T>(); }
+    }
+    public static class Debug {
+        public static readonly List<string> Errors = new List<string>();
+        public static void LogError(object message) { Errors.Add(message == null ? "<null>" : message.ToString()); }
+    }
+}
+
+public static class TransformExtensions {
+    public static UnityEngine.Vector3 GetPosition(this UnityEngine.Transform transform) {
+        return transform.position;
+    }
+}
+
+namespace HarmonyLib {
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class HarmonyPatch : Attribute {
+        public HarmonyPatch(Type type, string methodName) {}
+    }
+}
+
+public enum SimHashes { ProtoMatter = 1, IgneousRock = 2 }
+public struct Tag { public Tag(string id) {} }
+
+public sealed class PrimaryElement : UnityEngine.Component {
+    public SimHashes ElementID;
+    public float Mass;
+    public float Temperature;
+    public byte DiseaseIdx;
+    public int DiseaseCount;
+}
+
+public sealed class Substance {
+    public static readonly Queue<UnityEngine.GameObject> Results =
+        new Queue<UnityEngine.GameObject>();
+    public UnityEngine.GameObject SpawnResource(UnityEngine.Vector3 position, float mass,
+            float temperature, byte diseaseIndex, int diseaseCount,
+            bool prevent_merge = false, bool forceTemperature = false,
+            bool manual_activation = false) {
+        return Results.Dequeue();
+    }
+}
+
+public sealed class Element { public Substance substance = new Substance(); }
+public static class ElementLoader {
+    public static readonly Element IgneousRock = new Element();
+    public static Element FindElementByHash(SimHashes hash) { return IgneousRock; }
+}
+
+public static class Util {
+    public static readonly List<UnityEngine.GameObject> Destroyed =
+        new List<UnityEngine.GameObject>();
+    public static void KDestroyGameObject(UnityEngine.GameObject gameObject) {
+        // Deliberately do not remove components from Object.Registry: the real
+        // game defers deletion until the end of the frame.
+        Destroyed.Add(gameObject);
+    }
+}
+
+public sealed class Operational : UnityEngine.Component {
+    public sealed class Flag {
+        public enum Type { Requirement }
+        public Flag(string id, Type type) {}
+    }
+    public void SetFlag(Flag flag, bool value) {}
+}
+public class Storage {
+    public readonly List<UnityEngine.GameObject> items = new List<UnityEngine.GameObject>();
+    public void DropAll(bool a, bool b, UnityEngine.Vector3 c, bool d, object e) {}
+}
+public class ComplexFabricator : UnityEngine.Component {
+    public Storage inStorage = new Storage();
+    public Storage buildStorage = new Storage();
+    public Storage outStorage = new Storage();
+    public void SetQueueDirty() {}
+}
+public sealed class Deconstructable : UnityEngine.Component {
+    public bool HasBeenDestroyed;
+    public void ForceDestroyAndGetMaterials() { HasBeenDestroyed = true; }
+}
+public sealed class BuildingDef { public bool ShowInBuildMenu; }
+public static class Assets { public static BuildingDef GetBuildingDef(string id) { return null; } }
+public sealed class Tech { public readonly List<string> unlockedItemIDs = new List<string>(); }
+public sealed class Techs { public Tech TryGet(string id) { return null; } }
+public sealed class Db {
+    public Techs Techs;
+    public static Db Get() { return null; }
+}
+public sealed class Game { public static Game Instance; }
+
+namespace ForbiddenTechnologyPack.Core {
+    public static class ModIdentity {
+        public const string MatterAnalyzerId = "Analyzer";
+        public const string MassCrusherId = "Crusher";
+        public const string MatterCompilerId = "Compiler";
+        public const string ResearchId = "Research";
+    }
+}
+namespace ForbiddenTechnologyPack.Game.Elements {
+    public static class ProtoMatterRegistration {
+        public static readonly SimHashes Hash = SimHashes.ProtoMatter;
+    }
+}
+namespace ForbiddenTechnologyPack.Game.Save {
+    public sealed class ForbiddenTechSaveData {
+        public static ForbiddenTechSaveData Instance;
+        public bool SafeRemovalStarted;
+        public void BeginSafeRemoval() { SafeRemovalStarted = true; }
+        public void SetSafeRemovalCompleted(bool value) {}
+    }
+}
+namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
+    public class MatterAnalyzer : ComplexFabricator {}
+}
+namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
+    public class MassCrusher : ComplexFabricator {}
+}
+namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
+    public class MatterCompiler : ComplexFabricator {}
+    public sealed class CoolantController : UnityEngine.Component { public Storage storage; }
+}
+
+internal static class SafeRemovalBehavior {
+    private static void Check(bool condition, string message) {
+        if (!condition) throw new InvalidOperationException(message);
+    }
+    private static PrimaryElement Proto(string name, float mass) {
+        var gameObject = new UnityEngine.GameObject { name = name };
+        gameObject.transform.position = new UnityEngine.Vector3(mass, mass + 1f, mass + 2f);
+        var primary = new PrimaryElement {
+            ElementID = SimHashes.ProtoMatter,
+            Mass = mass,
+            Temperature = 273.15f + mass,
+            DiseaseIdx = (byte)mass,
+            DiseaseCount = (int)mass * 10
+        };
+        gameObject.Add(primary);
+        UnityEngine.Object.Registry.Add(primary);
+        return primary;
+    }
+    private static int Main() {
+        try {
+            var failed = Proto("failed-null-spawn", 3f);
+            var successful = Proto("successful-deferred-destroy", 7f);
+            Substance.Results.Enqueue(null);
+            Substance.Results.Enqueue(new UnityEngine.GameObject { name = "igneous-rock" });
+            Game.Instance = new Game();
+            ForbiddenTechnologyPack.Game.Save.ForbiddenTechSaveData.Instance =
+                new ForbiddenTechnologyPack.Game.Save.ForbiddenTechSaveData();
+            var report = ForbiddenTechnologyPack.Game.Safety.SafeRemovalController.Execute();
+
+            Check(report.RemainingCustomObjectCount == 1 && !report.IsComplete,
+                "Exactly the null-spawn Proto-Matter object must remain unresolved.");
+            Check(!Util.Destroyed.Contains(failed.gameObject),
+                "A null replacement must retain the original Proto-Matter GameObject.");
+            Check(Util.Destroyed.Count == 1 && Util.Destroyed[0] == successful.gameObject,
+                "Only a valid native replacement may schedule its custom original for destruction.");
+            Check(report.ConvertedObjectCount == 1 && report.ConvertedMassKg == 7f,
+                "Only the successfully scheduled replacement may be recorded as converted.");
+            Check(UnityEngine.Object.Registry.OfType<PrimaryElement>().Count() == 2,
+                "The behavior boundary must preserve deferred-destruction visibility.");
+            Check(UnityEngine.Debug.Errors.Any(message => message.Contains("failed-null-spawn")),
+                "Null replacement failure must produce a clear object-specific error.");
+            Console.WriteLine(
+                "Safe-removal behavior passed: null spawn retained/counts remaining; deferred successful destruction counts converted.");
+            return 0;
+        } catch (Exception exception) {
+            while (exception.InnerException != null) exception = exception.InnerException;
+            Console.Error.WriteLine(exception);
+            return 1;
+        }
+    }
+}
+'@
+[System.IO.File]::WriteAllText($behaviorSource, $behavior, [System.Text.UTF8Encoding]::new($false))
+& $compiler /nologo /target:exe /langversion:7.3 "/out:$behaviorAssembly" `
+    $behaviorSource `
+    (Join-Path $ProjectRoot 'src\Core\SafeRemovalReport.cs') `
+    (Join-Path $ProjectRoot 'src\Game\Safety\SafeRemovalController.cs')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $behaviorAssembly
 exit $LASTEXITCODE

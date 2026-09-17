@@ -31,8 +31,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ProcessBuildings(FindAllObjects<MatterAnalyzer>(), report);
             ProcessBuildings(FindAllObjects<MassCrusher>(), report);
             ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
-            ConvertProtoMatter(report);
-            report.Finish(CountRemainingCustomObjects());
+            var remainingProtoMatter = ConvertProtoMatter(report);
+            report.Finish(CountRemainingCustomObjects(remainingProtoMatter));
             saveData.SetSafeRemovalCompleted(report.IsComplete);
             if (report.IsComplete) {
                 ApplyCompletedVisibility();
@@ -125,7 +125,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             storage.DropAll(true, true, Vector3.zero, true, null);
         }
 
-        private static void ConvertProtoMatter(SafeRemovalReport report) {
+        private static int ConvertProtoMatter(SafeRemovalReport report) {
+            var remaining = 0;
             var elements = FindAllObjects<PrimaryElement>();
             for (var index = 0; index < elements.Length; index++) {
                 var primary = elements[index];
@@ -138,27 +139,66 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 var temperature = primary.Temperature;
                 var diseaseIndex = primary.DiseaseIdx;
                 var diseaseCount = primary.DiseaseCount;
-                ElementLoader.FindElementByHash(SimHashes.IgneousRock).substance.SpawnResource(
-                    position, mass, temperature, diseaseIndex, diseaseCount, prevent_merge: true);
-                Util.KDestroyGameObject(primary.gameObject);
+                GameObject replacement;
+                try {
+                    replacement = ElementLoader.FindElementByHash(SimHashes.IgneousRock)
+                        .substance.SpawnResource(position, mass, temperature, diseaseIndex,
+                            diseaseCount, prevent_merge: true);
+                } catch (System.Exception exception) {
+                    remaining++;
+                    LogReplacementFailure(primary,
+                        "the native resource spawn threw an exception", exception);
+                    continue;
+                }
+
+                if (replacement == null) {
+                    remaining++;
+                    LogReplacementFailure(primary,
+                        "the native resource spawn returned null", null);
+                    continue;
+                }
+
+                try {
+                    Util.KDestroyGameObject(primary.gameObject);
+                } catch (System.Exception exception) {
+                    remaining++;
+                    LogReplacementFailure(primary,
+                        "the original custom object could not be scheduled for destruction",
+                        exception);
+                    try {
+                        Util.KDestroyGameObject(replacement);
+                    } catch (System.Exception rollbackException) {
+                        Debug.LogError(
+                            "[ForbiddenTechnologyPack] Failed to remove the unused Igneous Rock " +
+                            "replacement after retaining Proto-Matter: " + rollbackException);
+                    }
+                    continue;
+                }
+
                 report.RecordConvertedObject(mass);
             }
+
+            return remaining;
         }
 
-        private static int CountRemainingCustomObjects() {
-            var remaining = 0;
-            var elements = FindAllObjects<PrimaryElement>();
-            for (var index = 0; index < elements.Length; index++) {
-                if (elements[index] != null &&
-                        elements[index].ElementID == ProtoMatterRegistration.Hash) {
-                    remaining++;
-                }
-            }
-
+        private static int CountRemainingCustomObjects(int remainingProtoMatter) {
+            var remaining = remainingProtoMatter;
             remaining += CountLiveBuildings(FindAllObjects<MatterAnalyzer>());
             remaining += CountLiveBuildings(FindAllObjects<MassCrusher>());
             remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
             return remaining;
+        }
+
+        private static void LogReplacementFailure(PrimaryElement primary, string reason,
+                System.Exception exception) {
+            var objectName = primary == null || primary.gameObject == null
+                ? "<unknown>" : primary.gameObject.name;
+            var detail = exception == null ? string.Empty : ": " + exception;
+            Debug.LogError(
+                "[ForbiddenTechnologyPack] Failed to replace Proto-Matter object '" +
+                objectName + "' with native Igneous Rock because " + reason +
+                ". The original object was retained and will remain in the cleanup count" +
+                detail);
         }
 
         private static T[] FindAllObjects<T>() where T : Object {
