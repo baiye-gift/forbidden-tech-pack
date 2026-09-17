@@ -25,7 +25,7 @@ internal static class EntropyFluxPolicyTests {
 
         var hotPhaseGuard = EntropyFluxPolicy.Evaluate(
             1f, 1f, 275.15f, 273.15f, 500f,
-            100f, 1f, 274.15f, 250f, 500f,
+            100f, 1f, 250f, 200f, 500f,
             10000000f);
         AssertEx.True(hotPhaseGuard.PhaseLimited, "hot lower phase boundary limits transfer");
         AssertEx.True(hotPhaseGuard.HotOutputTemperatureK >= 274.15f,
