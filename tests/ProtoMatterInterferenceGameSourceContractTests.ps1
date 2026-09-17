@@ -47,7 +47,7 @@ if ($manager -notmatch 'HashSet<ForbiddenTechDevice>\s+devices' -or
 if ($manager -match 'FindObjectsOfType' -or $manager -match 'Update\s*\(' -or $manager -match 'Sim1000ms') {
     throw 'Interference must be event-driven and must not scan all buildings every frame/tick.'
 }
-if ($manager -notmatch 'Grid\.WorldIdx' -or $manager -notmatch 'ProtoMatterInterferencePolicy\.IsInRange') {
+if ($manager -notmatch 'Grid\.WorldIdx' -or $manager -notmatch 'ProtoMatterInterferencePolicy\.IsInsideRadius') {
     throw 'Interference application must stay world-local and reuse the tested range policy.'
 }
 
