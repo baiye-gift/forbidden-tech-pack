@@ -46,6 +46,23 @@ public static class STRINGS {
                         public static LocString INACTIVE = "When receiving a Red signal, the Matter Compiler is disabled.";
                     }
                 }
+
+                public static class BAIYEMATTERRECONSTRUCTOR {
+                    public static LocString NAME = "Matter Reconstructor";
+                    public static LocString DESC = "Uses Proto-Matter to lever reality and rewrite an existing material substrate into an analyzed structure.";
+                    public static LocString EFFECT = "Consumes a tier-matched reality substrate and Proto-Matter to produce an equal mass of an analyzed target material.";
+                    public static LocString NO_RECIPES = "No analyzed reconstruction targets are available.";
+                    public static LocString WAITING_SUBSTRATE = "Waiting for a compatible reality substrate.";
+                    public static LocString WAITING_PROTO_MATTER = "Waiting for Proto-Matter.";
+                    public static LocString OUTPUT_BLOCKED = "Reconstructed material output is blocked.";
+                    public static LocString INTERFERED = "Proto-Matter interference has destabilized reality anchoring. Reconstruction is paused.";
+
+                    public static class LOGIC_PORT {
+                        public static LocString NAME = "Enable Matter Reconstructor";
+                        public static LocString ACTIVE = "When receiving a Green signal, the Matter Reconstructor may operate.";
+                        public static LocString INACTIVE = "When receiving a Red signal, the Matter Reconstructor is disabled.";
+                    }
+                }
             }
         }
 
@@ -64,6 +81,12 @@ public static class STRINGS {
                     public static LocString NAME = "Forbidden Matter Engineering";
                     public static LocString DESC = "Reverse-engineer matter itself and build machines that analyze, deconstruct, and compile solid materials.";
                     public static LocString SEARCH_TERMS = "forbidden matter proto-matter analyzer crusher compiler";
+                }
+
+                public static class BAIYEFORBIDDENPROTOFIELDENGINEERING {
+                    public static LocString NAME = "Proto-Matter Field Engineering";
+                    public static LocString DESC = "Use Proto-Matter as a dimensional coupling medium to lever reality itself and drive advanced forbidden machinery.";
+                    public static LocString SEARCH_TERMS = "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden";
                 }
             }
         }
