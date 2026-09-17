@@ -46,6 +46,7 @@ namespace ForbiddenTechnologyPack.Game.Elements {
                 var descriptor = ToDescriptor(element);
                 MaterialRule rule;
                 if (MaterialClassifier.TryCreateRule(descriptor, ForbiddenTechOptions.Current, out rule)) {
+                    ReconstructionSubstrateTags.AttachToElement(element, rule.Tier);
                     candidates[element.id.ToString()] = rule;
                 }
             }
