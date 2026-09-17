@@ -4,10 +4,38 @@ using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Common;
 using ForbiddenTechnologyPack.Game.Elements;
 using ForbiddenTechnologyPack.Game.Options;
+using HarmonyLib;
 using UnityEngine;
 using TUNING;
 
 namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
+    [HarmonyPatch(typeof(SolidConduitConsumer), "ConduitUpdate")]
+    internal static class MassCrusherRailInputPatch {
+        private static bool Prefix(SolidConduitConsumer __instance) {
+            if (__instance.GetComponent<MassCrusher>() == null || !__instance.IsConnected) {
+                return true;
+            }
+
+            var building = __instance.GetComponent<Building>();
+            if (building == null) {
+                return true;
+            }
+            var flow = global::Game.Instance.solidConduitFlow;
+            var contents = flow.GetContents(building.GetUtilityInputCell());
+            if (!contents.pickupableHandle.IsValid()) {
+                return true;
+            }
+            var pickupable = flow.GetPickupable(contents.pickupableHandle);
+            return pickupable != null && pickupable.PrimaryElement != null &&
+                CanAcceptElement(pickupable.PrimaryElement.ElementID.ToString());
+        }
+
+        internal static bool CanAcceptElement(string elementId) {
+            return !string.IsNullOrEmpty(elementId) &&
+                ElementCatalogAdapter.Rules.ContainsKey(elementId) && CrusherPolicy.CanCrush(elementId);
+        }
+    }
+
     public sealed class BaiyeMassCrusherConfig : IBuildingConfig {
         private const float InputCapacityKg = 1000f;
         private const float OutputCapacityKg = 120f;

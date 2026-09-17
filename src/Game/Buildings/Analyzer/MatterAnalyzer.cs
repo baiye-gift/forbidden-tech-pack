@@ -5,12 +5,13 @@ using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Recipes;
 using ForbiddenTechnologyPack.Game.Save;
 using ForbiddenTechnologyPack.Game.Elements;
-using HarmonyLib;
 using ForbiddenTechnologyPack.Game.Buildings.Common;
 using UnityEngine;
 
 namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     public sealed class MatterAnalyzer : ComplexFabricator {
+        private bool recipeRefreshPending;
+
         protected override void OnSpawn() {
             base.OnSpawn();
             SubscribeToUnlocks();
@@ -23,6 +24,11 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
         }
 
         public void RefreshRecipes() {
+            recipeRefreshPending = true;
+            if (CurrentWorkingOrder != null) {
+                return;
+            }
+
             var saveData = ForbiddenTechSaveData.Instance;
             if (saveData == null) {
                 return;
@@ -34,6 +40,30 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             var visibleIds = AnalyzerPolicy.VisibleRuleIds(rules, saveData.GetUnlockState(), activeIds);
             MatterAnalyzerRecipeList.Set(this, visibleIds.Where(RecipeRegistry.AnalyzerRecipes.ContainsKey)
                 .Select(id => RecipeRegistry.AnalyzerRecipes[id]).ToArray());
+            recipeRefreshPending = false;
+        }
+
+        public override void Sim1000ms(float dt) {
+            if (recipeRefreshPending && CurrentWorkingOrder == null) {
+                RefreshRecipes();
+            }
+            base.Sim1000ms(dt);
+        }
+
+        public override void CompleteWorkingOrder() {
+            var completedRecipe = CurrentWorkingOrder;
+            if (completedRecipe != null) {
+                // Base completion decrements this count, then may start another material.
+                // Do not disable Operational: that cancels unrelated open orders.
+                SetRecipeQueueCount(completedRecipe, 1);
+            }
+            base.CompleteWorkingOrder();
+
+            if (completedRecipe != null && completedRecipe.ingredients != null &&
+                    completedRecipe.ingredients.Length > 0 && ForbiddenTechSaveData.Instance != null) {
+                ForbiddenTechSaveData.Instance.Unlock(completedRecipe.ingredients[0].material);
+                RefreshRecipes();
+            }
         }
 
         protected override List<GameObject> SpawnOrderProduct(ComplexRecipe recipe) {
@@ -64,26 +94,6 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             if (ForbiddenTechSaveData.Instance != null) {
                 ForbiddenTechSaveData.Instance.UnlocksChanged -= RefreshRecipes;
             }
-        }
-    }
-
-    [HarmonyPatch(typeof(ComplexFabricator), "CompleteWorkingOrder")]
-    internal static class MatterAnalyzerCompletionPatch {
-        private static void Prefix(ComplexFabricator __instance, ref ComplexRecipe __state) {
-            if (__instance is MatterAnalyzer) {
-                __state = __instance.CurrentWorkingOrder;
-            }
-        }
-
-        private static void Postfix(ComplexFabricator __instance, ComplexRecipe __state) {
-            var analyzer = __instance as MatterAnalyzer;
-            if (analyzer == null || __state == null || __state.ingredients == null ||
-                    __state.ingredients.Length == 0 || ForbiddenTechSaveData.Instance == null) {
-                return;
-            }
-
-            ForbiddenTechSaveData.Instance.Unlock(__state.ingredients[0].material);
-            analyzer.RefreshRecipes();
         }
     }
 
