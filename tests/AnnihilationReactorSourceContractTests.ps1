@@ -58,6 +58,12 @@ $controllerRequirements = [ordered]@{
     'stable heat' = '1200000f\s*\*\s*ForbiddenTechOptions\.Current\.HeatMultiplier'
     'coolant phase margin' = 'EntropyFluxPolicy\.PhaseMarginKelvin'
     'safe-removal hook' = 'PrepareForSafeRemoval'
+    'animation controller' = 'KBatchedAnimController'
+    'charging animation' = '"charge"'
+    'stable animation' = '"working"'
+    'unstable animation' = '"unstable"'
+    'decoherence animation' = '"decohere"'
+    'lockout animation' = '"locked"'
 }
 foreach ($requirement in $controllerRequirements.GetEnumerator()) {
     if ($controller -notmatch $requirement.Value) {
