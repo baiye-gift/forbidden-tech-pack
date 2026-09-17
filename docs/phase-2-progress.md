@@ -11,13 +11,11 @@
 
 当前开发重点：**物质重构器（Matter Reconstructor）**。
 
-物质重构器不是从头开发状态。主体代码已经存在，当前已经完成 Core 规则、基质 Tag、配方、BuildingConfig、运行组件、研究注册、菜单注册、本地化、安全移除、SCML/图标源及资源恢复链。
+物质重构器主体代码、资源链和本机 ONI DLL 集成验证均已完成到 `LOCAL_VERIFIED`。当前不再进行重构器代码开发，真正的下一断点是：
 
-当前真正的断点是：
+**Task 7：安装当前 Phase 2 包并执行物质重构器游戏内验证。**
 
-**Task 7：用户本机 ONI 完整集成验证 + 游戏内验证。**
-
-不要重新执行 Task 1–5。
+不要重新执行 Task 1–6，也不要重复处理已经关闭的 SafeRemovalRuntime fixture 问题。
 
 ---
 
@@ -41,15 +39,15 @@
 
 | 任务 | 当前状态 | 已实现内容 | 仍需验证/处理 |
 | --- | --- | --- | --- |
-| Phase 2 共用原质干扰框架 | `LOCAL_VERIFIED` | `ForbiddenTechDevice`、事件驱动干扰管理、一阶段分析仪/粉碎机/编译器接入 | 后续仍需实际游戏里验证干扰表现 |
-| Task 1 重构 Core Policy | `PORTABLE_VERIFIED` | 层级映射、1000 kg 基质/产物质量规则、原质成本、倍率验证 | 随本机 All 再验证一次 |
-| Task 2 重构配方与已分析目标过滤 | `PORTABLE_VERIFIED` | `ReconstructorRecipes`、分析解锁过滤、原质独立消耗 | 实际游戏配方列表、工作单刷新 |
-| Task 3 现实基质层级 Tag | `PORTABLE_VERIFIED` | Common / OreOrOrganic / Industrial / Rare 稳定 Tag，复用现有材料分类 | 实际游戏元素 prefab Tag 与输送行为 |
-| Task 4 Matter Reconstructor 建筑与运行组件 | `PORTABLE_VERIFIED` | 4×4 BuildingConfig、4800 W、24 kDTU/s、输入/输出存储、固体轨道、电力、自动化、`ForbiddenTechDevice` | 用户本机 ONI DLL 编译 + 游戏内运行 |
-| Task 5 注册、二阶段研究、本地化、安全移除 | `PORTABLE_VERIFIED` | `BaiyeForbiddenProtoFieldEngineering`、菜单、本地化、配置标签、安全移除接入 | 本机 runtime tests + 游戏研究树/安全移除 |
-| Task 6 KAnim / 图标 / 资源链 | `PORTABLE_VERIFIED` | SCML、manifest、body/UI sprite Base64 源、自动恢复脚本、build-assets 映射、资源契约 | 本机 `build-assets.ps1` 实际 KAnim 编译 |
-| Task 7 完整集成验证 | `IN_PROGRESS` | GitHub Portable CI 已通过；本机完整 Mod 构建已能生成 DLL/包 | 重新执行本机 All，确认 safe-removal runtime fixture 修复；随后游戏内测试 |
-| 熵流偏转器 | `NOT_STARTED` | 已有稳定 ID / 配置规划 | 等物质重构器完成游戏验证后再开始 |
+| Phase 2 共用原质干扰框架 | `LOCAL_VERIFIED` | `ForbiddenTechDevice`、事件驱动干扰管理、一阶段分析仪/粉碎机/编译器接入 | 游戏内验证干扰暂停/恢复表现 |
+| Task 1 重构 Core Policy | `LOCAL_VERIFIED` | 层级映射、1000 kg 基质/产物质量规则、原质成本、倍率验证 | 游戏内验证实际质量行为 |
+| Task 2 重构配方与已分析目标过滤 | `LOCAL_VERIFIED` | `ReconstructorRecipes`、分析解锁过滤、原质独立消耗 | 游戏内配方列表、分析后刷新、工作单保持 |
+| Task 3 现实基质层级 Tag | `LOCAL_VERIFIED` | Common / OreOrOrganic / Industrial / Rare 稳定 Tag，复用现有材料分类 | 游戏内元素 Tag 与输送行为 |
+| Task 4 Matter Reconstructor 建筑与运行组件 | `LOCAL_VERIFIED` | 4×4 BuildingConfig、4800 W、24 kDTU/s、输入/输出存储、固体轨道、电力、自动化、`ForbiddenTechDevice` | 游戏内运行、物流、电力、自动化 |
+| Task 5 注册、二阶段研究、本地化、安全移除 | `LOCAL_VERIFIED` | `BaiyeForbiddenProtoFieldEngineering`、菜单、本地化、配置标签、安全移除接入 | 游戏研究树、菜单、配置、安全移除 |
+| Task 6 KAnim / 图标 / 资源链 | `LOCAL_VERIFIED` | SCML、manifest、body/UI sprite Base64 源、自动恢复脚本、build-assets 映射、资源契约 | 游戏内图标、尺寸、动画落地效果 |
+| Task 7 完整集成验证 | `LOCAL_VERIFIED` | GitHub Portable CI 通过；本机 `test.ps1 -Suite All` 223 项通过；测试过程中真实 ONI DLL 与包重新生成成功 | 安装当前包 + 游戏内验证 + 更新 test matrix |
+| 熵流偏转器 | `NOT_STARTED` | 已有稳定 ID / 配置规划 | 等物质重构器游戏内验证后再开始 |
 | 物质湮灭堆 | `NOT_STARTED` | 已有稳定 ID / 原质干扰系统设计 | 等前两台建筑稳定后开发 |
 
 ---
@@ -66,7 +64,7 @@ Built package: ...\dist\ForbiddenTechnologyPack
 TOTAL: 206 passed
 ```
 
-该次验证发生在物质重构器主体开发之前，因此它证明的是**Phase 2 共用框架 + 一阶段三台建筑干扰接入**可以在当前 ONI DLL 上编译和通过当时的完整测试，不能用它代替物质重构器的最终验证。
+该次验证证明 Phase 2 共用框架 + 一阶段三台建筑干扰接入可以在当前 ONI DLL 上编译并通过当时的完整测试。
 
 ### 4.2 物质重构器 Portable 验证
 
@@ -84,35 +82,43 @@ TOTAL: 206 passed
 - 重构器 BuildingConfig 契约；
 - 重构器集成契约。
 
-**这不等于本机 ONI DLL 编译通过，也不等于游戏内可用。**
+### 4.3 Task 7 首次本机 All 暴露的问题
 
-### 4.3 本机 Task 7 第一次 All 验证
+首次本机 All 时，Mod 本体已经成功完成编译和打包，但 `SafeRemovalRuntimeTests.ps1` 的旧 Phase 1 behavior fixture 没有声明 `MatterReconstructor`，因此出现：
 
-用户本机执行完整验证时，Mod 本体已经成功完成编译和打包：
+```text
+SafeRemovalController.cs(5,46): error CS0234: ... Buildings.Reconstructor ...
+```
+
+该问题属于测试夹具过期，不是 Mod 本体缺少 Reconstructor。修复提交：
+
+`be657795` — `test(phase2): cover reconstructor safe-removal runtime fixture`
+
+修复内容：
+
+- Runtime probe 增加 `MatterReconstructor` safe-removal 覆盖；
+- behavior fixture 增加 `MatterReconstructor` stub；
+- fixture 补齐 `MatterReconstructorId`；
+- fixture 补齐 `ProtoFieldResearchId`。
+
+### 4.4 Task 7 本机重新验证成功
+
+2026-09-18，用户在当前 ONI 安装上重新执行完整 All，得到：
 
 ```text
 Wrote D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack\ForbiddenTechnologyPack.dll
 Built package: D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack
-Safe-removal compiled contract passed: inactive discovery, native spawn, state capture, and custom-prefab destruction.
+Crusher rail compiled contract and live predicate passed (valid, unknown, forbidden, empty IDs). Native rail movement requires in-game validation.
+TOTAL: 223 passed
 ```
 
-随后 `SafeRemovalRuntimeTests.ps1` 的确定性行为模拟编译失败：
+因此可以确认：
 
-```text
-src\Game\Safety\SafeRemovalController.cs(5,46): error CS0234:
-命名空间“ForbiddenTechnologyPack.Game.Buildings”中不存在类型或命名空间名“Reconstructor”
-```
-
-根因已经定位：**测试夹具仍停留在 Phase 1，只 stub 了 Analyzer / Crusher / Compiler；生产代码已经引用 MatterReconstructor。完整 Mod build 本身并未缺少 Reconstructor。**
-
-修复提交 `be657795` 已补齐：
-
-- Runtime probe 对 `MatterReconstructor` 的 safe-removal 反射覆盖；
-- behavior fixture 的 `MatterReconstructor` stub；
-- `MatterReconstructorId`；
-- `ProtoFieldResearchId`。
-
-该修复尚需用户本机重新执行 `test.ps1 -Suite All` 后才能升级验证状态。
+- 当前 Phase 2 源码可使用用户本机 ONI DLL 编译；
+- 重构器相关 runtime/source/Core 契约进入完整 All 并通过；
+- KAnim/包构建链可在完整 All 路径中成功执行；
+- safe-removal fixture 修复已通过本机重新验证；
+- 真实游戏内行为仍然不能由该结果替代。
 
 ---
 
@@ -137,52 +143,41 @@ src\Game\Safety\SafeRemovalController.cs(5,46): error CS0234:
 - `aab2c641` — `docs(assets): document encoded reconstructor sprite sources`
   - 资源恢复链说明；其对应 Portable CI 已通过。
 - `be657795` — `test(phase2): cover reconstructor safe-removal runtime fixture`
-  - 修复 Task 7 首次本机 All 暴露的 Phase 1 safe-removal behavior fixture 过期问题，并把 Reconstructor 纳入 runtime probe。
-
-后续只有在新验证或新代码产生时继续追加关键锚点，不需要把每个微小提交都写入这里。
+  - 修复 Task 7 首次本机 All 暴露的旧 Phase 1 fixture，并把 Reconstructor 纳入 runtime probe。
 
 ---
 
 ## 6. 当前精确下一步
 
-**从这里继续，不重新开发物质重构器，也不重新跑已经成功的独立 build-assets 步骤。**
+**当前不需要继续编译，也不需要重新开发物质重构器。**
 
-用户本地同步最新分支后，先重新执行完整 All：
+下一步是安装当前 `dist\ForbiddenTechnologyPack` 到本地 Mod 目录，然后完全退出并重启 ONI，开始游戏内验证。
 
-```powershell
-git pull
-git log -1 --oneline
-
-.\test.ps1 -Suite All -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"
-```
-
-如果 All 通过，再执行最终独立 build：
+推荐先备份/替换本地 Mod：
 
 ```powershell
-.\build.ps1 -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"
+$src = "D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack"
+$dst = "$env:USERPROFILE\Documents\Klei\OxygenNotIncluded\mods\local\ForbiddenTechnologyPack"
+
+if (Test-Path $dst) {
+    Copy-Item $dst "$dst.backup-20260918" -Recurse -Force
+    Remove-Item $dst -Recurse -Force
+}
+Copy-Item $src $dst -Recurse -Force
 ```
 
-如果其中任何一步失败：
+然后：
 
-1. 在本文件“当前阻塞”中记录第一个真实失败；
-2. 只修这个失败；
-3. 修复后重新运行对应验证；
-4. 不回退重做已完成任务。
-
-如果 All + build 全部通过：
-
-1. 把 Task 1–6 中需要 ONI DLL 的部分升级为 `LOCAL_VERIFIED`；
-2. 安装到本地 Mod；
-3. 完全退出并重启 ONI；
-4. 进入游戏验证物质重构器；
-5. 将实际结果写入 `docs/test-matrix.md`；
-6. 本文件同步升级对应状态。
+1. 完全退出 ONI；
+2. 从 Steam 重新启动；
+3. 确认 Mod 启用；
+4. 进入已有测试存档或专用测试殖民地；
+5. 按第 7 节清单逐项验证；
+6. 每次发现第一个真实失败就停止继续扩展测试，记录 Player.log / 现象，先修该失败。
 
 ---
 
 ## 7. 游戏内验证清单（物质重构器）
-
-本机编译通过后，至少验证：
 
 - [ ] 二阶段“原质场工程”研究节点可见，前置为第一阶段“禁忌物质工程”。
 - [ ] 物质重构器在 Refining 菜单出现，图标不是问号。
@@ -209,21 +204,15 @@ git log -1 --oneline
 
 ## 8. 当前阻塞
 
-当前已知阻塞来自 **SafeRemovalRuntimeTests 的旧 Phase 1 behavior fixture**，不是 Mod 本体构建。
+**当前没有已知代码/编译阻塞。**
 
-状态：`FIX_COMMITTED / LOCAL_REVERIFY_PENDING`
+旧阻塞：`SafeRemovalRuntimeTests` Phase 1 fixture 缺少 Reconstructor。
 
-失败：
+状态：`CLOSED`  
+修复：`be657795`  
+本机重新验证：`TOTAL: 223 passed`
 
-```text
-SafeRemovalController.cs(5,46): error CS0234: ... Buildings.Reconstructor ...
-```
-
-根因：Runtime behavior fixture 缺少 Phase 2 `MatterReconstructor` namespace/type 以及二阶段 `ModIdentity` 常量。
-
-修复：`be657795`。
-
-下一步：用户本机重新执行 `test.ps1 -Suite All`。在看到新鲜的 `TOTAL: ... passed` 之前，不把 Task 7 标记为 `LOCAL_VERIFIED`。
+当前仅剩游戏内验证，不能在执行前标记为 `IN_GAME_VERIFIED`。
 
 ---
 
