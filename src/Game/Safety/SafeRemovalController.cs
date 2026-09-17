@@ -2,6 +2,7 @@ using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Analyzer;
 using ForbiddenTechnologyPack.Game.Buildings.Compiler;
 using ForbiddenTechnologyPack.Game.Buildings.Crusher;
+using ForbiddenTechnologyPack.Game.Buildings.EntropyDiverter;
 using ForbiddenTechnologyPack.Game.Buildings.Reconstructor;
 using ForbiddenTechnologyPack.Game.Elements;
 using ForbiddenTechnologyPack.Game.Save;
@@ -17,7 +18,8 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
             ModIdentity.MatterCompilerId,
-            ModIdentity.MatterReconstructorId
+            ModIdentity.MatterReconstructorId,
+            ModIdentity.EntropyFluxDiverterId
         };
 
         public static SafeRemovalReport Execute() {
@@ -34,6 +36,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             ProcessBuildings(FindAllObjects<MassCrusher>(), report);
             ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
             ProcessBuildings(FindAllObjects<MatterReconstructor>(), report);
+            ProcessEntropyDiverters(FindAllObjects<EntropyFluxDiverterController>(), report);
             var remainingProtoMatter = ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects(remainingProtoMatter));
             saveData.SetSafeRemovalCompleted(report.IsComplete);
@@ -97,11 +100,33 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                     DropStorage(coolant == null ? null : coolant.storage, report, true);
                 }
 
-                var deconstructable = fabricator.GetComponent<Deconstructable>();
-                if (deconstructable != null && !deconstructable.HasBeenDestroyed) {
-                    deconstructable.ForceDestroyAndGetMaterials();
-                    report.RecordRemovedBuilding();
+                DestroyBuilding(fabricator, report);
+            }
+        }
+
+        private static void ProcessEntropyDiverters(EntropyFluxDiverterController[] buildings,
+                SafeRemovalReport report) {
+            if (buildings == null) {
+                return;
+            }
+            for (var index = 0; index < buildings.Length; index++) {
+                var controller = buildings[index];
+                if (controller == null) {
+                    continue;
                 }
+                controller.PrepareForSafeRemoval();
+                DropStorage(controller.hotStorage, report, true);
+                DropStorage(controller.coldStorage, report, true);
+                DropStorage(controller.protoMatterStorage, report, true);
+                DestroyBuilding(controller, report);
+            }
+        }
+
+        private static void DestroyBuilding(Component component, SafeRemovalReport report) {
+            var deconstructable = component == null ? null : component.GetComponent<Deconstructable>();
+            if (deconstructable != null && !deconstructable.HasBeenDestroyed) {
+                deconstructable.ForceDestroyAndGetMaterials();
+                report.RecordRemovedBuilding();
             }
         }
 
@@ -188,6 +213,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             remaining += CountLiveBuildings(FindAllObjects<MassCrusher>());
             remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
             remaining += CountLiveBuildings(FindAllObjects<MatterReconstructor>());
+            remaining += CountLiveBuildings(FindAllObjects<EntropyFluxDiverterController>());
             return remaining;
         }
 
@@ -214,7 +240,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 FindObjectsInactive.Include, FindObjectsSortMode.None);
         }
 
-        private static int CountLiveBuildings<T>(T[] buildings) where T : ComplexFabricator {
+        private static int CountLiveBuildings<T>(T[] buildings) where T : Component {
             var count = 0;
             if (buildings == null) {
                 return count;
