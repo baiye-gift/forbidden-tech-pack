@@ -1,62 +1,68 @@
 # 第二阶段开发进度跟踪
 
-> **用途：这是第二阶段开发的实时断点文档。** 发生网络中断、会话丢失或换人接手时，以本文件 + 当前 Git HEAD + 测试结果为准，不从头重跑已经完成的开发任务。
+> **权威实时断点文档。** 网络中断、换会话或换人接手时，先看本文件，再对照当前 Git HEAD；如果 HEAD 比本文件记录更新，先审计提交，不允许从头重复开发。
 
 最后更新：2026-09-18  
-当前分支：`feature/baiye-20260917-phase2-protomatter-field`
+当前分支：`feature/baiye-20260917-phase2-protomatter-field`  
+本次进度审计基准：`ce1ed88e`（已同步熵流偏转器 / 湮灭堆实施计划）
 
-## 1. 当前阶段结论
+## 1. 当前结论
 
-第二阶段主题：**原质场与维度耦合**。
+第二阶段主题：**原质场与维度耦合 / Proto-Matter Field & Dimensional Coupling**。
 
-当前开发重点：**物质重构器（Matter Reconstructor）**。
+当前开发顺序已经推进到：
 
-物质重构器主体代码、资源链和本机 ONI DLL 集成验证均已完成到 `LOCAL_VERIFIED`。当前不再进行重构器代码开发，真正的下一断点是：
+1. 共用原质干扰框架：已完成；
+2. 物质重构器：代码与本机 All 已完成，等待最终游戏内验证；
+3. 熵流偏转器：主体代码已完成，资源链刚补齐，等待当前 Portable CI 结论与最终本机/游戏验证；
+4. 物质湮灭堆：Core 状态机已完成并 Portable 验证通过，下一断点是 **Game Runtime**。
 
-**Task 7：安装当前 Phase 2 包并执行物质重构器游戏内验证。**
-
-不要重新执行 Task 1–6，也不要重复处理已经关闭的 SafeRemovalRuntime fixture 问题。
+**禁止重新开发重构器、熵流偏转器 Core/Controller/Config/注册/安全移除，也禁止重新创建湮灭堆 Core Policy。**
 
 ---
 
-## 2. 关键设计文档
+## 2. 关键文档
 
-- 第二阶段总体开发文档：`docs/phase-2-protomatter-field-development.md`
-- 长期开发约束：`docs/phase-2-development-guide.md`
-- 物质重构器设计规格：`docs/superpowers/specs/2026-09-17-matter-reconstructor-design.md`
-- 物质重构器实施计划：`docs/superpowers/plans/2026-09-17-matter-reconstructor.md`
-- 测试矩阵：`docs/test-matrix.md`
+### 总体
+- `docs/phase-2-protomatter-field-development.md`
+- `docs/phase-2-development-guide.md`
+- `docs/test-matrix.md`
 
-核心设定已经确认：
+### 物质重构器
+- Spec：`docs/superpowers/specs/2026-09-17-matter-reconstructor-design.md`
+- Plan：`docs/superpowers/plans/2026-09-17-matter-reconstructor.md`
 
-`1000 kg 现实基质 + X kg 原质 -> 1000 kg 目标材料`
+### 熵流偏转器
+- Spec：`docs/superpowers/specs/2026-09-18-entropy-flux-diverter-design.md`
+- Plan：`docs/superpowers/plans/2026-09-18-entropy-flux-diverter.md`
 
-原质的作用是**撬动现实、削弱现实基质当前的结构锚定并允许重新写入目标结构**，原质本身不计入最终产物质量。
+### 物质湮灭堆
+- Spec：`docs/superpowers/specs/2026-09-18-matter-annihilation-reactor-design.md`
+- Plan：`docs/superpowers/plans/2026-09-18-matter-annihilation-reactor.md`
 
 ---
 
 ## 3. 当前任务状态
 
-| 任务 | 当前状态 | 已实现内容 | 仍需验证/处理 |
+| 模块 | 状态 | 已实现 | 下一步 |
 | --- | --- | --- | --- |
-| Phase 2 共用原质干扰框架 | `LOCAL_VERIFIED` | `ForbiddenTechDevice`、事件驱动干扰管理、一阶段分析仪/粉碎机/编译器接入 | 游戏内验证干扰暂停/恢复表现 |
-| Task 1 重构 Core Policy | `LOCAL_VERIFIED` | 层级映射、1000 kg 基质/产物质量规则、原质成本、倍率验证 | 游戏内验证实际质量行为 |
-| Task 2 重构配方与已分析目标过滤 | `LOCAL_VERIFIED` | `ReconstructorRecipes`、分析解锁过滤、原质独立消耗 | 游戏内配方列表、分析后刷新、工作单保持 |
-| Task 3 现实基质层级 Tag | `LOCAL_VERIFIED` | Common / OreOrOrganic / Industrial / Rare 稳定 Tag，复用现有材料分类 | 游戏内元素 Tag 与输送行为 |
-| Task 4 Matter Reconstructor 建筑与运行组件 | `LOCAL_VERIFIED` | 4×4 BuildingConfig、4800 W、24 kDTU/s、输入/输出存储、固体轨道、电力、自动化、`ForbiddenTechDevice` | 游戏内运行、物流、电力、自动化 |
-| Task 5 注册、二阶段研究、本地化、安全移除 | `LOCAL_VERIFIED` | `BaiyeForbiddenProtoFieldEngineering`、菜单、本地化、配置标签、安全移除接入 | 游戏研究树、菜单、配置、安全移除 |
-| Task 6 KAnim / 图标 / 资源链 | `LOCAL_VERIFIED` | SCML、manifest、body/UI sprite Base64 源、自动恢复脚本、build-assets 映射、资源契约 | 游戏内图标、尺寸、动画落地效果 |
-| Task 7 完整集成验证 | `LOCAL_VERIFIED` | GitHub Portable CI 通过；本机 `test.ps1 -Suite All` 223 项通过；测试过程中真实 ONI DLL 与包重新生成成功 | 安装当前包 + 游戏内验证 + 更新 test matrix |
-| 熵流偏转器 | `NOT_STARTED` | 已有稳定 ID / 配置规划 | 等物质重构器游戏内验证后再开始 |
-| 物质湮灭堆 | `NOT_STARTED` | 已有稳定 ID / 原质干扰系统设计 | 等前两台建筑稳定后开发 |
+| Phase 2 共用原质干扰框架 | `LOCAL_VERIFIED` | `ForbiddenTechDevice`、事件驱动 `ProtoMatterInterferenceManager`、一阶段三台建筑接入 | 最终游戏内验证暂停/恢复、重叠源、存档行为 |
+| 物质重构器 | `LOCAL_VERIFIED` | Core、配方、层级 Tag、4×4 Config/Runtime、研究、菜单、本地化、安全移除、SCML/图标、资源链 | 最终 Codex/用户游戏内验证 |
+| 熵流偏转器 Core | `PORTABLE_VERIFIED` | `EntropyFluxPolicy`：等 DTU 转移、热平衡 clamp、1 K 相变保护、按实际 DTU 消耗原质 | 最终本机/游戏验证 |
+| 熵流偏转器 Runtime | `CODE_DONE` | 4×4、双液体主/副管路、两个 10 kg buffer、原质 storage、`processedPair` 防重复、干扰暂停 | 当前资源 HEAD 的 Portable CI；之后本机 ONI DLL + 游戏验证 |
+| 熵流偏转器集成 | `CODE_DONE` | Refining 菜单、Phase-2 研究解锁、本地化、安全移除 | 同上 |
+| 熵流偏转器资源 | `CI_PENDING` | SCML、body/UI Base64 PNG、manifest、build-assets 映射、asset contract、恢复 PNG ignore | 等当前 Feature verification 结论 |
+| 湮灭堆 Core | `PORTABLE_VERIFIED` | `ReactorState` + `AnnihilationReactorPolicy`，完整状态转换、退相干损失/热脉冲/干扰参数 | 不再修改，除非后续 Runtime 暴露明确契约缺口 |
+| 湮灭堆 Runtime | `IN_PROGRESS` | 已有稳定 ID、配置开关、本地化文本、`ForbiddenTechDevice.IsInterfered` | **先写 `AnnihilationReactorSourceContractTests.ps1` 红灯，然后实现 Config + Controller** |
+| 湮灭堆注册/安全移除 | `NOT_STARTED` | `BuildingRegistration` 已有 Power 分类 helper，但 reactor 尚未列入 implemented ids | Runtime 完成后接入 |
+| 湮灭堆 KAnim | `NOT_STARTED` | Spec 已定义视觉与动画状态 | 最后资源阶段实现 |
 
 ---
 
-## 4. 已确认的验证证据
+## 4. 已验证证据
 
-### 4.1 共用原质干扰框架
-
-用户本机曾在接入 `ForbiddenTechDevice` / 原质干扰管理器后执行：
+### 4.1 共用框架
+用户本机完整测试曾得到：
 
 ```text
 Wrote ...\ForbiddenTechnologyPack.dll
@@ -64,46 +70,10 @@ Built package: ...\dist\ForbiddenTechnologyPack
 TOTAL: 206 passed
 ```
 
-该次验证证明 Phase 2 共用框架 + 一阶段三台建筑干扰接入可以在当前 ONI DLL 上编译并通过当时的完整测试。
+因此共用原质干扰框架可在当时当前 ONI DLL 上编译通过，但仍不等同于游戏行为验证。
 
-### 4.2 物质重构器 Portable 验证
-
-在资源恢复链修复后，GitHub Actions `Feature verification` 的 `core-and-asset-contracts` job 已通过。
-
-验证覆盖：
-
-- Core tests；
-- 资源源文件契约；
-- 重构器资产契约；
-- Phase 2 options / registration 契约；
-- 原质干扰源码契约；
-- 重构基质 Tag 契约；
-- 重构配方契约；
-- 重构器 BuildingConfig 契约；
-- 重构器集成契约。
-
-### 4.3 Task 7 首次本机 All 暴露的问题
-
-首次本机 All 时，Mod 本体已经成功完成编译和打包，但 `SafeRemovalRuntimeTests.ps1` 的旧 Phase 1 behavior fixture 没有声明 `MatterReconstructor`，因此出现：
-
-```text
-SafeRemovalController.cs(5,46): error CS0234: ... Buildings.Reconstructor ...
-```
-
-该问题属于测试夹具过期，不是 Mod 本体缺少 Reconstructor。修复提交：
-
-`be657795` — `test(phase2): cover reconstructor safe-removal runtime fixture`
-
-修复内容：
-
-- Runtime probe 增加 `MatterReconstructor` safe-removal 覆盖；
-- behavior fixture 增加 `MatterReconstructor` stub；
-- fixture 补齐 `MatterReconstructorId`；
-- fixture 补齐 `ProtoFieldResearchId`。
-
-### 4.4 Task 7 本机重新验证成功
-
-2026-09-18，用户在当前 ONI 安装上重新执行完整 All，得到：
+### 4.2 物质重构器
+用户本机 2026-09-18 重新执行 All：
 
 ```text
 Wrote D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack\ForbiddenTechnologyPack.dll
@@ -112,119 +82,106 @@ Crusher rail compiled contract and live predicate passed (valid, unknown, forbid
 TOTAL: 223 passed
 ```
 
-因此可以确认：
+因此重构器状态为 `LOCAL_VERIFIED`，不是 `IN_GAME_VERIFIED`。
 
-- 当前 Phase 2 源码可使用用户本机 ONI DLL 编译；
-- 重构器相关 runtime/source/Core 契约进入完整 All 并通过；
-- KAnim/包构建链可在完整 All 路径中成功执行；
-- safe-removal fixture 修复已通过本机重新验证；
-- 真实游戏内行为仍然不能由该结果替代。
+### 4.3 熵流偏转器
+已确认存在并完成：
 
----
+- `src/Core/EntropyFluxPolicy.cs`
+- `src/Game/Buildings/EntropyDiverter/EntropyFluxDiverterConfig.cs`
+- `src/Game/Buildings/EntropyDiverter/EntropyFluxDiverterController.cs`
+- `tests/EntropyFluxPolicyTests.cs`
+- `tests/EntropyDiverterSourceContractTests.ps1`
+- Refining 注册 / Phase-2 研究解锁 / 本地化 / safe removal
 
-## 5. 重要提交锚点
+关键提交锚点：
 
-以下提交用于中断后快速判断进度，不要求逐个回放：
+- `1975147b` — controller
+- `12982621` — `ForbiddenTechDevice.IsInterfered`
+- `8afc6e14` — BuildingConfig
+- `42c4579d` — Refining 注册
+- `af80c931` — Phase-2 research unlock
+- `433daa35` — 剩余 Phase-2 本地化
+- `72b06685` — safe removal
+- `0081d3e1` / `9c3fb0ed` — asset contract + Portable routing
+- `42ef10d7` / `23809ab2` / `3d8fa26a` — SCML + body/UI payload
+- `0611ec13` / `d82d32fc` / `534adebb` — manifest / build mapping / ignored restored PNGs
 
-- `288eb3dd` — `feat(phase2): connect compiler to proto-matter interference`
-  - Phase 2 共用原质干扰框架完成一阶段三台建筑接入的关键锚点。
-- `5d78b96c` — `docs(phase2): tighten matter reconstructor contract`
-  - 物质重构器最终设计规格确认后的锚点。
-- `5d78b96c..3b60f9e6`
-  - 物质重构器主体实现区间，共包含 Core、配方、Tag、BuildingConfig、研究、本地化、安全移除、SCML/图标等开发。
-- `3b60f9e6` — `chore(assets): stage reconstructor UI sprite payload`
-  - 网络中断前的资源阶段 HEAD。
-- `fe18cbf4` — `fix(assets): materialize encoded sprites before tests`
-  - 测试前自动把 `.png.b64` 无损恢复为 PNG 工作副本。
-- `f18ffc79` — `fix(assets): restore reconstructor sources before KAnim build`
-  - KAnim 构建前恢复资源，并补充重构器源目录映射。
-- `91cda1ae` — `chore(assets): ignore restored reconstructor PNGs`
-  - 恢复生成的 PNG 不污染 Git 工作区。
-- `aab2c641` — `docs(assets): document encoded reconstructor sprite sources`
-  - 资源恢复链说明；其对应 Portable CI 已通过。
-- `be657795` — `test(phase2): cover reconstructor safe-removal runtime fixture`
-  - 修复 Task 7 首次本机 All 暴露的旧 Phase 1 fixture，并把 Reconstructor 纳入 runtime probe。
+当前资源 HEAD 的 Feature verification 已排队；在看到成功结论前，熵流偏转器整体不能标记为 `PORTABLE_VERIFIED`。
 
----
+### 4.4 物质湮灭堆
+Core TDD 已完成：
 
-## 6. 当前精确下一步
+- `f274e85f` — `AnnihilationReactorPolicyTests.cs`
+- `b0d0d830` — 注册 Core suite
+- `5f37a67f` — `AnnihilationReactorPolicy.cs`
 
-**当前不需要继续编译，也不需要重新开发物质重构器。**
+`5f37a67f` 对应 Feature verification 已成功。
 
-下一步是安装当前 `dist\ForbiddenTechnologyPack` 到本地 Mod 目录，然后完全退出并重启 ONI，开始游戏内验证。
+当前固定 Core 规则：
 
-推荐先备份/替换本地 Mod：
-
-```powershell
-$src = "D:\缺氧mod开发\ForbiddenTechnologyPack\dist\ForbiddenTechnologyPack"
-$dst = "$env:USERPROFILE\Documents\Klei\OxygenNotIncluded\mods\local\ForbiddenTechnologyPack"
-
-if (Test-Path $dst) {
-    Copy-Item $dst "$dst.backup-20260918" -Recurse -Force
-    Remove-Item $dst -Recurse -Force
-}
-Copy-Item $src $dst -Recurse -Force
+```text
+Charging: 30 s
+Stable fault grace: 5 s
+Fluctuating recovery: 10 s
+Fluctuating -> Critical: 15 s
+Critical recovery: 5 s
+Critical -> Decohered: 10 s
+CoolingLockout: 30 s
+Decoherence Proto-Matter loss: 35%
+Heat pulse: 20,000,000 DTU / kg lost × HeatMultiplier
+Interference radius: 12 cells
+Interference duration: 60 s
 ```
 
-然后：
+---
 
-1. 完全退出 ONI；
-2. 从 Steam 重新启动；
-3. 确认 Mod 启用；
-4. 进入已有测试存档或专用测试殖民地；
-5. 按第 7 节清单逐项验证；
-6. 每次发现第一个真实失败就停止继续扩展测试，记录 Player.log / 现象，先修该失败。
+## 5. 当前精确断点
+
+### 熵流偏转器
+不要再碰 Tasks 1-3。当前只需：
+
+1. 看最新 entropy-asset HEAD 的 Feature verification；
+2. 成功后更新本文件为 `PORTABLE_VERIFIED`；
+3. 本机 ONI DLL 编译、真实 conduit、阻塞输出、save/reload、干扰行为全部留给最终 Codex/用户测试。
+
+### 物质湮灭堆
+从 `docs/superpowers/plans/2026-09-18-matter-annihilation-reactor.md` **Task 2 第一个未勾选项**开始：
+
+1. 新增 `tests/AnnihilationReactorSourceContractTests.ps1`；
+2. 接入 `test.ps1` Portable；
+3. 先出现 RED（因为 Config/Controller 尚不存在）；
+4. 实现 `MatterAnnihilationReactorConfig.cs`；
+5. 实现 `MatterAnnihilationReactorController.cs`；
+6. Portable 绿后，再做注册 / safe removal / KAnim。
 
 ---
 
-## 7. 游戏内验证清单（物质重构器）
+## 6. 最终 Codex / 用户验证边界
 
-- [ ] 二阶段“原质场工程”研究节点可见，前置为第一阶段“禁忌物质工程”。
-- [ ] 物质重构器在 Refining 菜单出现，图标不是问号。
-- [ ] 建筑尺寸与落地位置正常，动画不沉入地板。
-- [ ] 未分析材料不会直接出现在重构目标中。
-- [ ] 新分析材料后，空闲重构器可以刷新合法配方。
-- [ ] 已开始工作时刷新配方不会清空当前工作单或吞物料。
-- [ ] 1000 kg 现实基质 + 对应原质只生成 1000 kg 目标材料。
-- [ ] 原质不会并入产物质量。
-- [ ] 手动供料可用。
-- [ ] 固体运输输入可用。
-- [ ] 固体运输输出可用。
-- [ ] 输出阻塞时不会吞产物或无限继续生产。
-- [ ] 断电后暂停，恢复供电继续。
-- [ ] 自动化红信号暂停，绿信号恢复。
-- [ ] 原质干扰期间暂停，解除后恢复，存储和队列不丢失。
-- [ ] 工作中保存并重载后状态正确。
-- [ ] 拆除时普通材料质量/温度/疾病信息按游戏规则保留。
-- [ ] `ReconstructorEnabled=false` 后不再提供新建入口，但旧存档实例不被自动删除。
-- [ ] 安全移除流程能处理重构器中的普通材料和原质。
-- [ ] `Player.log` 无由本 Mod 引发的重复异常。
+开发阶段最多标记到 `PORTABLE_VERIFIED`，除非用户再次提供本机测试证据。
+
+最终联合验证至少包括：
+
+- `./test.ps1 -Suite All -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"`
+- `./build-assets.ps1`
+- `./build.ps1 -GamePath "D:\steam\steamapps\common\OxygenNotIncluded"`
+- 安装当前包后完全重启 ONI
+- 研究树 / 建造菜单 / 图标 / 动画
+- 熵流偏转器双液体管路、DTU 守恒、相变保护、输出阻塞、save/reload、干扰暂停
+- 湮灭堆启动外部供电、冷却、净发电、全部状态转换、退相干一次性副作用、12 格 60 秒干扰、lockout、save/reload
+- safe removal
+- `Player.log` 不出现本 Mod 重复异常
 
 ---
 
-## 8. 当前阻塞
+## 7. 强制记录规则
 
-**当前没有已知代码/编译阻塞。**
-
-旧阻塞：`SafeRemovalRuntimeTests` Phase 1 fixture 缺少 Reconstructor。
-
-状态：`CLOSED`  
-修复：`be657795`  
-本机重新验证：`TOTAL: 223 passed`
-
-当前仅剩游戏内验证，不能在执行前标记为 `IN_GAME_VERIFIED`。
-
----
-
-## 9. 后续强制记录规则
-
-从本文件创建以后，开发过程执行以下规则：
-
-1. **开始新建筑前**：必须先有 spec、implementation plan，并在本文件登记 `NOT_STARTED -> IN_PROGRESS`。
-2. **完成一个有意义代码批次后**：记录实现内容和关键 commit。
-3. **Portable CI 通过后**：只能标 `PORTABLE_VERIFIED`，不能写“完整通过”。
-4. **用户本机 All/build 通过后**：再升级为 `LOCAL_VERIFIED`。
-5. **游戏内实际验证后**：再升级为 `IN_GAME_VERIFIED`，同时更新 `test-matrix.md`。
-6. **发生失败**：记录第一个真实失败、相关 commit/日志和下一步，不隐藏失败历史。
-7. **发生网络中断**：恢复时先对照本文件和 Git HEAD；HEAD 比文档新时先做 diff/commit 审计，不重复执行已存在代码。
-8. **每次准备切换到下一台建筑前**：先更新本文件，保证最后一个提交之后始终存在可恢复断点。
+1. 新建筑先有 Spec + Plan；
+2. 实现进度同时更新 Plan checkbox 和本文件；
+3. Core/source 完成只能写 `CODE_DONE`；
+4. GitHub Portable CI 成功后才能写 `PORTABLE_VERIFIED`；
+5. 用户/Codex 用真实 ONI DLL 跑完整构建后才能写 `LOCAL_VERIFIED`；
+6. 游戏内实际验证后才能写 `IN_GAME_VERIFIED`；
+7. 失败时记录第一个真实失败和对应 commit；
+8. 网络中断恢复时先看 Git HEAD + 本文件，禁止重复开发已存在代码。
