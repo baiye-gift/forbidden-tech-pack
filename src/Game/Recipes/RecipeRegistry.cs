@@ -18,6 +18,7 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
         public static IReadOnlyDictionary<string, ComplexRecipe> AnalyzerRecipes { get; private set; } = EmptyRecipes;
         public static IReadOnlyDictionary<string, ComplexRecipe> CrusherRecipes { get; private set; } = EmptyRecipes;
         public static IReadOnlyDictionary<string, ComplexRecipe> CompilerRecipes { get; private set; } = EmptyRecipes;
+        public static IReadOnlyDictionary<string, ComplexRecipe> ReconstructorRecipes { get; private set; } = EmptyRecipes;
 
         public static void Build() {
             if (wasBuilt) {
@@ -27,6 +28,7 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
             var analyzerRecipes = new Dictionary<string, ComplexRecipe>(StringComparer.Ordinal);
             var crusherRecipes = new Dictionary<string, ComplexRecipe>(StringComparer.Ordinal);
             var compilerRecipes = new Dictionary<string, ComplexRecipe>(StringComparer.Ordinal);
+            var reconstructorRecipes = new Dictionary<string, ComplexRecipe>(StringComparer.Ordinal);
             var orderedRules = ElementCatalogAdapter.Rules.Values
                 .OrderBy(rule => GetLocalizedElementName(rule.ElementId), StringComparer.CurrentCulture)
                 .ThenBy(rule => rule.ElementId, StringComparer.Ordinal)
@@ -35,8 +37,11 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
             for (var index = 0; index < orderedRules.Count; index++) {
                 var rule = orderedRules[index];
                 RecipePlan plan;
+                ReconstructionPlan reconstructionPlan;
                 try {
                     plan = RecipePlanFactory.Create(rule, ForbiddenTechOptions.Current);
+                    reconstructionPlan = MatterReconstructionPolicy.CreatePlan(rule,
+                        ForbiddenTechOptions.Current);
                 } catch (ArgumentException exception) {
                     Debug.LogWarning("[ForbiddenTechnologyPack] Excluded unsafe recipe for " + rule.ElementId + ": " +
                         exception.Message);
@@ -46,11 +51,14 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
                 analyzerRecipes.Add(rule.ElementId, CreateAnalyzerRecipe(plan, index));
                 crusherRecipes.Add(rule.ElementId, CreateCrusherRecipe(plan, index));
                 compilerRecipes.Add(rule.ElementId, CreateCompilerRecipe(plan, index));
+                reconstructorRecipes.Add(rule.ElementId,
+                    CreateReconstructorRecipe(reconstructionPlan, index));
             }
 
             AnalyzerRecipes = Freeze(analyzerRecipes);
             CrusherRecipes = Freeze(crusherRecipes);
             CompilerRecipes = Freeze(compilerRecipes);
+            ReconstructorRecipes = Freeze(reconstructorRecipes);
             wasBuilt = true;
         }
 
@@ -82,6 +90,22 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
                 new[] { new ComplexRecipe.RecipeElement(new Tag(plan.ElementId), plan.CompilerOutputKg) },
                 ModIdentity.MatterCompilerId, plan.CompilerTimeSeconds, sortOrder);
             recipe.description = "Compile Proto-Matter back into " + GetLocalizedElementName(plan.ElementId) + ".";
+            return recipe;
+        }
+
+        private static ComplexRecipe CreateReconstructorRecipe(ReconstructionPlan plan, int sortOrder) {
+            var ingredients = new[] {
+                new ComplexRecipe.RecipeElement(ReconstructionSubstrateTags.ForTier(plan.TargetTier),
+                    plan.SubstrateKg),
+                new ComplexRecipe.RecipeElement(ProtoMatterRegistration.Tag, plan.ProtoMatterKg)
+            };
+            var results = new[] {
+                new ComplexRecipe.RecipeElement(new Tag(plan.TargetElementId), plan.ProductKg)
+            };
+            var recipe = CreateRecipe("BaiyeMatterReconstruct_" + plan.TargetElementId,
+                ingredients, results, ModIdentity.MatterReconstructorId, plan.TimeSeconds, sortOrder);
+            recipe.description = "Use Proto-Matter to lever reality and reconstruct a substrate into " +
+                GetLocalizedElementName(plan.TargetElementId) + ".";
             return recipe;
         }
 
