@@ -29,6 +29,7 @@ $sourceFolders = @{
     'baiye_matter_compiler' = 'matter_compiler'
     'baiye_matter_reconstructor' = 'matter_reconstructor'
     'baiye_entropy_flux_diverter' = 'entropy_flux_diverter'
+    'baiye_matter_annihilation_reactor' = 'matter_annihilation_reactor'
 }
 
 if (Test-Path -LiteralPath $output) {
