@@ -4,6 +4,11 @@ param()
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$restoreEncodedAssets = Join-Path $projectRoot 'scripts\Restore-EncodedAssetSources.ps1'
+if (Test-Path -LiteralPath $restoreEncodedAssets -PathType Leaf) {
+    & $restoreEncodedAssets -ProjectRoot $projectRoot
+}
+
 $manifestPath = Join-Path $projectRoot 'assets\animation-manifest.json'
 $tool = Join-Path $projectRoot 'tools\kanimal-cli.exe'
 $output = Join-Path $projectRoot 'packaging\anim'
@@ -22,6 +27,7 @@ $sourceFolders = @{
     'baiye_matter_analyzer' = 'matter_analyzer'
     'baiye_mass_crusher' = 'mass_crusher'
     'baiye_matter_compiler' = 'matter_compiler'
+    'baiye_matter_reconstructor' = 'matter_reconstructor'
 }
 
 if (Test-Path -LiteralPath $output) {
@@ -31,6 +37,9 @@ if (Test-Path -LiteralPath $output) {
 New-Item -ItemType Directory -Force -Path $outputGroup | Out-Null
 
 foreach ($name in $manifest.PSObject.Properties.Name) {
+    if (-not $sourceFolders.ContainsKey($name)) {
+        throw "No SCML source folder mapping exists for '$name'."
+    }
 
     $scml = Join-Path $projectRoot ("assets\scml\{0}\{1}.scml" -f $sourceFolders[$name], $name)
     if (-not (Test-Path -LiteralPath $scml -PathType Leaf)) {
