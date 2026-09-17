@@ -1,0 +1,1 @@
+Matter Reconstructor source art represents a four-cell-wide reality anchoring chamber: a central substrate block held by directional anchors inside a pulsing Proto-Matter field. PNG files in this directory are source sprites compiled through build-assets.ps1; generated packaging/anim and dist files must not be edited directly.
