@@ -30,6 +30,10 @@ $suiteCatalog = [ordered]@{
         Path = (Join-Path $projectRoot 'tests\Phase2OptionsSourceContractTests.ps1')
         RequiresGame = $false
     }
+    'Phase2RegistrationSourceContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\Phase2RegistrationSourceContractTests.ps1')
+        RequiresGame = $false
+    }
     'ElementCatalogRuntimeTests' = [pscustomobject]@{
         Path = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
         RequiresGame = $true
