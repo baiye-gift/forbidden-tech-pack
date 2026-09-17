@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="ForbiddenTechnologyPack" generator_version="1.0">
+  <folder id="0">
+    <file id="0" name="baiye_matter_annihilation_reactor_0.png" width="560" height="480" pivot_x="0.5" pivot_y="0"/>
+    <file id="1" name="ui_0.png" width="128" height="128" pivot_x="0.5" pivot_y="0.5"/>
+  </folder>
+  <entity id="0" name="baiye_matter_annihilation_reactor">
+    <animation id="0" name="off" length="800" looping="false">
+      <mainline><key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key></mainline>
+      <timeline id="0" name="body"><key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="0.56"/></key></timeline>
+    </animation>
+    <animation id="1" name="idle" length="1600" looping="true">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="800"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="0.88"/></key>
+        <key id="1" time="800"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.006" scale_y="1.006" a="0.96"/></key>
+      </timeline>
+    </animation>
+    <animation id="2" name="charge" length="1200" looping="true">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="600"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="-0.5" scale_x="0.992" scale_y="0.992" a="0.76"/></key>
+        <key id="1" time="600"><object folder="0" file="0" x="0" y="0" angle="0.5" scale_x="1.018" scale_y="1.018" a="1"/></key>
+      </timeline>
+    </animation>
+    <animation id="3" name="working" length="900" looping="true">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="300"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+        <key id="2" time="600"><object_ref id="0" timeline="0" key="2" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="0.9"/></key>
+        <key id="1" time="300"><object folder="0" file="0" x="0" y="0" angle="0.4" scale_x="1.02" scale_y="1.02" a="1"/></key>
+        <key id="2" time="600"><object folder="0" file="0" x="0" y="0" angle="-0.4" scale_x="1.008" scale_y="1.008" a="0.94"/></key>
+      </timeline>
+    </animation>
+    <animation id="4" name="unstable" length="600" looping="true">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="200"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+        <key id="2" time="400"><object_ref id="0" timeline="0" key="2" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="-3" y="0" angle="-1.1" scale_x="1.01" scale_y="1.01" a="0.9"/></key>
+        <key id="1" time="200"><object folder="0" file="0" x="3" y="1" angle="1.2" scale_x="1.025" scale_y="0.99" a="1"/></key>
+        <key id="2" time="400"><object folder="0" file="0" x="-2" y="-1" angle="-0.7" scale_x="0.995" scale_y="1.02" a="0.84"/></key>
+      </timeline>
+    </animation>
+    <animation id="5" name="decohere" length="900" looping="false">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="300"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+        <key id="2" time="899"><object_ref id="0" timeline="0" key="2" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key>
+        <key id="1" time="300"><object folder="0" file="0" x="0" y="3" angle="2" scale_x="1.055" scale_y="0.95" a="0.82"/></key>
+        <key id="2" time="899"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="0.98" scale_y="0.98" a="0.42"/></key>
+      </timeline>
+    </animation>
+    <animation id="6" name="locked" length="1200" looping="true">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="0" key="0" z_index="0"/></key>
+        <key id="1" time="600"><object_ref id="0" timeline="0" key="1" z_index="0"/></key>
+      </mainline>
+      <timeline id="0" name="body">
+        <key id="0" time="0"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="0.48"/></key>
+        <key id="1" time="600"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="0.62"/></key>
+      </timeline>
+    </animation>
+    <animation id="7" name="ui" length="100" looping="false">
+      <mainline><key id="0" time="0"><object_ref id="0" timeline="1" key="0" z_index="0"/></key></mainline>
+      <timeline id="1" name="ui_0"><key id="0" time="0"><object folder="0" file="1" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key></timeline>
+    </animation>
+  </entity>
+</spriter_data>
