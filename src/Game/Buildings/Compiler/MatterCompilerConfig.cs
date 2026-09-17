@@ -118,6 +118,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
         public override void DoPostConfigureComplete(GameObject gameObject) {
             gameObject.AddOrGet<ComplexFabricatorWorkable>();
             gameObject.AddOrGet<Operational>();
+            gameObject.AddOrGet<ForbiddenTechDevice>();
             gameObject.AddOrGet<LogicOperationalController>();
             gameObject.AddOrGetDef<PoweredActiveController.Def>();
         }
