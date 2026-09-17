@@ -63,7 +63,7 @@ namespace ForbiddenTechnologyPack.Game.Options {
         public float RecoveryRate { get; set; } = 0.90f;
 
         [JsonProperty]
-        [Option("编译成本倍率", "仅在选择“自定义”预设时生效。", "自定义参数")]
+        [Option("物质工程成本倍率", "同时影响物质编译与物质重构的原质成本，仅在选择“自定义”预设时生效。", "自定义参数")]
         [Limit(0.05f, 20.00f)]
         public float CostMultiplier { get; set; } = 1.00f;
 
