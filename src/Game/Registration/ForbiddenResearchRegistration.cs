@@ -8,6 +8,11 @@ using UnityEngine;
 namespace ForbiddenTechnologyPack.Game.Registration {
     [HarmonyPatch(typeof(Database.Techs), "Load")]
     internal static class ForbiddenResearchRegistration {
+        private static readonly string[] ImplementedPhase2BuildingIds = {
+            ModIdentity.MatterReconstructorId,
+            ModIdentity.EntropyFluxDiverterId
+        };
+
         private static void Prefix(Database.Techs __instance, TextAsset tree_file) {
             if (__instance == null || tree_file == null) {
                 return;
@@ -35,7 +40,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 return;
             }
 
-            RegisterPhase2(__instance, tree, phase1);
+            RegisterPhase2(__instance, tree, phase1, plan);
         }
 
         private static Tech RegisterPhase1(Database.Techs techs,
@@ -75,10 +80,15 @@ namespace ForbiddenTechnologyPack.Game.Registration {
         }
 
         private static void RegisterPhase2(Database.Techs techs,
-                ResourceTreeLoader<ResourceTreeNode> tree, Tech phase1) {
+                ResourceTreeLoader<ResourceTreeNode> tree, Tech phase1,
+                RegistrationPlan plan) {
             if (techs.TryGet(ModIdentity.ProtoFieldResearchId) != null ||
-                    !ForbiddenTechOptions.Current.ModuleEnabled ||
-                    !ForbiddenTechOptions.Current.ReconstructorEnabled) {
+                    !ForbiddenTechOptions.Current.ModuleEnabled) {
+                return;
+            }
+
+            var unlocked = BuildImplementedPhase2Unlocks(plan);
+            if (unlocked.Count == 0) {
                 return;
             }
 
@@ -93,7 +103,6 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 { "advanced", 120f },
                 { "nuclear", 40f }
             };
-            var unlocked = new List<string> { ModIdentity.MatterReconstructorId };
             var tech = new Tech(ModIdentity.ProtoFieldResearchId, unlocked, techs, costs);
             tech.costsByResearchTypeID.Clear();
             foreach (var cost in costs) {
@@ -104,6 +113,18 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             tech.requiredTech.Add(phase1);
             phase1.unlockedTech.Add(tech);
             tech.AddSearchTerms(global::STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENPROTOFIELDENGINEERING.SEARCH_TERMS);
+        }
+
+        private static List<string> BuildImplementedPhase2Unlocks(RegistrationPlan plan) {
+            var enabled = new HashSet<string>(plan.Phase2BuildingIds, StringComparer.Ordinal);
+            var result = new List<string>();
+            for (var index = 0; index < ImplementedPhase2BuildingIds.Length; index++) {
+                var id = ImplementedPhase2BuildingIds[index];
+                if (enabled.Contains(id)) {
+                    result.Add(id);
+                }
+            }
+            return result;
         }
 
         private static void Postfix(Database.Techs __instance) {
