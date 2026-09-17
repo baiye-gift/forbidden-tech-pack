@@ -58,6 +58,10 @@ $suiteCatalog = [ordered]@{
         Path = (Join-Path $projectRoot 'tests\ReconstructorIntegrationSourceContractTests.ps1')
         RequiresGame = $false
     }
+    'EntropyDiverterSourceContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\EntropyDiverterSourceContractTests.ps1')
+        RequiresGame = $false
+    }
     'ElementCatalogRuntimeTests' = [pscustomobject]@{
         Path = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
         RequiresGame = $true
@@ -166,9 +170,9 @@ if ($DescribePlan) {
     exit 0
 }
 
-$restoreEncodedAssets = Join-Path $projectRoot 'scripts\Restore-EncodedAssetSources.ps1'
-if (Test-Path -LiteralPath $restoreEncodedAssets -PathType Leaf) {
-    & $restoreEncodedAssets -ProjectRoot $projectRoot
+& (Join-Path $projectRoot 'scripts\Restore-EncodedAssetSources.ps1') -ProjectRoot $projectRoot
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
 }
 
 foreach ($invocation in $powerShellInvocations) {
