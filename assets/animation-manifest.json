@@ -49,5 +49,15 @@
     "working",
     "blocked",
     "ui"
+  ],
+  "baiye_matter_annihilation_reactor": [
+    "off",
+    "idle",
+    "charge",
+    "working",
+    "unstable",
+    "decohere",
+    "locked",
+    "ui"
   ]
 }
