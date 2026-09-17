@@ -90,6 +90,13 @@ internal static class AnalyzerRecipeRuntimeProbe {
             });
 
             var registry = mod.GetType("ForbiddenTechnologyPack.Game.Recipes.RecipeRegistry", true);
+            var hashMethod = registry.GetMethod("ComputeSdbmLower", BindingFlags.Static | BindingFlags.NonPublic);
+            var simHashes = Assembly.LoadFrom(Path.Combine(gameManaged, "Assembly-CSharp.dll")).GetType("SimHashes", true);
+            var expectedWaterHash = Convert.ToInt32(Enum.Parse(simHashes, "Water"));
+            var actualWaterHash = Convert.ToInt32(hashMethod.Invoke(null, new object[] { "Water" }));
+            if (actualWaterHash != expectedWaterHash) {
+                throw new InvalidOperationException("Managed SDBM hash must match the game's SimHashes values.");
+            }
             var create = registry.GetMethod("CreateAnalyzerRecipe", BindingFlags.Static | BindingFlags.NonPublic);
             var recipe = create.Invoke(null, new[] { plan, (object)0 });
             var results = (Array)recipe.GetType().GetField("results").GetValue(recipe);
@@ -137,7 +144,10 @@ internal static class AnalyzerRecipeRuntimeProbe {
             while (root.InnerException != null) {
                 root = root.InnerException;
             }
-            Console.Error.WriteLine(root.GetType().FullName + ": " + root.Message);
+            Console.Error.WriteLine(exception.ToString());
+            if (!object.ReferenceEquals(root, exception)) {
+                Console.Error.WriteLine("Root cause: " + root.GetType().FullName + ": " + root.Message);
+            }
             return 1;
         }
     }

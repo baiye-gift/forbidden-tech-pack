@@ -9,7 +9,8 @@
     "working_loop",
     "working_pst",
     "working_pst_complete",
-    "overheat"
+    "overheat",
+    "ui"
   ],
   "baiye_mass_crusher": [
     "off",
@@ -18,7 +19,8 @@
     "working_loop",
     "working_pst",
     "working_pst_complete",
-    "blocked"
+    "blocked",
+    "ui"
   ],
   "baiye_matter_compiler": [
     "off",
@@ -28,6 +30,7 @@
     "working_pst",
     "working_pst_complete",
     "no_coolant",
-    "blocked"
+    "blocked",
+    "ui"
   ]
 }

@@ -4,14 +4,17 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+
 if (-not (Test-Path -LiteralPath $PackagePath -PathType Container)) {
     throw "Package directory was not found: '$PackagePath'."
 }
 
 $dlls = @(Get-ChildItem -LiteralPath $PackagePath -Filter '*.dll' -File -Recurse)
+
 if ($dlls.Count -ne 1 -or $dlls[0].Name -ne 'ForbiddenTechnologyPack.dll') {
-    throw "Expected exactly one merged ForbiddenTechnologyPack.dll, found: $($dlls.Name -join ', ')."
+    throw "Expected exactly one merged ForbiddenTechnologyPack.dll."
 }
 
 foreach ($metadataFile in @('mod.yaml', 'mod_info.yaml')) {
@@ -21,34 +24,44 @@ foreach ($metadataFile in @('mod.yaml', 'mod_info.yaml')) {
 }
 
 if (Get-ChildItem -LiteralPath $PackagePath -Filter 'PLib.dll' -File -Recurse) {
-    throw 'Package must not contain a standalone PLib.dll.'
+    throw 'Package must not contain standalone PLib.dll.'
 }
 
 $manifestPath = Join-Path $projectRoot 'assets\animation-manifest.json'
+
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
     throw "Animation manifest is missing: '$manifestPath'."
 }
+
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+
 $animDirectory = Join-Path $PackagePath 'anim'
+
 if (-not (Test-Path -LiteralPath $animDirectory -PathType Container)) {
-    throw "Package animation directory is missing: '$animDirectory'."
+    throw "Package animation directory is missing."
 }
 
 foreach ($name in $manifest.PSObject.Properties.Name) {
-    $animationPackage = Join-Path $animDirectory ("forbidden_technology\$name")
+    # ONI discovers mod KAnim bundles two directories below anim/ and derives
+    # the runtime resource id from the innermost directory name.
+    $animationPackage = Join-Path $animDirectory ("forbidden_technology\$($name)")
+
     if (-not (Test-Path -LiteralPath $animationPackage -PathType Container)) {
-        throw "Package is missing loadable KAnim directory 'anim\forbidden_technology\$name'."
+        throw "Missing KAnim directory: $animationPackage"
     }
-    foreach ($suffix in @('.png', '_anim.bytes', '_build.bytes')) {
+
+    foreach ($suffix in @('.png','_anim.bytes','_build.bytes')) {
+
         $assetPath = Join-Path $animationPackage ($name + $suffix)
+
         if (-not (Test-Path -LiteralPath $assetPath -PathType Leaf)) {
-            throw "Package is missing required KAnim asset '$($name + $suffix)'."
+            throw "Missing KAnim asset: $assetPath"
         }
     }
 }
 
 if (Get-ChildItem -LiteralPath $animDirectory -File) {
-    throw 'Package contains KAnim files directly in anim; ONI only scans anim/<group>/<resource>/ directories.'
+    throw 'KAnim files must not exist directly under anim.'
 }
 
 $baseGameAnimationNames = @(
@@ -64,14 +77,17 @@ foreach ($assetFile in Get-ChildItem -LiteralPath $animDirectory -File -Recurse)
     }
 }
 
-foreach ($language in @('en', 'zh')) {
+foreach ($language in @('en','zh')) {
+
     $translation = Join-Path $PackagePath ("translations\$language.po")
+
     if (-not (Test-Path -LiteralPath $translation -PathType Leaf)) {
-        throw "Package translation is missing: '$language.po'."
+        throw "Missing translation: $language.po"
     }
 }
 
-$textFiles = Get-ChildItem -LiteralPath $PackagePath -File -Recurse | Where-Object { $_.Extension -in '.yaml', '.json', '.po', '.txt' }
+$textFiles = Get-ChildItem -LiteralPath $PackagePath -File -Recurse |
+    Where-Object { $_.Extension -in '.yaml', '.json', '.po', '.txt' }
 foreach ($textFile in $textFiles) {
     $content = Get-Content -LiteralPath $textFile.FullName -Raw
     if ($content -match '(?i)([a-z]:[\\/]|\\\\[^\\/]+[\\/][^\\/]+|//[^/]+/[^/]+|/users/|/home/)') {

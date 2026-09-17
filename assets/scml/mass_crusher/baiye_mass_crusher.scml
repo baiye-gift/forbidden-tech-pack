@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spriter_data scml_version="1.0" generator="ForbiddenTechnologyPack" generator_version="1.0">
-  <folder id="0"><file id="0" name="baiye_mass_crusher_0.png" width="400" height="400" pivot_x="0.5" pivot_y="0.5"/></folder>
+  <folder id="0">
+    <file id="0" name="baiye_mass_crusher_0.png" width="400" height="400" pivot_x="0.5" pivot_y="0"/>
+    <file id="1" name="ui_0.png" width="128" height="128" pivot_x="0.5" pivot_y="0.5"/>
+  </folder>
   <entity id="0" name="baiye_mass_crusher">
     <animation id="0" name="off" length="800" looping="false">
       <mainline>
@@ -68,6 +71,13 @@
         <key id="1" time="500"><object folder="0" file="0" x="0" y="0" angle="0" scale_x="0.985" scale_y="0.985" a="0.55"/></key>
       </timeline>
     </animation>
+    <animation id="7" name="ui" length="100" looping="false">
+      <mainline>
+        <key id="0" time="0"><object_ref id="0" timeline="1" key="0" z_index="0"/></key>
+      </mainline>
+      <timeline id="1" name="ui_0">
+        <key id="0" time="0"><object folder="0" file="1" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1"/></key>
+      </timeline>
+    </animation>
   </entity>
 </spriter_data>
-

@@ -2,6 +2,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
+
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $manifestPath = Join-Path $projectRoot 'assets\animation-manifest.json'
 $tool = Join-Path $projectRoot 'tools\kanimal-cli.exe'
@@ -15,6 +16,7 @@ foreach ($required in @($manifestPath, $tool)) {
 }
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+
 $sourceFolders = @{
     'baiye_proto_matter' = 'proto_matter'
     'baiye_matter_analyzer' = 'matter_analyzer'
@@ -23,31 +25,29 @@ $sourceFolders = @{
 }
 
 if (Test-Path -LiteralPath $output) {
-    Remove-Item -LiteralPath $output -Recurse -Force
+    Remove-Item $output -Recurse -Force
 }
-New-Item -ItemType Directory -Force -Path $output | Out-Null
+
 New-Item -ItemType Directory -Force -Path $outputGroup | Out-Null
 
 foreach ($name in $manifest.PSObject.Properties.Name) {
-    if (-not $sourceFolders.ContainsKey($name)) {
-        throw "No SCML source folder is mapped for '$name'."
-    }
 
     $scml = Join-Path $projectRoot ("assets\scml\{0}\{1}.scml" -f $sourceFolders[$name], $name)
     if (-not (Test-Path -LiteralPath $scml -PathType Leaf)) {
-        throw "SCML source is missing for '$name': '$scml'."
+        throw "SCML source missing: $scml"
     }
 
-    # ONI only discovers mod KAnim bundles two directories below anim/ and
-    # derives the resource id from the innermost directory name.
     $animationPackage = Join-Path $outputGroup $name
+
     New-Item -ItemType Directory -Force -Path $animationPackage | Out-Null
+
     & $tool kanim $scml -o $animationPackage
+
     if ($LASTEXITCODE -ne 0) {
-        throw "kanimal failed for '$name' with exit code $LASTEXITCODE."
+        throw "kanimal failed for '$name'"
     }
 
-    foreach ($suffix in @('.png', '_anim.bytes', '_build.bytes')) {
+    foreach ($suffix in @('.png','_anim.bytes','_build.bytes')) {
         $built = Join-Path $animationPackage ($name + $suffix)
         if (-not (Test-Path -LiteralPath $built -PathType Leaf)) {
             throw "kanimal did not produce '$built'."

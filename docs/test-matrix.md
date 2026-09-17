@@ -1,17 +1,23 @@
 # Forbidden Technology Pack 0.1.0 Test Matrix
 
-Automated checks may be recorded as PASS only when the corresponding command has been run successfully. All in-game cases remain **PENDING** until they are executed in Oxygen Not Included and supported by a Player.log excerpt or an explicit observation note.
+Automated checks may be recorded as PASS only when the corresponding command has been run successfully. Full in-game cases remain **PENDING** until they are executed in Oxygen Not Included and supported by a Player.log excerpt or an explicit observation note. A limited startup smoke test does not complete a content-mode row.
 
 ## Automated gates
 
 | Check | Status | Evidence |
 |---|---|---|
-| Core and contract tests | PASS | `./test.ps1` — 142 tests passed before Task 12; rerun required before release |
+| Core and contract tests | PASS | `.\test.ps1 -Suite All -GamePath '<GamePath>'` — 152 tests passed on 2026-09-17 |
 | Original KAnim compilation | PASS | `build-assets.ps1` generated all four KAnim triplets |
 | Game DLL/package build | PASS | `build.ps1` completed against local ONI installation; deprecation warnings remain in explicit safe-removal scans |
 | Package structure verification | PASS | `verify-package.ps1` passed after build |
 | Local installation | PASS | `install.ps1` verified the package and installed only to `mods\\local\\ForbiddenTechnologyPack` |
 | Release ZIP verification | PASS | `pack-release.ps1` rebuilt, SHA256-hashed, extracted, and reverified `ForbiddenTechnologyPack-0.1.0.zip` |
+
+## Recorded smoke test
+
+| Check | Status | Evidence |
+|---|---|---|
+| Steam main-menu startup | PASS | On 2026-09-17, the current Spaced Out!-enabled mode loaded the DLL and Animation group; the main menu remained responsive and Player.log contained no fatal error attributable to this Mod. This does not validate colony gameplay or other content modes. |
 
 ## Content mode
 

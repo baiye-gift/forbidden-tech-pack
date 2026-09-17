@@ -57,6 +57,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             tech.SetNode(node, string.Empty);
             tech.requiredTech.Add(prerequisite);
             prerequisite.unlockedTech.Add(tech);
+            tech.AddSearchTerms(global::STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMATTERENGINEERING.SEARCH_TERMS);
         }
 
         private static void Postfix(Database.Techs __instance) {
@@ -114,7 +115,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 return null;
             }
 
-            var candidateX = prerequisiteNode.nodeX + prerequisiteNode.width;
+            var candidateX = rightEdge + prerequisiteNode.width;
             while (occupied.Contains(candidateX + ":" + prerequisiteNode.nodeY)) {
                 candidateX += prerequisiteNode.width;
             }

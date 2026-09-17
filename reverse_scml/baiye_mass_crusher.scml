@@ -1,0 +1,121 @@
+<spriter_data scml_version="1.0" generator="kanimAL" generator_version="v1">
+  <folder id="0">
+    <file id="0" name="baiye_mass_crusher_0.png" width="400" height="400" pivot_x="0.5" pivot_y="0.5" />
+  </folder>
+  <entity id="0" name="baiye_mass_crusher">
+    <animation id="0" name="off" length="800" interval="800">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="1" name="idle" length="800" interval="400">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+        <key id="1" time="400">
+          <object_ref id="0" timeline="0" key="1" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+        <key id="1" time="400">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.0149999602557396" scale_y="1.0149999602557396" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="2" name="working_pre" length="800" interval="400">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+        <key id="1" time="400">
+          <object_ref id="0" timeline="0" key="1" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+        <key id="1" time="400">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.0249999837177555" scale_y="1.0249999837177555" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="3" name="working_loop" length="2000" interval="1000">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+        <key id="1" time="1000">
+          <object_ref id="0" timeline="0" key="1" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+        <key id="1" time="1000">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.0249999837177555" scale_y="1.0249999837177555" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="4" name="working_pst" length="800" interval="800">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="5" name="working_pst_complete" length="800" interval="400">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+        <key id="1" time="400">
+          <object_ref id="0" timeline="0" key="1" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1.0249999837177555" scale_y="1.0249999837177555" a="1" />
+        </key>
+        <key id="1" time="400">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+      </timeline>
+    </animation>
+    <animation id="6" name="blocked" length="1000" interval="500">
+      <mainline>
+        <key id="0" time="0">
+          <object_ref id="0" timeline="0" key="0" z_index="1" />
+        </key>
+        <key id="1" time="500">
+          <object_ref id="0" timeline="0" key="1" z_index="1" />
+        </key>
+      </mainline>
+      <timeline id="0" name="baiye_mass_crusher_0">
+        <key id="0" time="0">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="1" scale_y="1" a="1" />
+        </key>
+        <key id="1" time="500">
+          <object folder="0" file="0" x="0" y="0" angle="0" scale_x="0.9850000183473382" scale_y="0.9850000183473382" a="1" />
+        </key>
+      </timeline>
+    </animation>
+  </entity>
+</spriter_data>
