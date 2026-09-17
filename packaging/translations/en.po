@@ -126,6 +126,130 @@ msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERRECONSTRUCTOR.LOGIC_PORT.INACTIVE"
 msgid "When receiving a Red signal, the Matter Reconstructor is disabled."
 msgstr "When receiving a Red signal, the Matter Reconstructor is disabled."
 
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.NAME"
+msgid "Entropy Flux Diverter"
+msgstr "Entropy Flux Diverter"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.DESC"
+msgid "Uses a Proto-Matter field to establish an artificial thermodynamic coupling between two liquid streams."
+msgstr "Uses a Proto-Matter field to establish an artificial thermodynamic coupling between two liquid streams."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.EFFECT"
+msgid "Moves equal thermal energy from a hotter liquid stream into a colder one while consuming a small amount of Proto-Matter. It does not delete heat."
+msgstr "Moves equal thermal energy from a hotter liquid stream into a colder one while consuming a small amount of Proto-Matter. It does not delete heat."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.WAITING_HOT"
+msgid "Waiting for hot liquid."
+msgstr "Waiting for hot liquid."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.WAITING_COLD"
+msgid "Waiting for cold liquid."
+msgstr "Waiting for cold liquid."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.WAITING_PROTO_MATTER"
+msgid "Waiting for Proto-Matter."
+msgstr "Waiting for Proto-Matter."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.NO_GRADIENT"
+msgid "No usable thermal gradient is present."
+msgstr "No usable thermal gradient is present."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.PHASE_LIMITED"
+msgid "Transfer is limited by a liquid phase boundary."
+msgstr "Transfer is limited by a liquid phase boundary."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.TRANSFERRING"
+msgid "Redirecting entropy between the two liquid streams."
+msgstr "Redirecting entropy between the two liquid streams."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.OUTPUT_BLOCKED"
+msgid "A processed liquid output is blocked."
+msgstr "A processed liquid output is blocked."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.INTERFERED"
+msgid "Proto-Matter interference has broken the coupling field. Transfer is paused."
+msgstr "Proto-Matter interference has broken the coupling field. Transfer is paused."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.LOGIC_PORT.NAME"
+msgid "Enable Entropy Flux Diverter"
+msgstr "Enable Entropy Flux Diverter"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.LOGIC_PORT.ACTIVE"
+msgid "When receiving a Green signal, the Entropy Flux Diverter may operate."
+msgstr "When receiving a Green signal, the Entropy Flux Diverter may operate."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEENTROPYFLUXDIVERTER.LOGIC_PORT.INACTIVE"
+msgid "When receiving a Red signal, the Entropy Flux Diverter is disabled."
+msgstr "When receiving a Red signal, the Entropy Flux Diverter is disabled."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.NAME"
+msgid "Matter Annihilation Reactor"
+msgstr "Matter Annihilation Reactor"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.DESC"
+msgid "Confines Proto-Matter at the boundary of reality and deliberately relaxes its material anchor to release usable energy."
+msgstr "Confines Proto-Matter at the boundary of reality and deliberately relaxes its material anchor to release usable energy."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.EFFECT"
+msgid "Requires external power to establish confinement, then consumes Proto-Matter to generate large amounts of electricity and heat. Cooling or confinement failure can trigger localized Proto-Matter decoherence."
+msgstr "Requires external power to establish confinement, then consumes Proto-Matter to generate large amounts of electricity and heat. Cooling or confinement failure can trigger localized Proto-Matter decoherence."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.OFFLINE"
+msgid "Reactor offline."
+msgstr "Reactor offline."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.CHARGING"
+msgid "Charging confinement field."
+msgstr "Charging confinement field."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.STABLE"
+msgid "Stable annihilation reaction."
+msgstr "Stable annihilation reaction."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.FLUCTUATING"
+msgid "Constraint field fluctuating."
+msgstr "Constraint field fluctuating."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.CRITICAL"
+msgid "Proto-Matter confinement is at the decoherence threshold."
+msgstr "Proto-Matter confinement is at the decoherence threshold."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.DECOHERED"
+msgid "Proto-Matter decohered. Emergency lockout engaged."
+msgstr "Proto-Matter decohered. Emergency lockout engaged."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.LOCKOUT"
+msgid "Cooling lockout active."
+msgstr "Cooling lockout active."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.WAITING_PROTO_MATTER"
+msgid "Waiting for Proto-Matter."
+msgstr "Waiting for Proto-Matter."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.COOLING_INSUFFICIENT"
+msgid "Coolant cannot safely absorb reactor heat."
+msgstr "Coolant cannot safely absorb reactor heat."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.POWER_INSUFFICIENT"
+msgid "Constraint power is insufficient."
+msgstr "Constraint power is insufficient."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.INTERFERED"
+msgid "External Proto-Matter interference is destabilizing confinement."
+msgstr "External Proto-Matter interference is destabilizing confinement."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.LOGIC_PORT.NAME"
+msgid "Enable Matter Annihilation Reactor"
+msgstr "Enable Matter Annihilation Reactor"
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.LOGIC_PORT.ACTIVE"
+msgid "When receiving a Green signal, the reactor may charge or sustain confinement."
+msgstr "When receiving a Green signal, the reactor may charge or sustain confinement."
+
+msgctxt "STRINGS.BUILDINGS.PREFABS.BAIYEMATTERANNIHILATIONREACTOR.LOGIC_PORT.INACTIVE"
+msgid "When receiving a Red signal, the reactor performs an orderly shutdown into cooling lockout."
+msgstr "When receiving a Red signal, the reactor performs an orderly shutdown into cooling lockout."
+
 msgctxt "STRINGS.BUILDING.STATUSITEMS.BAIYEMATTERCOMPILERUNSAFECOOLANT.NAME"
 msgid "Waiting for Safe Coolant"
 msgstr "Waiting for Safe Coolant"
@@ -155,8 +279,8 @@ msgid "Use Proto-Matter as a dimensional coupling medium to lever reality itself
 msgstr "Use Proto-Matter as a dimensional coupling medium to lever reality itself and drive advanced forbidden machinery."
 
 msgctxt "STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENPROTOFIELDENGINEERING.SEARCH_TERMS"
-msgid "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden"
-msgstr "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden"
+msgid "proto-matter field dimensional coupling reconstruction reality reconstructor entropy diverter annihilation reactor forbidden"
+msgstr "proto-matter field dimensional coupling reconstruction reality reconstructor entropy diverter annihilation reactor forbidden"
 
 msgctxt "STRINGS.UI.SAFEREMOVAL.TITLE"
 msgid "Safe Removal - Forbidden Technology Pack"
@@ -197,4 +321,3 @@ msgstr "Safe removal scan is complete. Converted {0} Proto-Matter objects ({1:0.
 msgctxt "STRINGS.UI.SAFEREMOVAL.INCOMPLETE"
 msgid "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
 msgstr "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet."
-
