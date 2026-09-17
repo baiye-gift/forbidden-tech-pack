@@ -47,6 +47,10 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             if (recipeRefreshPending && CurrentWorkingOrder == null) {
                 RefreshRecipes();
             }
+            // Base queue validation indexes recipe 0 even when no analyses remain.
+            if (CurrentWorkingOrder == null && GetRecipes().Length == 0) {
+                return;
+            }
             base.Sim1000ms(dt);
         }
 

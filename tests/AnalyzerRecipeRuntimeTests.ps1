@@ -202,6 +202,8 @@ public class ComplexFabricator {
     public Dictionary<string, int> Queues = new Dictionary<string, int>();
     public bool CanStart = true;
     public bool FailCompletion;
+    public bool QueueDirty = true;
+    public int NextOrderIndex;
     public Storage buildStorage = new Storage(), outStorage = new Storage();
     protected virtual void OnSpawn() {}
     protected virtual void OnCleanUp() {}
@@ -211,6 +213,7 @@ public class ComplexFabricator {
         if (CurrentWorkingOrder == recipe && count == 0) CurrentWorkingOrder = null;
     }
     public int GetRecipeQueueCount(ComplexRecipe recipe) { return Queues[recipe.id]; }
+    public ComplexRecipe[] GetRecipes() { return Recipes; }
     public virtual void CompleteWorkingOrder() {
         if (CurrentWorkingOrder == null) return;
         if (FailCompletion) throw new InvalidOperationException("Engine completion failed");
@@ -218,12 +221,28 @@ public class ComplexFabricator {
         SpawnOrderProduct(recipe);
         if (Queues[recipe.id] != -1) Queues[recipe.id]--;
         CurrentWorkingOrder = null;
+        QueueDirty = true;
         StartNext();
     }
     public virtual void Sim1000ms(float dt) { StartNext(); }
     private void StartNext() {
-        if (CanStart && CurrentWorkingOrder == null)
-            CurrentWorkingOrder = Recipes.FirstOrDefault(r => Queues[r.id] != 0);
+        if (!CanStart) return;
+        if (QueueDirty) {
+            QueueDirty = false;
+            ValidateNextOrder();
+        }
+        if (CurrentWorkingOrder == null && Queues[Recipes[NextOrderIndex].id] != 0)
+            CurrentWorkingOrder = Recipes[NextOrderIndex];
+    }
+    private void ValidateNextOrder() {
+        // Current game RefreshQueue reads this index before scanning alternatives,
+        // including when SetRecipeList has installed an empty array and index 0.
+        var next = Recipes[NextOrderIndex];
+        if (Queues[next.id] != 0) return;
+        for (int i = 0; i < Recipes.Length; i++) {
+            NextOrderIndex = (NextOrderIndex + 1) % Recipes.Length;
+            if (Queues[Recipes[NextOrderIndex].id] != 0) return;
+        }
     }
 }
 namespace ForbiddenTechnologyPack.Game.Save {
@@ -256,6 +275,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Common {
             if (f.CurrentWorkingOrder != null) throw new InvalidOperationException("Active recipe-list replacement");
             Replacements++;
             f.Recipes = recipes.ToArray();
+            f.NextOrderIndex = 0;
+            f.QueueDirty = true;
         }
     }
 }
@@ -286,6 +307,10 @@ internal static class AnalyzerBehavior {
                 Check(ForbiddenTechSaveData.Instance.GetUnlockState().IsUnlocked("Dirt"), "Completed ingredient must unlock even after next batch starts");
                 a.CompleteWorkingOrder();
                 Check(a.CurrentWorkingOrder == null && a.Recipes.Length == 0, "Idle completion must apply deferred recipe refresh");
+                a.Sim1000ms(1f);
+                a.Sim1000ms(1f);
+                Check(a.CurrentWorkingOrder == null && a.Recipes.Length == 0,
+                    "Final analysis must remain idle safely on subsequent simulation ticks");
             }
             var deferred = Create(1, 2);
             ForbiddenTechSaveData.Instance.Unlock(new Tag("Sand"));
@@ -299,7 +324,7 @@ internal static class AnalyzerBehavior {
             try { failed.CompleteWorkingOrder(); } catch (InvalidOperationException) {}
             Check(!ForbiddenTechSaveData.Instance.GetUnlockState().IsUnlocked("Dirt"), "Failed completion must not unlock");
             Check(failed.Queues["Sand"] == 2, "Completion failure must not erase other queues");
-            Console.WriteLine("Analyzer completion behavior passed: finite/infinite duplicate queues, other materials, deferred external refresh, failed completion.");
+            Console.WriteLine("Analyzer completion behavior passed: finite/infinite duplicate queues, other materials, empty-list simulation ticks, deferred external refresh, failed completion.");
             return 0;
         } catch (Exception e) { Console.Error.WriteLine(e); return 1; }
     }
