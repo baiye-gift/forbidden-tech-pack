@@ -1,13 +1,19 @@
 [CmdletBinding()]
 param(
-    [string[]]$Suite = @('All')
+    [string[]]$Suite = @('All'),
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-$powerShellSuites = @{
+$portablePowerShellSuites = [ordered]@{
     'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
+    'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
+    'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
+    'ReleaseWorkflowContractTests' = (Join-Path $projectRoot 'tests\ReleaseWorkflowContractTests.ps1')
+}
+$gameDependentPowerShellSuites = [ordered]@{
     'ElementCatalogRuntimeTests' = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
     'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
     'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
@@ -15,29 +21,68 @@ $powerShellSuites = @{
     'OptionsLocalizationRuntimeTests' = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
     'SafeRemovalRuntimeTests' = (Join-Path $projectRoot 'tests\SafeRemovalRuntimeTests.ps1')
     'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
-    'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
-    'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
-    'ReleaseWorkflowContractTests' = (Join-Path $projectRoot 'tests\ReleaseWorkflowContractTests.ps1')
 }
-$runAll = @($Suite | Where-Object { $_ -ieq 'All' }).Count -gt 0
-$requestedPowerShellSuites = if ($runAll) {
-    @($powerShellSuites.Keys)
-} else {
-    @($Suite | Where-Object { $powerShellSuites.ContainsKey($_) })
+$powerShellSuites = @{}
+foreach ($entry in $portablePowerShellSuites.GetEnumerator()) {
+    $powerShellSuites[$entry.Key] = $entry.Value
 }
-if ($requestedPowerShellSuites.Count -gt 0) {
-    foreach ($suiteName in $requestedPowerShellSuites) {
-        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
-        if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
+foreach ($entry in $gameDependentPowerShellSuites.GetEnumerator()) {
+    $powerShellSuites[$entry.Key] = $entry.Value
+}
+$suiteGroups = @{
+    'Portable' = @($portablePowerShellSuites.Keys)
+    'All' = @($portablePowerShellSuites.Keys) + @($gameDependentPowerShellSuites.Keys)
+}
+
+$requestedPowerShellSuites = [System.Collections.Generic.List[string]]::new()
+foreach ($requestedSuite in $Suite) {
+    if ($suiteGroups.ContainsKey($requestedSuite)) {
+        foreach ($suiteName in $suiteGroups[$requestedSuite]) {
+            if (-not $requestedPowerShellSuites.Contains($suiteName)) {
+                $requestedPowerShellSuites.Add($suiteName)
+            }
         }
+    } elseif ($powerShellSuites.ContainsKey($requestedSuite) -and
+            -not $requestedPowerShellSuites.Contains($requestedSuite)) {
+        $requestedPowerShellSuites.Add($requestedSuite)
     }
 }
 
-$csharpSuites = if ($runAll) {
+$requestedGameSuites = @($requestedPowerShellSuites | Where-Object {
+    $gameDependentPowerShellSuites.Contains($_)
+})
+if ($requestedGameSuites.Count -gt 0) {
+    if ([string]::IsNullOrWhiteSpace($GamePath)) {
+        throw "-GamePath is required for game integration suites: $($requestedGameSuites -join ', ')."
+    }
+    if (-not (Test-Path -LiteralPath $GamePath -PathType Container)) {
+        throw "GamePath was not found: '$GamePath'."
+    }
+    $gameAssemblyPath = Join-Path $GamePath 'OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll'
+    if (-not (Test-Path -LiteralPath $gameAssemblyPath -PathType Leaf)) {
+        throw "GamePath does not contain the required game assembly: '$gameAssemblyPath'."
+    }
+}
+
+foreach ($suiteName in $requestedPowerShellSuites) {
+    if ($gameDependentPowerShellSuites.Contains($suiteName)) {
+        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] `
+            -ProjectRoot $projectRoot -GamePath $GamePath
+    } else {
+        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
+    }
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+}
+
+$runCoreAll = @($Suite | Where-Object { $_ -ieq 'All' -or $_ -ieq 'Portable' }).Count -gt 0
+$csharpSuites = if ($runCoreAll) {
     @('All')
 } else {
-    @($Suite | Where-Object { -not $powerShellSuites.ContainsKey($_) })
+    @($Suite | Where-Object {
+        -not $powerShellSuites.ContainsKey($_) -and -not $suiteGroups.ContainsKey($_)
+    })
 }
 if ($csharpSuites.Count -eq 0) {
     exit 0

@@ -1,12 +1,17 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$ProjectRoot
+    [string]$ProjectRoot,
+    [Parameter(Mandatory = $true)]
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
-$gamePath = 'D:\steam\steamapps\common\OxygenNotIncluded'
 $managedDirectory = Join-Path $gamePath 'OxygenNotIncluded_Data\Managed'
+$gameAssemblyPath = Join-Path $managedDirectory 'Assembly-CSharp.dll'
+if (-not (Test-Path -LiteralPath $gameAssemblyPath -PathType Leaf)) {
+    throw "GamePath does not contain the required game assembly: '$gameAssemblyPath'."
+}
 $rawAssembly = Join-Path $ProjectRoot 'obj\ForbiddenTechnologyPack.raw.dll'
 $probeDirectory = Join-Path $ProjectRoot 'test-artifacts\options-localization-runtime'
 $probeSource = Join-Path $probeDirectory 'OptionsLocalizationRuntimeProbe.cs'

@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$GamePath = 'D:\steam\steamapps\common\OxygenNotIncluded'
+    [Parameter(Mandatory = $true)]
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'

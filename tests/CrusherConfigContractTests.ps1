@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$ProjectRoot
+    [string]$ProjectRoot,
+    [Parameter(Mandatory = $true)]
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -31,7 +33,9 @@ Require-Condition ($source -match '40f\s*\*\s*ForbiddenTechOptions\.Current\.Hea
 
 Write-Host 'Mass Crusher config contract validation passed.'
 
-$gamePath = 'D:\steam\steamapps\common\OxygenNotIncluded'
+$gameAssemblyPath = Join-Path $GamePath 'OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll'
+Require-Condition (Test-Path -LiteralPath $gameAssemblyPath -PathType Leaf) `
+    "GamePath does not contain the required game assembly: '$gameAssemblyPath'."
 & (Join-Path $ProjectRoot 'build.ps1') -GamePath $gamePath
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $probeDirectory = Join-Path $ProjectRoot 'test-artifacts\crusher-rail-runtime'

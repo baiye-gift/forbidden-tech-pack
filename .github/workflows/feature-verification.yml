@@ -19,4 +19,4 @@ jobs:
 
       - name: Run core and contract tests
         shell: pwsh
-        run: ./test.ps1 -Suite All
+        run: ./test.ps1 -Suite Portable

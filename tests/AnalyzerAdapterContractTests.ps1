@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$ProjectRoot
+    [string]$ProjectRoot,
+    [Parameter(Mandatory = $true)]
+    [string]$GamePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -26,7 +28,7 @@ Require-Condition ($source -match '\.Select\(id => RecipeRegistry\.AnalyzerRecip
 Require-Condition ($source -notmatch 'Set\(ComplexFabricator fabricator, List<ComplexRecipe> recipes\)') `
     'MatterAnalyzer must not reflectively assign List<ComplexRecipe> to recipe_list.'
 
-$gameAssemblyPath = 'D:\steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll'
+$gameAssemblyPath = Join-Path $GamePath 'OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll'
 Require-Condition (Test-Path -LiteralPath $gameAssemblyPath -PathType Leaf) `
     "Game assembly was not found for analyzer adapter contract validation: $gameAssemblyPath"
 
