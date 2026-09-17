@@ -101,6 +101,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
         public override void DoPostConfigureComplete(GameObject gameObject) {
             gameObject.AddOrGet<ComplexFabricatorWorkable>();
             gameObject.AddOrGet<Operational>();
+            gameObject.AddOrGet<ForbiddenTechDevice>();
             gameObject.AddOrGet<LogicOperationalController>();
             gameObject.AddOrGetDef<PoweredActiveController.Def>();
         }
