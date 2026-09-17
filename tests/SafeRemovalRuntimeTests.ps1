@@ -405,13 +405,13 @@ public sealed class PrimaryElement : UnityEngine.Component {
 }
 
 public sealed class Substance {
-    public static readonly Queue<UnityEngine.GameObject> Results =
-        new Queue<UnityEngine.GameObject>();
+    public static readonly Queue<Func<UnityEngine.GameObject>> Results =
+        new Queue<Func<UnityEngine.GameObject>>();
     public UnityEngine.GameObject SpawnResource(UnityEngine.Vector3 position, float mass,
             float temperature, byte diseaseIndex, int diseaseCount,
             bool prevent_merge = false, bool forceTemperature = false,
             bool manual_activation = false) {
-        return Results.Dequeue();
+        return Results.Dequeue()();
     }
 }
 
@@ -514,29 +514,40 @@ internal static class SafeRemovalBehavior {
     }
     private static int Main() {
         try {
-            var failed = Proto("failed-null-spawn", 3f);
+            var nullFailed = Proto("failed-null-spawn", 3f);
+            var throwingFailed = Proto("failed-throwing-spawn", 5f);
             var successful = Proto("successful-deferred-destroy", 7f);
-            Substance.Results.Enqueue(null);
-            Substance.Results.Enqueue(new UnityEngine.GameObject { name = "igneous-rock" });
+            Substance.Results.Enqueue(() => null);
+            Substance.Results.Enqueue(() => {
+                throw new InvalidOperationException("synthetic SpawnResource failure");
+            });
+            Substance.Results.Enqueue(() =>
+                new UnityEngine.GameObject { name = "igneous-rock" });
             Game.Instance = new Game();
             ForbiddenTechnologyPack.Game.Save.ForbiddenTechSaveData.Instance =
                 new ForbiddenTechnologyPack.Game.Save.ForbiddenTechSaveData();
             var report = ForbiddenTechnologyPack.Game.Safety.SafeRemovalController.Execute();
 
-            Check(report.RemainingCustomObjectCount == 1 && !report.IsComplete,
-                "Exactly the null-spawn Proto-Matter object must remain unresolved.");
-            Check(!Util.Destroyed.Contains(failed.gameObject),
+            Check(report.RemainingCustomObjectCount == 2 && !report.IsComplete,
+                "Null and throwing spawns must both remain unresolved.");
+            Check(!Util.Destroyed.Contains(nullFailed.gameObject),
                 "A null replacement must retain the original Proto-Matter GameObject.");
+            Check(!Util.Destroyed.Contains(throwingFailed.gameObject),
+                "A throwing replacement must retain the original Proto-Matter GameObject.");
             Check(Util.Destroyed.Count == 1 && Util.Destroyed[0] == successful.gameObject,
                 "Only a valid native replacement may schedule its custom original for destruction.");
             Check(report.ConvertedObjectCount == 1 && report.ConvertedMassKg == 7f,
                 "Only the successfully scheduled replacement may be recorded as converted.");
-            Check(UnityEngine.Object.Registry.OfType<PrimaryElement>().Count() == 2,
+            Check(UnityEngine.Object.Registry.OfType<PrimaryElement>().Count() == 3,
                 "The behavior boundary must preserve deferred-destruction visibility.");
             Check(UnityEngine.Debug.Errors.Any(message => message.Contains("failed-null-spawn")),
                 "Null replacement failure must produce a clear object-specific error.");
+            Check(UnityEngine.Debug.Errors.Any(message =>
+                    message.Contains("failed-throwing-spawn") &&
+                    message.Contains("synthetic SpawnResource failure")),
+                "Throwing replacement failure must produce a clear object-specific error.");
             Console.WriteLine(
-                "Safe-removal behavior passed: null spawn retained/counts remaining; deferred successful destruction counts converted.");
+                "Safe-removal behavior passed: null/throwing spawns retained and counted; following deferred destruction converted.");
             return 0;
         } catch (Exception exception) {
             while (exception.InnerException != null) exception = exception.InnerException;
