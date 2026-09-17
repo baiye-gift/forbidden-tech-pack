@@ -15,7 +15,8 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             ModIdentity.MassCrusherId,
             ModIdentity.MatterCompilerId,
             ModIdentity.MatterReconstructorId,
-            ModIdentity.EntropyFluxDiverterId
+            ModIdentity.EntropyFluxDiverterId,
+            ModIdentity.MatterAnnihilationReactorId
         };
 
         internal static void Register() {
