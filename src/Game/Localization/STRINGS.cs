@@ -63,6 +63,49 @@ public static class STRINGS {
                         public static LocString INACTIVE = "When receiving a Red signal, the Matter Reconstructor is disabled.";
                     }
                 }
+
+                public static class BAIYEENTROPYFLUXDIVERTER {
+                    public static LocString NAME = "Entropy Flux Diverter";
+                    public static LocString DESC = "Uses a Proto-Matter field to establish an artificial thermodynamic coupling between two liquid streams.";
+                    public static LocString EFFECT = "Moves equal thermal energy from a hotter liquid stream into a colder one while consuming a small amount of Proto-Matter. It does not delete heat.";
+                    public static LocString WAITING_HOT = "Waiting for hot liquid.";
+                    public static LocString WAITING_COLD = "Waiting for cold liquid.";
+                    public static LocString WAITING_PROTO_MATTER = "Waiting for Proto-Matter.";
+                    public static LocString NO_GRADIENT = "No usable thermal gradient is present.";
+                    public static LocString PHASE_LIMITED = "Transfer is limited by a liquid phase boundary.";
+                    public static LocString TRANSFERRING = "Redirecting entropy between the two liquid streams.";
+                    public static LocString OUTPUT_BLOCKED = "A processed liquid output is blocked.";
+                    public static LocString INTERFERED = "Proto-Matter interference has broken the coupling field. Transfer is paused.";
+
+                    public static class LOGIC_PORT {
+                        public static LocString NAME = "Enable Entropy Flux Diverter";
+                        public static LocString ACTIVE = "When receiving a Green signal, the Entropy Flux Diverter may operate.";
+                        public static LocString INACTIVE = "When receiving a Red signal, the Entropy Flux Diverter is disabled.";
+                    }
+                }
+
+                public static class BAIYEMATTERANNIHILATIONREACTOR {
+                    public static LocString NAME = "Matter Annihilation Reactor";
+                    public static LocString DESC = "Confines Proto-Matter at the boundary of reality and deliberately relaxes its material anchor to release usable energy.";
+                    public static LocString EFFECT = "Requires external power to establish confinement, then consumes Proto-Matter to generate large amounts of electricity and heat. Cooling or confinement failure can trigger localized Proto-Matter decoherence.";
+                    public static LocString OFFLINE = "Reactor offline.";
+                    public static LocString CHARGING = "Charging confinement field.";
+                    public static LocString STABLE = "Stable annihilation reaction.";
+                    public static LocString FLUCTUATING = "Constraint field fluctuating.";
+                    public static LocString CRITICAL = "Proto-Matter confinement is at the decoherence threshold.";
+                    public static LocString DECOHERED = "Proto-Matter decohered. Emergency lockout engaged.";
+                    public static LocString LOCKOUT = "Cooling lockout active.";
+                    public static LocString WAITING_PROTO_MATTER = "Waiting for Proto-Matter.";
+                    public static LocString COOLING_INSUFFICIENT = "Coolant cannot safely absorb reactor heat.";
+                    public static LocString POWER_INSUFFICIENT = "Constraint power is insufficient.";
+                    public static LocString INTERFERED = "External Proto-Matter interference is destabilizing confinement.";
+
+                    public static class LOGIC_PORT {
+                        public static LocString NAME = "Enable Matter Annihilation Reactor";
+                        public static LocString ACTIVE = "When receiving a Green signal, the reactor may charge or sustain confinement.";
+                        public static LocString INACTIVE = "When receiving a Red signal, the reactor performs an orderly shutdown into cooling lockout.";
+                    }
+                }
             }
         }
 
@@ -86,7 +129,7 @@ public static class STRINGS {
                 public static class BAIYEFORBIDDENPROTOFIELDENGINEERING {
                     public static LocString NAME = "Proto-Matter Field Engineering";
                     public static LocString DESC = "Use Proto-Matter as a dimensional coupling medium to lever reality itself and drive advanced forbidden machinery.";
-                    public static LocString SEARCH_TERMS = "proto-matter field dimensional coupling reconstruction reality reconstructor forbidden";
+                    public static LocString SEARCH_TERMS = "proto-matter field dimensional coupling reconstruction reality reconstructor entropy diverter annihilation reactor forbidden";
                 }
             }
         }
