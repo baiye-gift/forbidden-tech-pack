@@ -7,6 +7,8 @@ using HarmonyLib;
 namespace ForbiddenTechnologyPack.Game.Registration {
     [HarmonyPatch(typeof(GeneratedBuildings), nameof(GeneratedBuildings.LoadGeneratedBuildings))]
     internal static class BuildingRegistration {
+        // Keep this list limited to BuildingConfig implementations that actually exist in the game assembly.
+        // Phase-2 IDs may already exist in the core registration plan before their BuildingConfig is implemented.
         private static readonly string[] AllBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
@@ -20,16 +22,15 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             var plan = RegistrationPolicy.Create(ForbiddenTechOptions.Current);
             var enabled = new HashSet<string>(plan.BuildingIds, StringComparer.Ordinal);
 
-            for (var index = 0; index < AllBuildingIds.Length; index++) {
-                var buildingDef = Assets.GetBuildingDef(AllBuildingIds[index]);
-                if (buildingDef != null) {
-                    buildingDef.ShowInBuildMenu = enabled.Contains(AllBuildingIds[index]);
+            foreach (var buildingId in AllBuildingIds) {
+                var buildingDef = Assets.GetBuildingDef(buildingId);
+                if (buildingDef == null) {
+                    continue;
                 }
-            }
 
-            for (var index = 0; index < plan.BuildingIds.Count; index++) {
-                var buildingId = plan.BuildingIds[index];
-                if (AddedMenuEntries.Add(buildingId)) {
+                var showInMenu = enabled.Contains(buildingId);
+                buildingDef.ShowInBuildMenu = showInMenu;
+                if (showInMenu && AddedMenuEntries.Add(buildingId)) {
                     ModUtil.AddBuildingToPlanScreen("Refining", buildingId);
                 }
             }
