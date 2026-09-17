@@ -3,38 +3,49 @@ using System.Collections.Generic;
 using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Options;
 using HarmonyLib;
+using UnityEngine;
 
 namespace ForbiddenTechnologyPack.Game.Registration {
-    [HarmonyPatch(typeof(GeneratedBuildings), nameof(GeneratedBuildings.LoadGeneratedBuildings))]
     internal static class BuildingRegistration {
-        // Keep this list limited to BuildingConfig implementations that actually exist in the game assembly.
-        // Phase-2 IDs may already exist in the core registration plan before their BuildingConfig is implemented.
+        // This list is intentionally limited to BuildingConfig implementations that exist in
+        // the current assembly. Planned Phase-2 IDs live in RegistrationPlan separately so a
+        // future building cannot break startup before its config class is implemented.
         private static readonly string[] AllBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
             ModIdentity.MatterCompilerId,
-            ModIdentity.MatterReconstructorId
+            ModIdentity.MatterReconstructorId,
+            ModIdentity.EntropyFluxDiverterId
         };
 
-        private static readonly HashSet<string> AddedMenuEntries =
-            new HashSet<string>(StringComparer.Ordinal);
-
-        private static void Postfix() {
+        internal static void Register() {
             var plan = RegistrationPolicy.Create(ForbiddenTechOptions.Current);
             var enabled = new HashSet<string>(plan.BuildingIds, StringComparer.Ordinal);
-
-            foreach (var buildingId in AllBuildingIds) {
+            for (var index = 0; index < AllBuildingIds.Length; index++) {
+                var buildingId = AllBuildingIds[index];
                 var buildingDef = Assets.GetBuildingDef(buildingId);
-                if (buildingDef == null) {
-                    continue;
+                if (buildingDef != null) {
+                    buildingDef.ShowInBuildMenu = enabled.Contains(buildingId);
                 }
-
-                var showInMenu = enabled.Contains(buildingId);
-                buildingDef.ShowInBuildMenu = showInMenu;
-                if (showInMenu && AddedMenuEntries.Add(buildingId)) {
-                    ModUtil.AddBuildingToPlanScreen("Refining", buildingId);
+                if (enabled.Contains(buildingId)) {
+                    ModUtil.AddBuildingToPlanScreen(GetPlanCategory(buildingId), buildingId);
                 }
             }
+        }
+
+        private static string GetPlanCategory(string buildingId) {
+            if (string.Equals(buildingId, ModIdentity.MatterAnnihilationReactorId,
+                    StringComparison.Ordinal)) {
+                return "Power";
+            }
+            return "Refining";
+        }
+    }
+
+    [HarmonyPatch(typeof(GeneratedBuildings), "LoadGeneratedBuildings")]
+    internal static class GeneratedBuildingsRegistrationPatch {
+        private static void Prefix() {
+            BuildingRegistration.Register();
         }
     }
 }
