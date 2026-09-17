@@ -1,37 +1,76 @@
 [CmdletBinding()]
 param(
     [string[]]$Suite = @('All'),
-    [string]$GamePath
+    [string]$GamePath,
+    [switch]$DescribeSuites,
+    [switch]$DescribePlan
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-$portablePowerShellSuites = [ordered]@{
-    'ElementYamlTests' = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
-    'AssetSourceContractTests' = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
-    'PackageAssetVerificationTests' = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
-    'ReleaseWorkflowContractTests' = (Join-Path $projectRoot 'tests\ReleaseWorkflowContractTests.ps1')
+$suiteCatalog = [ordered]@{
+    'ElementYamlTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
+        RequiresGame = $false
+    }
+    'AssetSourceContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\AssetSourceContractTests.ps1')
+        RequiresGame = $false
+    }
+    'PackageAssetVerificationTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\PackageAssetVerificationTests.ps1')
+        RequiresGame = $false
+    }
+    'ReleaseWorkflowContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ReleaseWorkflowContractTests.ps1')
+        RequiresGame = $false
+    }
+    'ElementCatalogRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
+        RequiresGame = $true
+    }
+    'AnalyzerAdapterContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
+        RequiresGame = $true
+    }
+    'AnalyzerRecipeRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
+        RequiresGame = $true
+    }
+    'ResearchRegistrationRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ResearchRegistrationRuntimeTests.ps1')
+        RequiresGame = $true
+    }
+    'OptionsLocalizationRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
+        RequiresGame = $true
+    }
+    'SafeRemovalRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\SafeRemovalRuntimeTests.ps1')
+        RequiresGame = $true
+    }
+    'CrusherConfigContractTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
+        RequiresGame = $true
+    }
 }
-$gameDependentPowerShellSuites = [ordered]@{
-    'ElementCatalogRuntimeTests' = (Join-Path $projectRoot 'tests\ElementCatalogRuntimeTests.ps1')
-    'AnalyzerAdapterContractTests' = (Join-Path $projectRoot 'tests\AnalyzerAdapterContractTests.ps1')
-    'AnalyzerRecipeRuntimeTests' = (Join-Path $projectRoot 'tests\AnalyzerRecipeRuntimeTests.ps1')
-    'ResearchRegistrationRuntimeTests' = (Join-Path $projectRoot 'tests\ResearchRegistrationRuntimeTests.ps1')
-    'OptionsLocalizationRuntimeTests' = (Join-Path $projectRoot 'tests\OptionsLocalizationRuntimeTests.ps1')
-    'SafeRemovalRuntimeTests' = (Join-Path $projectRoot 'tests\SafeRemovalRuntimeTests.ps1')
-    'CrusherConfigContractTests' = (Join-Path $projectRoot 'tests\CrusherConfigContractTests.ps1')
-}
-$powerShellSuites = @{}
-foreach ($entry in $portablePowerShellSuites.GetEnumerator()) {
-    $powerShellSuites[$entry.Key] = $entry.Value
-}
-foreach ($entry in $gameDependentPowerShellSuites.GetEnumerator()) {
-    $powerShellSuites[$entry.Key] = $entry.Value
+
+if ($DescribeSuites) {
+    @($suiteCatalog.GetEnumerator() | ForEach-Object {
+        [pscustomobject]@{
+            Name = $_.Key
+            Path = $_.Value.Path
+            RequiresGame = $_.Value.RequiresGame
+        }
+    }) | ConvertTo-Json -Depth 4 -Compress
+    exit 0
 }
 $suiteGroups = @{
-    'Portable' = @($portablePowerShellSuites.Keys)
-    'All' = @($portablePowerShellSuites.Keys) + @($gameDependentPowerShellSuites.Keys)
+    'Portable' = @($suiteCatalog.GetEnumerator() | Where-Object {
+        -not $_.Value.RequiresGame
+    } | ForEach-Object { $_.Key })
+    'All' = @($suiteCatalog.Keys)
 }
 
 $requestedPowerShellSuites = [System.Collections.Generic.List[string]]::new()
@@ -42,14 +81,14 @@ foreach ($requestedSuite in $Suite) {
                 $requestedPowerShellSuites.Add($suiteName)
             }
         }
-    } elseif ($powerShellSuites.ContainsKey($requestedSuite) -and
+    } elseif ($suiteCatalog.Contains($requestedSuite) -and
             -not $requestedPowerShellSuites.Contains($requestedSuite)) {
         $requestedPowerShellSuites.Add($requestedSuite)
     }
 }
 
 $requestedGameSuites = @($requestedPowerShellSuites | Where-Object {
-    $gameDependentPowerShellSuites.Contains($_)
+    $suiteCatalog[$_].RequiresGame
 })
 if ($requestedGameSuites.Count -gt 0) {
     if ([string]::IsNullOrWhiteSpace($GamePath)) {
@@ -64,26 +103,45 @@ if ($requestedGameSuites.Count -gt 0) {
     }
 }
 
-foreach ($suiteName in $requestedPowerShellSuites) {
-    if ($gameDependentPowerShellSuites.Contains($suiteName)) {
-        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] `
-            -ProjectRoot $projectRoot -GamePath $GamePath
-    } else {
-        & pwsh -NoLogo -NoProfile -File $powerShellSuites[$suiteName] -ProjectRoot $projectRoot
+$powerShellInvocations = @($requestedPowerShellSuites | ForEach-Object {
+    $suiteName = $_
+    $definition = $suiteCatalog[$suiteName]
+    $arguments = @('-NoLogo', '-NoProfile', '-File', $definition.Path, '-ProjectRoot', $projectRoot)
+    if ($definition.RequiresGame) {
+        $arguments += @('-GamePath', $GamePath)
     }
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
+    [pscustomobject]@{
+        Name = $suiteName
+        RequiresGame = $definition.RequiresGame
+        Arguments = $arguments
     }
-}
+})
 
 $runCoreAll = @($Suite | Where-Object { $_ -ieq 'All' -or $_ -ieq 'Portable' }).Count -gt 0
 $csharpSuites = if ($runCoreAll) {
     @('All')
 } else {
     @($Suite | Where-Object {
-        -not $powerShellSuites.ContainsKey($_) -and -not $suiteGroups.ContainsKey($_)
+        -not $suiteCatalog.Contains($_) -and -not $suiteGroups.ContainsKey($_)
     })
 }
+
+if ($DescribePlan) {
+    [pscustomobject]@{
+        PowerShellSuites = $powerShellInvocations
+        CSharpSuites = $csharpSuites
+    } | ConvertTo-Json -Depth 6 -Compress
+    exit 0
+}
+
+foreach ($invocation in $powerShellInvocations) {
+    $invocationArguments = @($invocation.Arguments)
+    & pwsh @invocationArguments
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+}
+
 if ($csharpSuites.Count -eq 0) {
     exit 0
 }
