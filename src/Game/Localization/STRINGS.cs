@@ -1,5 +1,6 @@
-namespace ForbiddenTechnologyPack.Game {
-    public static class STRINGS {
+// ONI localization uses a global STRINGS root. Vanilla code references this
+// generated tree directly (BUILDINGS.PREFABS.*, RESEARCH.TECHS.*, etc.).
+public static class STRINGS {
         public static class ELEMENTS {
             public static class BAIYEFORBIDDENPROTOMATTER {
                 public static LocString NAME = "Proto-Matter";
@@ -81,5 +82,4 @@ namespace ForbiddenTechnologyPack.Game {
                 public static LocString INCOMPLETE = "Safe removal is not complete. {0} custom objects remain. Keep the mod enabled, reload the colony if necessary, and run Safe Removal again. Do not disable the mod yet.";
             }
         }
-    }
 }

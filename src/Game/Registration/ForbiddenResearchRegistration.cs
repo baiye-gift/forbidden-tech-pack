@@ -97,12 +97,14 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 string prerequisiteId) {
             ResourceTreeNode prerequisiteNode = null;
             var rightEdge = float.MinValue;
+            var occupied = new HashSet<string>();
             foreach (var existingNode in tree) {
                 if (existingNode == null) {
                     continue;
                 }
 
                 rightEdge = System.Math.Max(rightEdge, existingNode.nodeX + existingNode.width);
+                occupied.Add(existingNode.nodeX + ":" + existingNode.nodeY);
                 if (existingNode.Id == prerequisiteId) {
                     prerequisiteNode = existingNode;
                 }
@@ -112,10 +114,15 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 return null;
             }
 
+            var candidateX = prerequisiteNode.nodeX + prerequisiteNode.width;
+            while (occupied.Contains(candidateX + ":" + prerequisiteNode.nodeY)) {
+                candidateX += prerequisiteNode.width;
+            }
+
             return new ResourceTreeNode {
                 Id = ModIdentity.ResearchId,
                 Name = ModIdentity.ResearchId,
-                nodeX = rightEdge + prerequisiteNode.width,
+                nodeX = candidateX,
                 nodeY = prerequisiteNode.nodeY,
                 width = prerequisiteNode.width,
                 height = prerequisiteNode.height
