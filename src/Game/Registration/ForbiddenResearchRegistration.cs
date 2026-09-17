@@ -10,7 +10,8 @@ namespace ForbiddenTechnologyPack.Game.Registration {
     internal static class ForbiddenResearchRegistration {
         private static readonly string[] ImplementedPhase2BuildingIds = {
             ModIdentity.MatterReconstructorId,
-            ModIdentity.EntropyFluxDiverterId
+            ModIdentity.EntropyFluxDiverterId,
+            ModIdentity.MatterAnnihilationReactorId
         };
 
         private static void Prefix(Database.Techs __instance, TextAsset tree_file) {
