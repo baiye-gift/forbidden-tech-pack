@@ -10,7 +10,9 @@ namespace ForbiddenTechnologyPack.Game.Registration {
         private static readonly string[] AllBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
-            ModIdentity.MatterCompilerId
+            ModIdentity.MatterCompilerId,
+            ModIdentity.AnnihilationReactorId,
+            ModIdentity.EnergyCondenserId
         };
 
         private static readonly HashSet<string> AddedMenuEntries =
@@ -30,7 +32,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
             for (var index = 0; index < plan.BuildingIds.Count; index++) {
                 var buildingId = plan.BuildingIds[index];
                 if (AddedMenuEntries.Add(buildingId)) {
-                    ModUtil.AddBuildingToPlanScreen("Refining", buildingId);
+                    ModUtil.AddBuildingToPlanScreen(buildingId == ModIdentity.AnnihilationReactorId ? "Power" : "Refining", buildingId);
                 }
             }
         }

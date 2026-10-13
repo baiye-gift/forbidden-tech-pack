@@ -11,6 +11,7 @@ using UnityEngine;
 namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
     public sealed class MatterAnalyzer : ComplexFabricator {
         private bool recipeRefreshPending;
+        private ForbiddenTechSaveData subscribedSave;
 
         protected override void OnSpawn() {
             base.OnSpawn();
@@ -44,6 +45,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
         }
 
         public override void Sim1000ms(float dt) {
+            SubscribeToUnlocks();
             if (recipeRefreshPending && CurrentWorkingOrder == null) {
                 RefreshRecipes();
             }
@@ -89,15 +91,17 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
         }
 
         private void SubscribeToUnlocks() {
-            if (ForbiddenTechSaveData.Instance != null) {
-                ForbiddenTechSaveData.Instance.UnlocksChanged += RefreshRecipes;
-            }
+            if (subscribedSave == ForbiddenTechSaveData.Instance) return;
+            UnsubscribeFromUnlocks();
+            subscribedSave = ForbiddenTechSaveData.Instance;
+            if (subscribedSave == null) return;
+            subscribedSave.UnlocksChanged += RefreshRecipes;
+            recipeRefreshPending = true;
         }
 
         private void UnsubscribeFromUnlocks() {
-            if (ForbiddenTechSaveData.Instance != null) {
-                ForbiddenTechSaveData.Instance.UnlocksChanged -= RefreshRecipes;
-            }
+            if (subscribedSave != null) subscribedSave.UnlocksChanged -= RefreshRecipes;
+            subscribedSave = null;
         }
     }
 

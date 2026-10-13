@@ -6,6 +6,9 @@ namespace ForbiddenTechnologyPack.Core {
         public const string MatterAnalyzerId = "BaiyeMatterAnalyzer";
         public const string MassCrusherId = "BaiyeMassCrusher";
         public const string MatterCompilerId = "BaiyeMatterCompiler";
+        public const string AnnihilationReactorId = "BaiyeProtoAnnihilationReactor";
+        public const string EnergyCondenserId = "BaiyeEnergyMatterCondenser";
+        public const string MassEnergyResearchId = "BaiyeForbiddenMassEnergyEngineering";
         public const string ResearchId = "BaiyeForbiddenMatterEngineering";
     }
 }

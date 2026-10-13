@@ -231,13 +231,18 @@ internal static class SafeRemovalRuntimeProbe {
             foreach (var typeName in new[] {
                     "ForbiddenTechnologyPack.Game.Buildings.Analyzer.MatterAnalyzer",
                     "ForbiddenTechnologyPack.Game.Buildings.Crusher.MassCrusher",
-                    "ForbiddenTechnologyPack.Game.Buildings.Compiler.MatterCompiler" }) {
+                    "ForbiddenTechnologyPack.Game.Buildings.Compiler.MatterCompiler",
+                    "ForbiddenTechnologyPack.Game.Buildings.MassEnergy.EnergyMatterCondenser",
+                    "ForbiddenTechnologyPack.Game.Buildings.MassEnergy.ProtoAnnihilationReactor" }) {
                 var type = mod.GetType(typeName, true);
                 Check(CallsClosedGeneric(execute, finder, type),
                     "Execute must include inactive " + type.Name + " objects.");
                 Check(CallsClosedGeneric(count, finder, type),
                     "Completion counting must include inactive " + type.Name + " objects.");
             }
+            var construction = game.GetType("BuildingUnderConstruction",true);
+            Check(CallsClosedGeneric(execute,finder,construction) && CallsClosedGeneric(count,finder,construction),
+                "Native custom construction plans must be cancelled and counted, including pending cancellation.");
             var primaryElement = game.GetType("PrimaryElement", true);
             Check(CallsClosedGeneric(convert, finder, primaryElement),
                 "Proto-Matter conversion must include inactive loose, stored, and rail objects.");
@@ -325,7 +330,7 @@ $compiler = Get-ForbiddenTechnologyCSharpCompiler -ProjectRoot $ProjectRoot
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $runtimeConfigBody = @'
-{"runtimeOptions":{"tfm":"net10.0","framework":{"name":"Microsoft.NETCore.App","version":"10.0.0"}}}
+{"runtimeOptions":{"tfm":"net6.0","rollForward":"Major","framework":{"name":"Microsoft.NETCore.App","version":"6.0.0"}}}
 '@
 [System.IO.File]::WriteAllText($runtimeConfig, $runtimeConfigBody, [System.Text.UTF8Encoding]::new($false))
 & dotnet $probeAssembly $managedDirectory $rawAssembly (Join-Path $ProjectRoot 'lib')
@@ -363,6 +368,7 @@ namespace UnityEngine {
     }
     public class GameObject : Object {
         private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
+        private readonly List<Component> allComponents = new List<Component>();
         public string name;
         public readonly Transform transform = new Transform();
         public T GetComponent<T>() where T : class {
@@ -372,12 +378,20 @@ namespace UnityEngine {
         public void Add(Component component) {
             component.gameObject = this;
             components[component.GetType()] = component;
+            allComponents.Add(component);
+        }
+        public T[] GetComponents<T>() where T : class { return allComponents.OfType<T>().ToArray(); }
+        public bool CancelFails;
+        public void Trigger(int hash) {
+            if (hash == (int)GameHashes.Cancel && !CancelFails)
+                foreach(var component in allComponents) Object.Registry.Remove(component);
         }
     }
     public class Component : Object {
         public GameObject gameObject;
         public Transform transform { get { return gameObject.transform; } }
         public T GetComponent<T>() where T : class { return gameObject.GetComponent<T>(); }
+        public T[] GetComponents<T>() where T : class { return gameObject.GetComponents<T>(); }
     }
     public static class Debug {
         public static readonly List<string> Errors = new List<string>();
@@ -398,7 +412,7 @@ namespace HarmonyLib {
     }
 }
 
-public enum SimHashes { ProtoMatter = 1, IgneousRock = 2 }
+public enum SimHashes { ProtoMatter = 1, IgneousRock = 2, Water = 3 }
 public struct Tag { public Tag(string id) {} }
 
 public sealed class PrimaryElement : UnityEngine.Component {
@@ -443,11 +457,12 @@ public sealed class Operational : UnityEngine.Component {
     }
     public void SetFlag(Flag flag, bool value) {}
 }
-public class Storage {
+public class Storage : UnityEngine.Component {
     public readonly List<UnityEngine.GameObject> items = new List<UnityEngine.GameObject>();
-    public void DropAll(bool a, bool b, UnityEngine.Vector3 c, bool d, object e) {}
+    public void DropAll(bool a, bool b, UnityEngine.Vector3 c, bool d, object e) { items.Clear(); }
 }
-public class ComplexFabricator : UnityEngine.Component {
+public class KMonoBehaviour : UnityEngine.Component {}
+public class ComplexFabricator : KMonoBehaviour {
     public Storage inStorage = new Storage();
     public Storage buildStorage = new Storage();
     public Storage outStorage = new Storage();
@@ -457,7 +472,9 @@ public sealed class Deconstructable : UnityEngine.Component {
     public bool HasBeenDestroyed;
     public void ForceDestroyAndGetMaterials() { HasBeenDestroyed = true; }
 }
-public sealed class BuildingDef { public bool ShowInBuildMenu; }
+public enum GameHashes { Cancel }
+public sealed class BuildingDef { public bool ShowInBuildMenu; public string PrefabID; }
+public sealed class BuildingUnderConstruction : KMonoBehaviour { public BuildingDef Def; }
 public static class Assets { public static BuildingDef GetBuildingDef(string id) { return null; } }
 public sealed class Tech { public readonly List<string> unlockedItemIDs = new List<string>(); }
 public sealed class Techs { public Tech TryGet(string id) { return null; } }
@@ -473,6 +490,9 @@ namespace ForbiddenTechnologyPack.Core {
         public const string MassCrusherId = "Crusher";
         public const string MatterCompilerId = "Compiler";
         public const string ResearchId = "Research";
+        public const string AnnihilationReactorId = "Reactor";
+        public const string EnergyCondenserId = "Condenser";
+        public const string MassEnergyResearchId = "EnergyResearch";
     }
 }
 namespace ForbiddenTechnologyPack.Game.Elements {
@@ -496,7 +516,11 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
 }
 namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
     public class MatterCompiler : ComplexFabricator {}
-    public sealed class CoolantController : UnityEngine.Component { public Storage storage; }
+    public sealed class CoolantController : UnityEngine.Component { public Storage storage; public Storage heatedStorage; }
+}
+namespace ForbiddenTechnologyPack.Game.Buildings.MassEnergy {
+    public class EnergyMatterCondenser : ComplexFabricator {}
+    public class ProtoAnnihilationReactor : KMonoBehaviour { public bool Prepared; internal void PrepareRemoval() { Prepared=true; } }
 }
 
 internal static class SafeRemovalBehavior {
@@ -553,6 +577,40 @@ internal static class SafeRemovalBehavior {
                 "Throwing replacement failure must produce a clear object-specific error.");
             Console.WriteLine(
                 "Safe-removal behavior passed: null/throwing spawns retained and counted; following deferred destruction converted.");
+            UnityEngine.Object.Registry.Clear();Util.Destroyed.Clear();
+            var reactor = new ForbiddenTechnologyPack.Game.Buildings.MassEnergy.ProtoAnnihilationReactor();
+            var reactorObject = new UnityEngine.GameObject {name="reactor"};reactorObject.Add(reactor);
+            reactorObject.Add(new Deconstructable());UnityEngine.Object.Registry.Add(reactor);
+            var fuel = new Storage();fuel.items.Add(Proto("fuel",3).gameObject);reactorObject.Add(fuel);
+            var cold = new Storage();var coldWater=Proto("cold water",5);coldWater.ElementID=SimHashes.Water;
+            cold.items.Add(coldWater.gameObject);reactorObject.Add(cold);
+            var hot = new Storage();var hotWater=Proto("hot water",6);hotWater.ElementID=SimHashes.Water;
+            hot.items.Add(hotWater.gameObject);reactorObject.Add(hot);
+            var condenser = new ForbiddenTechnologyPack.Game.Buildings.MassEnergy.EnergyMatterCondenser();
+            var condenserObject = new UnityEngine.GameObject {name="condenser"};condenserObject.Add(condenser);
+            condenserObject.Add(new Deconstructable());UnityEngine.Object.Registry.Add(condenser);
+            condenser.outStorage.items.Add(Proto("condensed output",2).gameObject);
+            Substance.Results.Enqueue(()=>new UnityEngine.GameObject());Substance.Results.Enqueue(()=>new UnityEngine.GameObject());
+            var energyReport=ForbiddenTechnologyPack.Game.Safety.SafeRemovalController.Execute();
+            Check(reactor.Prepared && energyReport.RemovedBuildingCount==2 && energyReport.IsComplete,
+                "Both mass-energy buildings must stop and be excluded from deferred-destruction completion counting.");
+            Check(fuel.items.Count==0 && cold.items.Count==0 && hot.items.Count==0 && condenser.outStorage.items.Count==0,
+                "Mass-energy removal must return every fuel, coolant and output inventory.");
+            Check(energyReport.ConvertedObjectCount==2 && energyReport.ConvertedMassKg==5 && energyReport.ReturnedInputCount==2,
+                "Reactor fuel and condenser outputs must convert while ordinary coolants count as returned inputs.");
+            Console.WriteLine("Mass-energy safe-removal behavior passed: all storages returned, both buildings removed, fuel/output converted, deferred deletion handled.");
+            UnityEngine.Object.Registry.Clear();
+            var plan=new BuildingUnderConstruction{Def=new BuildingDef{PrefabID=ForbiddenTechnologyPack.Core.ModIdentity.AnnihilationReactorId}};
+            var planObject=new UnityEngine.GameObject{name="reactor construction"};planObject.Add(plan);UnityEngine.Object.Registry.Add(plan);
+            var constructionStorage=new Storage();var ingredient=Proto("construction water",4);ingredient.ElementID=SimHashes.Water;
+            constructionStorage.items.Add(ingredient.gameObject);planObject.Add(constructionStorage);
+            planObject.CancelFails=true;
+            var pending=ForbiddenTechnologyPack.Game.Safety.SafeRemovalController.Execute();
+            Check(!pending.IsComplete && constructionStorage.items.Count==0,"A pending construction cancellation must return material and prevent false completion");
+            planObject.CancelFails=false;
+            var cancelled=ForbiddenTechnologyPack.Game.Safety.SafeRemovalController.Execute();
+            Check(cancelled.IsComplete && !UnityEngine.Object.Registry.Contains(plan),"Native cancellation removes the remaining custom construction plan");
+            Console.WriteLine("Construction safe-removal passed: refund, pending count and native cancel event.");
             return 0;
         } catch (Exception exception) {
             while (exception.InnerException != null) exception = exception.InnerException;

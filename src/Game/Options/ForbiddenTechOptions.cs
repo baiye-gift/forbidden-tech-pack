@@ -30,7 +30,7 @@ namespace ForbiddenTechnologyPack.Game.Options {
         public LocalizedBalancePreset Preset { get; set; } = LocalizedBalancePreset.Strong;
 
         [JsonProperty]
-        [Option("启用物质编译模块", "关闭后隐藏本模组的研究和建造项目；已建建筑仍会保持存档安全。", "模块与建筑")]
+        [Option("启用禁忌科技建筑包", "关闭后隐藏本模组的研究和建造项目；已建建筑仍会保持存档安全。", "模块与建筑")]
         public bool ModuleEnabled { get; set; } = true;
 
         [JsonProperty]
@@ -44,6 +44,18 @@ namespace ForbiddenTechnologyPack.Game.Options {
         [JsonProperty]
         [Option("启用物质编译器", "关闭后隐藏物质编译器的建造项目。", "模块与建筑")]
         public bool CompilerEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用质能工程模块", "启用原质湮灭与能量凝质。质能账本不受材料成本、耗电或发热倍率影响。", "质能工程")]
+        public bool MassEnergyEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用原质湮灭反应堆", "控制新建入口；已有实例、燃料、热液和点火记录保留。", "质能工程")]
+        public bool ReactorEnabled { get; set; } = true;
+
+        [JsonProperty]
+        [Option("启用能量凝质器", "控制新建入口；已有实例、成品和已付款进度保留。", "质能工程")]
+        public bool CondenserEnabled { get; set; } = true;
 
         [JsonProperty]
         [Option("原质回收率", "仅在选择“自定义”预设时生效。", "自定义参数")]
@@ -102,6 +114,9 @@ namespace ForbiddenTechnologyPack.Game.Options {
                 AnalyzerEnabled = AnalyzerEnabled,
                 CrusherEnabled = CrusherEnabled,
                 CompilerEnabled = CompilerEnabled,
+                MassEnergyEnabled = MassEnergyEnabled,
+                ReactorEnabled = ReactorEnabled,
+                CondenserEnabled = CondenserEnabled,
                 RecoveryRate = RecoveryRate,
                 CostMultiplier = CostMultiplier,
                 PowerMultiplier = PowerMultiplier,

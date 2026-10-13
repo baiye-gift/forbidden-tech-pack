@@ -18,6 +18,7 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
         public static IReadOnlyDictionary<string, ComplexRecipe> AnalyzerRecipes { get; private set; } = EmptyRecipes;
         public static IReadOnlyDictionary<string, ComplexRecipe> CrusherRecipes { get; private set; } = EmptyRecipes;
         public static IReadOnlyDictionary<string, ComplexRecipe> CompilerRecipes { get; private set; } = EmptyRecipes;
+        public static ComplexRecipe CondenserRecipe { get; private set; }
 
         public static void Build() {
             if (wasBuilt) {
@@ -51,7 +52,16 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
             AnalyzerRecipes = Freeze(analyzerRecipes);
             CrusherRecipes = Freeze(crusherRecipes);
             CompilerRecipes = Freeze(compilerRecipes);
+            CondenserRecipe = CreateCondenserRecipe();
             wasBuilt = true;
+        }
+        private static ComplexRecipe CreateCondenserRecipe() {
+            var condensed = new ComplexRecipe.RecipeElement(ProtoMatterRegistration.Tag, 1f);
+            condensed.temperatureOperation = ComplexRecipe.RecipeElement.TemperatureOperation.Heated;
+            var recipe = CreateRecipe("BaiyeCondenseProtoMatter", new ComplexRecipe.RecipeElement[0],
+                new[] { condensed }, ModIdentity.EnergyCondenserId, (float)MassEnergyBalance.CondenseSecondsPerKg, 0);
+            recipe.description = STRINGS.UI.MASSENERGY.CONDENSE_RECIPE;
+            return recipe;
         }
 
         private static ComplexRecipe CreateAnalyzerRecipe(RecipePlan plan, int sortOrder) {
@@ -61,8 +71,9 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
             var recipe = CreateRecipe(plan.AnalyzerId, new[] { input }, new[] { metadataResult },
                 ModIdentity.MatterAnalyzerId, plan.AnalyzerTimeSeconds, sortOrder);
             recipe.nameDisplay = ComplexRecipe.RecipeNameDisplay.Ingredient;
-            recipe.description = "Analyze " + GetLocalizedElementName(plan.ElementId) +
-                " to unlock forbidden matter compilation for this material.";
+            recipe.description = string.Format(STRINGS.UI.MATTER.ANALYZE,
+                GetLocalizedElementName(plan.ElementId), plan.AnalyzerInputKg,
+                plan.AnalyzerInputDoNotConsume ? STRINGS.UI.MATTER.RETURNED : STRINGS.UI.MATTER.CONSUMED);
             return recipe;
         }
 
@@ -71,8 +82,10 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
                 new[] { new ComplexRecipe.RecipeElement(new Tag(plan.ElementId), plan.CrusherInputKg) },
                 new[] { new ComplexRecipe.RecipeElement(ProtoMatterRegistration.Tag, plan.CrusherOutputKg) },
                 ModIdentity.MassCrusherId, plan.CrusherTimeSeconds, sortOrder);
-            recipe.description = "Crush " + GetLocalizedElementName(plan.ElementId) +
-                " into Proto-Matter for later forbidden matter compilation.";
+            recipe.nameDisplay = ComplexRecipe.RecipeNameDisplay.Ingredient;
+            recipe.description = string.Format(STRINGS.UI.MATTER.CRUSH, plan.CrusherInputKg,
+                GetLocalizedElementName(plan.ElementId), plan.CrusherOutputKg,
+                plan.CrusherInputKg - plan.CrusherOutputKg);
             return recipe;
         }
 
@@ -81,7 +94,8 @@ namespace ForbiddenTechnologyPack.Game.Recipes {
                 new[] { new ComplexRecipe.RecipeElement(ProtoMatterRegistration.Tag, plan.CompilerInputKg) },
                 new[] { new ComplexRecipe.RecipeElement(new Tag(plan.ElementId), plan.CompilerOutputKg) },
                 ModIdentity.MatterCompilerId, plan.CompilerTimeSeconds, sortOrder);
-            recipe.description = "Compile Proto-Matter back into " + GetLocalizedElementName(plan.ElementId) + ".";
+            recipe.description = string.Format(STRINGS.UI.MATTER.COMPILE, plan.CompilerOutputKg,
+                GetLocalizedElementName(plan.ElementId), plan.CompilerInputKg);
             return recipe;
         }
 

@@ -15,7 +15,7 @@ internal static class AnalyzerPolicyTests {
 
         var strong = PackOptions.Resolve(new RawOptions { Preset = BalancePreset.Strong });
         var extreme = PackOptions.Resolve(new RawOptions { Preset = BalancePreset.Extreme });
-        AssertEx.True(AnalyzerPolicy.ShouldConsumeSample(strong), "strong consumes");
-        AssertEx.False(AnalyzerPolicy.ShouldConsumeSample(extreme), "extreme preserves");
+        AssertEx.False(RecipePlanFactory.Create(rules[1], strong).AnalyzerInputDoNotConsume, "strong analyzer recipe consumes");
+        AssertEx.True(RecipePlanFactory.Create(rules[1], extreme).AnalyzerInputDoNotConsume, "extreme analyzer recipe preserves");
     }
 }

@@ -66,7 +66,10 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Common {
             RecipeListField.SetValue(fabricator, recipeArray);
             OpenOrderCountsField.SetValue(fabricator,
                 Enumerable.Repeat(0, recipeArray.Length).ToList());
-            NextOrderIndexField.SetValue(fabricator, 0);
+            var savedId = GetLastWorkingRecipeId(fabricator);
+            var savedIndex = fabricator.OrderProgress > 0f
+                ? Array.FindIndex(recipeArray, recipe => recipe.id == savedId) : -1;
+            NextOrderIndexField.SetValue(fabricator, Math.Max(0, savedIndex));
             NextOrderIsWorkableField.SetValue(fabricator, false);
             fabricator.SetQueueDirty();
         }

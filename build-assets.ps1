@@ -22,10 +22,15 @@ $sourceFolders = @{
     'baiye_matter_analyzer' = 'matter_analyzer'
     'baiye_mass_crusher' = 'mass_crusher'
     'baiye_matter_compiler' = 'matter_compiler'
+    'baiye_proto_annihilation_reactor' = 'proto_annihilation_reactor'
+    'baiye_energy_matter_condenser' = 'energy_matter_condenser'
 }
 
 if (Test-Path -LiteralPath $output) {
-    Remove-Item $output -Recurse -Force
+    $resolvedOutput = [IO.Path]::GetFullPath($output)
+    $expectedOutput = [IO.Path]::GetFullPath((Join-Path $projectRoot 'packaging\anim'))
+    if ($resolvedOutput -ne $expectedOutput) { throw 'Unexpected animation output path.' }
+    Remove-Item -LiteralPath $resolvedOutput -Recurse -Force
 }
 
 New-Item -ItemType Directory -Force -Path $outputGroup | Out-Null
@@ -41,7 +46,14 @@ foreach ($name in $manifest.PSObject.Properties.Name) {
 
     New-Item -ItemType Directory -Force -Path $animationPackage | Out-Null
 
-    & $tool kanim $scml -o $animationPackage
+    # Pinned kanimal targets .NET 3.1. Use an installed newer major runtime too.
+    $previousRollForward = $env:DOTNET_ROLL_FORWARD
+    try {
+        $env:DOTNET_ROLL_FORWARD = 'Major'
+        & $tool kanim $scml -o $animationPackage
+    } finally {
+        $env:DOTNET_ROLL_FORWARD = $previousRollForward
+    }
 
     if ($LASTEXITCODE -ne 0) {
         throw "kanimal failed for '$name'"

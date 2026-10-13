@@ -1,47 +1,75 @@
 # Forbidden Technology Pack / 禁忌科技建筑包
 
-Forbidden Technology Pack adds a configurable high-power solid-material processing chain to Oxygen Not Included. Materials can be analyzed, converted into transportable Proto-Matter, and later reconstructed through a coolant-gated compiler.
+为《缺氧》提供物质重编译与极限质能工程：采集真实样本、粉碎基础物质、编译目标材料，或以原质进行受控湮灭，再用高耗电凝聚回收实体原质。当前 **0.2.0 是本地开发候选包**，尚未安装或发布，游戏内验收仍待完成，详见 [验证矩阵](docs/test-matrix.md)。
 
-## Requirements
+## 环境与兼容
 
-- Oxygen Not Included build 744825 or newer.
-- Base game and supported DLC content modes are declared through `supportedContent: ALL`.
-- The mod ships its required runtime code and does not require users to install PLib separately.
+- 元数据最低游戏版本 744825，声明 `supportedContent: ALL`；这项声明不等于本轮已通过全部 DLC 实机验证。
+- PLib 已合并入 DLL，无需单独安装。
+- 需要 PowerShell 7、Git、.NET 6 或更新运行时，以及本地 ONI 托管程序集来构建。kanimal 使用 Major roll-forward，在本机 .NET 6/8 上构建成功。
 
-## Installation
+## 本地构建与验证
 
-Extract `ForbiddenTechnologyPack` into the game's local mods directory:
+```powershell
+.\restore-deps.ps1
+.\test.ps1 -Suite Portable
+.\build.ps1 -GamePath '<游戏目录>'
+.\test.ps1 -Suite All -GamePath '<游戏目录>'
+.\pack-release.ps1 -GamePath '<游戏目录>'
+```
 
-`Documents\Klei\OxygenNotIncluded\mods\local\ForbiddenTechnologyPack`
+Portable 包含纯逻辑、适配宿主、素材与打包合同。All 还包括原生托管检查；研究注册探针当前会触发 Unity ECall，无法在命令行环境完成，不能把 All 报告为通过。具体结果及未验证范围见验证矩阵。
 
-Restart the game after installing or updating the mod.
+本地压缩包位于 `release/ForbiddenTechnologyPack-0.2.0.zip`，脚本重新构建、校验、计算 SHA256、解压复验，保留旧版本 ZIP。安装需用户当次授权，候选包先用于测试存档。安装目标是游戏的 `mods/local/ForbiddenTechnologyPack`，更新后需重启。
 
-## Buildings
+## 五台建筑
 
-### Matter Analyzer
+### Matter Analyzer / 物质分析仪
 
-Consumes a physical solid sample to unlock that material for Matter Compiler recipes. Already analyzed materials are filtered from the available analysis recipes.
+3×3，复制人操作，以 10 kg 合格固体样本进行 30 秒分析，完成后全殖民地解锁相应编译配方。默认消耗样本；极度超模预设可返还。已分析的样本从配方列表移除。基础功率 1.2 kW、机体产热 4 kDTU/s。
 
-### Mass Crusher
+### Mass Crusher / 质量粉碎机
 
-Converts eligible solid materials into Proto-Matter while preserving the configured mass-conversion rules. It supports manual handling and solid conveyor logistics.
+4×4，自动加工，支持复制人/清扫器送料与固体轨道。默认每批 100 kg 合格固体 → 90 kg 原质，40 秒有效加工，基础功率 2.4 kW、机体产热 40 kDTU/s。损耗在配方说明中显示。按原料名称排队，成品可手动取走；输出不足一批空间时停机。未支付电力的时间不增加进度。
 
-### Matter Compiler
+### Matter Compiler / 物质编译器
 
-Reconstructs unlocked solids from Proto-Matter. It requires a liquid coolant loop and pauses instead of consuming a batch when safe cooling or output capacity is unavailable.
+5×5，自动加工。接通原质输入、普通固体输出及液体进出管，再选择已分析的目标材料。基础功率 9.6 kW，工作过程将 160 kDTU/s 热量交给真实冷却液，需外部散热；建筑不提供净电力或免费冷却。普通材料一般输出 100 kg/批，稀有与终局材料 10 kg/批；原质费用和时间按材料等级确定，以配方显示为准。
 
-## Configuration presets
+冷却液原有 10 kg 输入库存保留，在它之后追加独立 10 kg 回流缓冲。每 0.2 秒有效加工最多转移 2 kg 液体；加热与拆分保持总热量，剩余输入液保留自己的热量份额。回流堵塞或无法安全加热时停止加工，不删除液体；过热输入可原温排回。温度、质量和病菌沿用原生库存与运输接口。用户取消订单走原生返料，已有热量不会回滚。
 
-Balanced, Strong, and Extreme presets provide increasing production strength. Custom settings are clamped to supported safety limits. Individual buildings can also be disabled for future construction without deleting existing instances or their storage.
+三台设备使用原生制作侧栏、进度条、配方队列与状态提示。常见停机状态直接说明缺料、输出堵塞、冷却或供电/自动化问题；详细数值放在 tooltip。外壳固定，扫描头、转子、压杆、发射环和出料机构独立运动。美术与动作依据见 [DESIGN.md](DESIGN.md)，源图和生成步骤见 [assets/README.md](assets/README.md)。
 
-## Safe Removal
+### Proto-Matter Annihilation Reactor / 原质湮灭反应炉
 
-Use **Safe Removal** before disabling the mod in an existing colony. The workflow uses two confirmations, returns stored inputs where applicable, converts remaining Proto-Matter to Igneous Rock, removes custom buildings, and reports anything that still blocks safe removal. Save under a new name and reload successfully before disabling the mod.
+5×5。首次点火实际支付 600 kJ 电力，启动热量进入冷却液，尚不扣燃料或发电。已支付的点火进度保留至暂停及存读档。进入反应后消耗 0.02 kg/s 原质，总发电 48 kW、运行耗电 8 kW、净输出 40 kW，向外部液体回路传入 200 kDTU/s。原质仓 120 kg，支持复制人/清扫器或输入轨道；电量缓冲 96 kJ。缺料、满发电缓冲、回流堵塞、危险冷却液、断电、自动化或损坏都会暂停。
 
-## Compatibility
+供电与发电接口在同格，首次启动需要外部电源；启动电力与运行电力均读取实际付款。Spaced Out! 辐射系统启用时，实际反应区间发射 500 rads、半径参数 4×4；需要玩家安排屏蔽，实机范围待验收。基础版无辐射组件，电力与废热合同相同。维护使用原生过热损坏与维修；首版没有额外周期磨损耗材。
 
-The mod is designed to tolerate base-game-only and supported DLC combinations by filtering unavailable content instead of requiring every DLC. Existing unlock state is preserved when a DLC recipe becomes temporarily unavailable.
+### Energy-Matter Condenser / 质能凝聚器
 
-## Updates
+4×4，使用原生订单队列和进度条。无物质输入，每批真实支付 18 MJ 电力，36 kW 连续有效加工 500 秒后一次生成 1 kg 原质，同时向冷却液排出 6 MJ（12 kDTU/s）。成品仓 20 kg，支持手动取走和输出轨道。堵塞、断电与冷却异常不增加进度；取消订单不退已消耗的电力、不撤销已排热，不生成零碎半成品。
 
-Updates preserve published building and element IDs. Back up important colonies before installing a new version, and review the changelog for migration or compatibility notes.
+两台建筑通过“禁忌物质工程 → 禁忌质能工程”研究解锁，新研究费用为基础 180、进阶 160 点。每台均使用真实冷热 10 kg 缓冲、原生自动化和库存状态；新增开关独立于既有材料预设。能量基线是游戏平衡缩放，不冒充现实 `E=mc²` 全量转化：原质每千克至多回收 12 MJ，凝聚消耗 18 MJ，连同运行电力及全部废热回收也不能产生循环净收益。材料粉碎仍需采集基础物资。
+
+五台建筑统一使用适合《缺氧》的简洁分层工业画风。编译器的固定假液位罐已改为实体绝缘管路；其他未绑定库存的发光条也改为机械部件。真实库存继续从侧栏读取。冷却回液通常积攒至少 5 kg 再交给原生管路；停机尾料等待 2 秒，满混合缓冲可缓慢排出以避免堵死。固体仍整批产出：编译器 10/100 kg、粉碎机按整批配方，凝聚器每 500 秒有效加工产出 1 kg，未增加高频微量产物。
+
+## 原质图标与说明
+
+原质采用深色外壳、紫色晶粒与青色内层的致密固体轮廓，具有独立菜单图标。32/24 像素作者预览用于检查库存缩略图辨识度；原生条目继续显示真实质量、温度、病菌，并说明材料用途与 12/18 MJ 能量预算。保持原质元素与动画 ID，已有库存无需替换。
+
+## 配置预设
+
+默认 Strong（强力）预设，另有 Balanced、Extreme 与受约束的 Custom；调整后需要重启。可隐藏单台建筑的新建入口，同时保留已有实例和库存。
+
+## Safe Removal / 安全移除
+
+关闭模组前使用配置页的安全移除，保留原有两次确认流程：返还设备库存，将剩余原质转为等质量火成岩，移除全部五台自定义建筑，并报告仍然阻止卸载的对象。另存新档并成功重载后再关闭模组。此次更新覆盖反应炉燃料和两台新增建筑的冷热库存；真实殖民地清理仍需验收。
+
+## 存档兼容
+
+配方过滤不可用内容，解锁记录保留。建筑、元素、配方 ID、原有保存字段与前四个 Storage 顺序保持；旧版本待排热液迁移到追加的回流缓冲，超量旧库存不会裁剪。真实存读档和组件顺序的游戏验证仍待完成。
+
+## 开发记录
+
+见 [CHANGELOG.md](CHANGELOG.md)。

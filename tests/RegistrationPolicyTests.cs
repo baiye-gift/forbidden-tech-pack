@@ -14,7 +14,9 @@ internal static class RegistrationPolicyTests {
         AssertEx.SequenceEqual(new[] {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
-            ModIdentity.MatterCompilerId
+            ModIdentity.MatterCompilerId,
+            ModIdentity.AnnihilationReactorId,
+            ModIdentity.EnergyCondenserId
         }, all.BuildingIds, "all buildings enabled");
         AssertEx.True(all.HasAnyBuildings, "enabled module has build entries");
 
@@ -38,5 +40,10 @@ internal static class RegistrationPolicyTests {
         }));
         AssertEx.Equal(0, moduleOff.BuildingIds.Count, "module switch hides every building");
         AssertEx.False(moduleOff.HasAnyBuildings, "module switch hides research contents");
+        var energyOff = RegistrationPolicy.Create(PackOptions.Resolve(new RawOptions {MassEnergyEnabled=false}));
+        AssertEx.Equal(3, energyOff.BuildingIds.Count, "energy module does not hide original material chain");
+        var reactorOff = RegistrationPolicy.Create(PackOptions.Resolve(new RawOptions {ReactorEnabled=false}));
+        AssertEx.False(reactorOff.IsEnabled(ModIdentity.AnnihilationReactorId), "reactor hides independently");
+        AssertEx.True(reactorOff.IsEnabled(ModIdentity.EnergyCondenserId), "condenser remains enabled");
     }
 }

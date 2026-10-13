@@ -60,8 +60,8 @@ internal static class OptionsLocalizationRuntimeProbe {
     }
 
     private static int Main(string[] args) {
-        if (args.Length != 3) {
-            Console.Error.WriteLine("Expected game-managed, mod-assembly, and library-directory arguments.");
+        if (args.Length != 4) {
+            Console.Error.WriteLine("Expected game-managed, mod-assembly, library-directory, and translations arguments.");
             return 2;
         }
 
@@ -83,8 +83,8 @@ internal static class OptionsLocalizationRuntimeProbe {
                 })
                 .Where(item => item.Attribute != null)
                 .ToArray();
-            if (optionProperties.Length != 14) {
-                throw new InvalidOperationException("Expected all 14 user-facing options to have Option attributes.");
+            if (optionProperties.Length != 17) {
+                throw new InvalidOperationException("Expected all 17 user-facing options to have Option attributes.");
             }
 
             foreach (var item in optionProperties) {
@@ -118,6 +118,38 @@ internal static class OptionsLocalizationRuntimeProbe {
             }
 
             Console.WriteLine("Chinese options runtime contract passed.");
+            var game = Assembly.LoadFrom(Path.Combine(gameManaged, "Assembly-CSharp.dll"));
+            var localization = game.GetType("Localization", true);
+            var load = localization.GetMethod("LoadStringsFile", BindingFlags.Public | BindingFlags.Static);
+            var overload = localization.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Single(m => m.Name == "OverloadStrings" && m.GetParameters().Length == 6);
+            var strings = mod.GetType("STRINGS", true);
+            var messages = strings.GetNestedType("UI").GetNestedType("MATTER");
+            var applyFile = mod.GetType("ForbiddenTechnologyPack.Game.Localization.TranslationLoader", true)
+                .GetMethod("ApplyFile", BindingFlags.Static | BindingFlags.NonPublic);
+            foreach (string language in new[] { "zh", "en" }) {
+                var entries = load.Invoke(null, new object[] { Path.Combine(args[3], language + ".po"), false });
+                var arguments = new object[] { entries, "STRINGS", strings, "", "", "" };
+                overload.Invoke(null, arguments);
+                if (arguments.Skip(3).Any(value => !string.IsNullOrEmpty((string)value)))
+                    throw new InvalidOperationException("Translation parameter/link validation failed: " + string.Join(";", arguments.Skip(3)));
+                applyFile.Invoke(null, new object[] { Path.Combine(args[3], language + ".po") });
+                var working = messages.GetField("WORKING").GetValue(null).ToString();
+                var missing = messages.GetField("MISSING").GetValue(null).ToString();
+                if (ContainsChinese(working) != (language == "zh") || ContainsChinese(missing) != (language == "zh") ||
+                    !working.Contains("{0}") || !working.Contains("{1"))
+                    throw new InvalidOperationException("Native PO loading did not update working/missing labels for " + language);
+                var energy = strings.GetNestedType("UI").GetNestedType("MASSENERGY");
+                foreach (var field in energy.GetFields(BindingFlags.Public | BindingFlags.Static)) {
+                    if (ContainsChinese(field.GetValue(null).ToString()) != (language == "zh"))
+                        throw new InvalidOperationException("Untranslated mass-energy field: " + field.Name);
+                }
+                var protoDescription = strings.GetNestedType("ELEMENTS").GetNestedType("BAIYEFORBIDDENPROTOMATTER")
+                    .GetField("DESC").GetValue(null).ToString();
+                if (ContainsChinese(protoDescription) != (language == "zh") || !protoDescription.Contains("18 MJ"))
+                    throw new InvalidOperationException("Proto-Matter description is missing its translated energy budget.");
+            }
+            Console.WriteLine("Native targeted zh/en PO loading and parameter/link validation passed (no Unity UI).");
             return 0;
         } catch (Exception exception) {
             var root = exception;
@@ -142,15 +174,15 @@ if ($LASTEXITCODE -ne 0) {
 $runtimeConfigBody = @'
 {
   "runtimeOptions": {
-    "tfm": "net10.0",
+    "tfm": "net6.0", "rollForward": "Major",
     "framework": {
       "name": "Microsoft.NETCore.App",
-      "version": "10.0.0"
+      "version": "6.0.0"
     }
   }
 }
 '@
 [System.IO.File]::WriteAllText($runtimeConfig, $runtimeConfigBody, [System.Text.UTF8Encoding]::new($false))
 
-& dotnet $probeAssembly $managedDirectory $rawAssembly (Join-Path $ProjectRoot 'lib')
+& dotnet $probeAssembly $managedDirectory $rawAssembly (Join-Path $ProjectRoot 'lib') (Join-Path $ProjectRoot 'packaging\translations')
 exit $LASTEXITCODE

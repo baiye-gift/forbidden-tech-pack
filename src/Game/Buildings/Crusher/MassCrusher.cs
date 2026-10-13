@@ -22,6 +22,21 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
             base.OnCleanUp();
         }
 
+        protected override float ComputeWorkProgress(float dt, ComplexRecipe recipe) {
+            var power = GetComponent<FabricatorPowerBudget>();
+            if (recipe == null || !HasOutputSpace() || power == null) {
+                if (power != null) power.Clear();
+                return 0f;
+            }
+            return power.TakeWorkSeconds(Math.Min(dt,
+                Math.Max(0f, 1f - OrderProgress) * recipe.time)) / recipe.time;
+        }
+
+        public override void Sim1000ms(float dt) {
+            if (CurrentWorkingOrder == null && GetRecipes().Length == 0) return;
+            base.Sim1000ms(dt);
+        }
+
         private void OnDeconstructComplete(object data) {
             DropStorage(inStorage);
             DropStorage(buildStorage);

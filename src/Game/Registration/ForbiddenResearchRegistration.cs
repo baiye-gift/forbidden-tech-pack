@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Options;
 using HarmonyLib;
@@ -12,7 +13,9 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 return;
             }
 
-            Register(__instance, new ResourceTreeLoader<ResourceTreeNode>(tree_file));
+            var tree = new ResourceTreeLoader<ResourceTreeNode>(tree_file);
+            Register(__instance, tree);
+            RegisterEnergy(__instance, tree);
         }
 
         private static void Register(Database.Techs __instance,
@@ -48,7 +51,7 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 { "advanced", 80f }
             };
             var tech = new Tech(ModIdentity.ResearchId,
-                new List<string>(plan.BuildingIds), __instance, costs);
+                plan.BuildingIds.Where(id => id != ModIdentity.AnnihilationReactorId && id != ModIdentity.EnergyCondenserId).ToList(), __instance, costs);
             tech.costsByResearchTypeID.Clear();
             foreach (var cost in costs) {
                 tech.costsByResearchTypeID[cost.Key] = cost.Value;
@@ -61,14 +64,18 @@ namespace ForbiddenTechnologyPack.Game.Registration {
         }
 
         private static void Postfix(Database.Techs __instance) {
-            var tech = __instance == null ? null : __instance.TryGet(ModIdentity.ResearchId);
+            ConnectTech(__instance, ModIdentity.ResearchId);
+            ConnectTech(__instance, ModIdentity.MassEnergyResearchId);
+        }
+        private static void ConnectTech(Database.Techs __instance, string id) {
+            var tech = __instance == null ? null : __instance.TryGet(id);
             var techNode = GetNode(tech);
             if (techNode == null) {
                 return;
             }
 
-            var prerequisite = __instance.TryGet("MatterDeconstruction") ??
-                __instance.TryGet("HighTempForging");
+            var prerequisite = id == ModIdentity.MassEnergyResearchId ? __instance.TryGet(ModIdentity.ResearchId) :
+                __instance.TryGet("MatterDeconstruction") ?? __instance.TryGet("HighTempForging");
             var prerequisiteNode = GetNode(prerequisite);
             if (prerequisiteNode == null) {
                 return;
@@ -128,6 +135,27 @@ namespace ForbiddenTechnologyPack.Game.Registration {
                 width = prerequisiteNode.width,
                 height = prerequisiteNode.height
             };
+        }
+
+        private static void RegisterEnergy(Database.Techs techs, ResourceTreeLoader<ResourceTreeNode> tree) {
+            if (techs.TryGet(ModIdentity.MassEnergyResearchId) != null) return;
+            var ids = RegistrationPolicy.Create(ForbiddenTechOptions.Current).BuildingIds.Where(
+                id => id == ModIdentity.AnnihilationReactorId || id == ModIdentity.EnergyCondenserId).ToList();
+            if (ids.Count == 0) return;
+            var prerequisite = techs.TryGet(ModIdentity.ResearchId);
+            var prerequisiteNode = GetNode(prerequisite);
+            if (prerequisite == null || prerequisiteNode == null) return;
+            var node = new ResourceTreeNode {
+                Id = ModIdentity.MassEnergyResearchId, Name = ModIdentity.MassEnergyResearchId,
+                nodeX = prerequisiteNode.nodeX + 2f * prerequisiteNode.width, nodeY = prerequisiteNode.nodeY,
+                width = prerequisiteNode.width, height = prerequisiteNode.height
+            };
+            var costs = new Dictionary<string, float> { { "basic", 180f }, { "advanced", 160f } };
+            var tech = new Tech(ModIdentity.MassEnergyResearchId, ids, techs, costs);
+            tech.costsByResearchTypeID.Clear();
+            foreach (var cost in costs) tech.costsByResearchTypeID[cost.Key] = cost.Value;
+            tech.SetNode(node, string.Empty); tech.requiredTech.Add(prerequisite); prerequisite.unlockedTech.Add(tech);
+            tech.AddSearchTerms(STRINGS.RESEARCH.TECHS.BAIYEFORBIDDENMASSENERGYENGINEERING.SEARCH_TERMS);
         }
     }
 }

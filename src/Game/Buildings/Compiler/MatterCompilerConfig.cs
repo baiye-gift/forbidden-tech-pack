@@ -51,6 +51,10 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
         public override void ConfigureBuildingTemplate(GameObject gameObject, Tag prefabTag) {
             gameObject.GetComponent<KPrefabID>().AddTag(RoomConstraints.ConstraintTags.IndustrialMachinery);
             var fabricator = gameObject.AddOrGet<MatterCompiler>();
+            fabricator.duplicantOperated = false;
+            fabricator.showProgressBar = true;
+            gameObject.AddOrGet<FabricatorPowerBudget>();
+            gameObject.AddOrGet<FabricatorStatus>();
             fabricator.heatedTemperature = 293.15f;
             fabricator.sideScreenStyle = ComplexFabricatorSideScreen.StyleSetting.ListQueueHybrid;
             fabricator.storeProduced = true;
@@ -72,6 +76,13 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             coolantStorage.allowItemRemoval = true;
             coolantStorage.allowUIItemRemoval = true;
             FabricatorSupport.SetStorageFilters(coolantStorage, new[] { GameTags.Liquid });
+
+            // Append after the four existing storages to preserve old save indices.
+            var heatedStorage = FabricatorSupport.CreateSealedStorage(gameObject,
+                CoolantCapacityKg, true);
+            heatedStorage.allowItemRemoval = true;
+            heatedStorage.allowUIItemRemoval = true;
+            FabricatorSupport.SetStorageFilters(heatedStorage, new[] { GameTags.Liquid });
 
             AttachSolidPorts(gameObject);
 
@@ -100,13 +111,14 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
 
             var coolantDispenser = gameObject.AddOrGet<ConduitDispenser>();
             coolantDispenser.conduitType = ConduitType.Liquid;
-            coolantDispenser.storage = coolantStorage;
+            coolantDispenser.storage = heatedStorage;
             coolantDispenser.elementFilter = null;
             coolantDispenser.alwaysDispense = true;
-            coolantDispenser.isOn = false;
+            coolantDispenser.isOn = true;
 
             var coolantController = gameObject.AddOrGet<CoolantController>();
             coolantController.storage = coolantStorage;
+            coolantController.heatedStorage = heatedStorage;
             coolantController.heatJoulesPerSecond =
                 BaseHeatJoulesPerSecond * ForbiddenTechOptions.Current.HeatMultiplier;
 
@@ -119,7 +131,6 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             gameObject.AddOrGet<ComplexFabricatorWorkable>();
             gameObject.AddOrGet<Operational>();
             gameObject.AddOrGet<LogicOperationalController>();
-            gameObject.AddOrGetDef<PoweredActiveController.Def>();
         }
 
         public override void DoPostConfigurePreview(BuildingDef def, GameObject gameObject) {

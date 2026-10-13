@@ -2,6 +2,7 @@ using ForbiddenTechnologyPack.Core;
 using ForbiddenTechnologyPack.Game.Buildings.Analyzer;
 using ForbiddenTechnologyPack.Game.Buildings.Compiler;
 using ForbiddenTechnologyPack.Game.Buildings.Crusher;
+using ForbiddenTechnologyPack.Game.Buildings.MassEnergy;
 using ForbiddenTechnologyPack.Game.Elements;
 using ForbiddenTechnologyPack.Game.Save;
 using HarmonyLib;
@@ -15,7 +16,9 @@ namespace ForbiddenTechnologyPack.Game.Safety {
         private static readonly string[] ForbiddenBuildingIds = {
             ModIdentity.MatterAnalyzerId,
             ModIdentity.MassCrusherId,
-            ModIdentity.MatterCompilerId
+            ModIdentity.MatterCompilerId,
+            ModIdentity.AnnihilationReactorId,
+            ModIdentity.EnergyCondenserId
         };
 
         public static SafeRemovalReport Execute() {
@@ -28,9 +31,27 @@ namespace ForbiddenTechnologyPack.Game.Safety {
 
             saveData.BeginSafeRemoval();
 
+            foreach (var plan in FindAllObjects<BuildingUnderConstruction>()) {
+                if (!IsForbiddenConstruction(plan)) continue;
+                foreach (var storage in plan.GetComponents<Storage>()) DropStorage(storage, report, true);
+                // Use the same Cancel event as the native construction user menu.
+                // Pending/deferred cancellations stay in the remaining count.
+                plan.gameObject.Trigger((int)GameHashes.Cancel);
+            }
+
             ProcessBuildings(FindAllObjects<MatterAnalyzer>(), report);
             ProcessBuildings(FindAllObjects<MassCrusher>(), report);
             ProcessBuildings(FindAllObjects<MatterCompiler>(), report);
+            ProcessBuildings(FindAllObjects<EnergyMatterCondenser>(), report);
+            foreach (var reactor in FindAllObjects<ProtoAnnihilationReactor>()) {
+                if (reactor == null) continue;
+                reactor.PrepareRemoval();
+                foreach (var storage in reactor.GetComponents<Storage>()) DropStorage(storage, report, true);
+                var deconstructable = reactor.GetComponent<Deconstructable>();
+                if (deconstructable != null && !deconstructable.HasBeenDestroyed) {
+                    deconstructable.ForceDestroyAndGetMaterials(); report.RecordRemovedBuilding();
+                }
+            }
             var remainingProtoMatter = ConvertProtoMatter(report);
             report.Finish(CountRemainingCustomObjects(remainingProtoMatter));
             saveData.SetSafeRemovalCompleted(report.IsComplete);
@@ -54,12 +75,18 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 if (tech != null) {
                     tech.unlockedItemIDs.Clear();
                 }
+                var energyTech = db.Techs.TryGet(ModIdentity.MassEnergyResearchId);
+                if (energyTech != null) energyTech.unlockedItemIDs.Clear();
             }
         }
 
         internal static bool IsForbiddenFabricator(ComplexFabricator fabricator) {
             return fabricator is MatterAnalyzer || fabricator is MassCrusher ||
-                fabricator is MatterCompiler;
+                fabricator is MatterCompiler || fabricator is EnergyMatterCondenser;
+        }
+
+        private static bool IsForbiddenConstruction(BuildingUnderConstruction plan) {
+            return plan != null && plan.Def != null && System.Array.IndexOf(ForbiddenBuildingIds, plan.Def.PrefabID) >= 0;
         }
 
         internal static void Disable(ComplexFabricator fabricator) {
@@ -90,10 +117,10 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 DropStorage(fabricator.buildStorage, report, true);
                 DropStorage(fabricator.outStorage, report, false);
 
-                var compiler = fabricator as MatterCompiler;
-                if (compiler != null) {
-                    var coolant = compiler.GetComponent<CoolantController>();
+                if (fabricator is MatterCompiler || fabricator is EnergyMatterCondenser) {
+                    var coolant = fabricator.GetComponent<CoolantController>();
                     DropStorage(coolant == null ? null : coolant.storage, report, true);
+                    DropStorage(coolant == null ? null : coolant.heatedStorage, report, true);
                 }
 
                 var deconstructable = fabricator.GetComponent<Deconstructable>();
@@ -186,6 +213,10 @@ namespace ForbiddenTechnologyPack.Game.Safety {
             remaining += CountLiveBuildings(FindAllObjects<MatterAnalyzer>());
             remaining += CountLiveBuildings(FindAllObjects<MassCrusher>());
             remaining += CountLiveBuildings(FindAllObjects<MatterCompiler>());
+            remaining += CountLiveBuildings(FindAllObjects<EnergyMatterCondenser>());
+            remaining += CountLiveBuildings(FindAllObjects<ProtoAnnihilationReactor>());
+            foreach (var plan in FindAllObjects<BuildingUnderConstruction>())
+                if (IsForbiddenConstruction(plan)) remaining++;
             return remaining;
         }
 
@@ -206,7 +237,7 @@ namespace ForbiddenTechnologyPack.Game.Safety {
                 FindObjectsInactive.Include, FindObjectsSortMode.None);
         }
 
-        private static int CountLiveBuildings<T>(T[] buildings) where T : ComplexFabricator {
+        private static int CountLiveBuildings<T>(T[] buildings) where T : KMonoBehaviour {
             var count = 0;
             if (buildings == null) {
                 return count;
