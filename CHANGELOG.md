@@ -1,12 +1,12 @@
 # Changelog
 
-## 2026-10-14 — GitHub 同步验证与整理
+## 2026-10-14 — GitHub 修复分支已同步
 
 - 用户明确要求同步此前已完成更新。同步目标为 `baiye-gift/forbidden-tech-pack` 的 `codex/repair-forbidden-tech`，基线/默认分支为 `feature/forbidden-technology-pack` 的 `573028b`；未覆盖远端已有提交。
 - 同步范围：前述 0.1.1/0.2.0 修复与新增质能建筑的 `src/`、`tests/`、`scripts/`、`assets/`、`packaging/`、构建/打包脚本、`.gitignore`、`AGENTS.md`、`README.md`、`DESIGN.md`、`docs/` 和本日志；包含 10 月 12 日已完成新版 `preview.png`，保留独立审查记录及旧 debug 文档归档/备份脚本删除。`obj/`、`dist/`、`release/`、第三方本地依赖不上传，本次无新生产行为修改。
 - 同步前重新验证：Portable 退出 0，184 核心、73 生产宿主、18 付款适配器、16 研究连接宿主及素材/打包合同通过；原生 ElementCatalog、AnalyzerAdapter、AnalyzerRecipe、OptionsLocalization、SafeRemoval、CrusherConfig 六套检查退出 0，当前游戏 DLL/PLib 与六组 KAnim 重建成功。首条六套检查命令误用 PowerShell CLI 数组传参，未进入检查；改为直接脚本数组调用后完整通过。`git diff --check` 通过，仅既有 PO 行尾提示，CS0437/过时接口警告保留。
 - 构建会重建本地分发目录，检查后从项目根恢复已确认封面；本次不重打 release ZIP，10 月 11 日候选 ZIP 的历史校验值仍保持。未安装、发布或运行 Unity/Sim；原生研究构造的既有 Unity ECall 限制及实机验收待办不变。
-- GitHub 分支推送及 PR 创建结果待本轮操作完成后补录。
+- 已将实现提交 `9feccb7` 推送至远端 `codex/repair-forbidden-tech`，并创建草稿 PR [#1](https://github.com/baiye-gift/forbidden-tech-pack/pull/1)，基于默认分支 `feature/forbidden-technology-pack`；已附到当前聊天。源代码、新版封面、编译素材、测试与独立审查记录均已同步；默认分支尚未合并，未创建发布或上传 ZIP。本条同步结果通过后续日志提交同分支推送。
 
 ## 2026-10-12 — 工坊封面第二版，简化背景与光效
 
