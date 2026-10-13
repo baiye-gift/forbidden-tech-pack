@@ -52,14 +52,17 @@ if ($rareBlock -notmatch '"Niobium"' -or $rareBlock -notmatch '"Fullerene"') {
 $translationPath = Join-Path $ProjectRoot 'packaging\translations\zh.po'
 $translation = Get-Content -Raw -LiteralPath $translationPath
 foreach ($entry in @(
-    @{ Context = 'STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME'; English = 'Proto-Matter'; Chinese = '原质' },
-    @{ Context = 'STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC'; English = 'A compact, transportable substrate produced by forbidden matter processing.'; Chinese = '由禁忌物质处理生成的紧凑、可运输基质。' }
+    @{ Context = 'STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.NAME'; English = 'Proto-Matter'; Chinese = '原质' }
 )) {
     $expected = 'msgctxt "' + [regex]::Escape($entry.Context) + '"\s+msgid "' +
         [regex]::Escape($entry.English) + '"\s+msgstr "' + [regex]::Escape($entry.Chinese) + '"'
     if ($translation -notmatch $expected) {
         throw "Translation entry must use msgctxt/msgid/msgstr: $($entry.Context)"
     }
+}
+
+if ($translation -notmatch '(?s)msgctxt "STRINGS.ELEMENTS.BAIYEFORBIDDENPROTOMATTER.DESC"\s+msgid "[^\r\n]+18 MJ[^\r\n]+"\s+msgstr "[^\r\n]+18 MJ[^\r\n]+"') {
+    throw 'Proto-Matter must describe its physical form and mass-energy budget in both languages.'
 }
 
 Write-Host 'Element YAML validation passed.'

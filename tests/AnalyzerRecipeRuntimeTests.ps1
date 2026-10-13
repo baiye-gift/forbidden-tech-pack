@@ -138,6 +138,18 @@ internal static class AnalyzerRecipeRuntimeProbe {
             }
 
             Console.WriteLine("Analyzer runtime recipe contract passed.");
+            var condensedRecipe = registry.GetMethod("CreateCondenserRecipe", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            var condensedType = condensedRecipe.GetType();
+            var condensedInputs = (Array)condensedType.GetField("ingredients").GetValue(condensedRecipe);
+            var condensedOutputs = (Array)condensedType.GetField("results").GetValue(condensedRecipe);
+            var condensedOutput = condensedOutputs.GetValue(0);
+            if (condensedInputs.Length != 0 || condensedOutputs.Length != 1 ||
+                (float)condensedOutput.GetType().GetProperty("amount").GetValue(condensedOutput, null) != 1f ||
+                (float)condensedType.GetField("time").GetValue(condensedRecipe) != 500f)
+                throw new InvalidOperationException("Native condenser recipe must have no input, exactly 1 kg output and 500 seconds work.");
+            if (condensedOutput.GetType().GetField("temperatureOperation").GetValue(condensedOutput).ToString() != "Heated")
+                throw new InvalidOperationException("An ingredient-free result must use its explicit heated temperature.");
+            Console.WriteLine("Native condenser recipe contract passed (empty inputs, 1 kg/500 s, explicit output temperature; no Unity/Sim).");
             return 0;
         } catch (Exception exception) {
             var root = exception;
@@ -165,10 +177,10 @@ if ($LASTEXITCODE -ne 0) {
 $runtimeConfigBody = @'
 {
   "runtimeOptions": {
-    "tfm": "net10.0",
+    "tfm": "net6.0", "rollForward": "Major",
     "framework": {
       "name": "Microsoft.NETCore.App",
-      "version": "10.0.0"
+      "version": "6.0.0"
     }
   }
 }

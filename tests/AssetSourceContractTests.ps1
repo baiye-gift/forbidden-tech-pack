@@ -31,7 +31,9 @@ if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $expected = [ordered]@{
-    'baiye_proto_matter' = @('idle')
+    'baiye_proto_matter' = @('idle','ui')
+    'baiye_proto_annihilation_reactor' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'no_coolant', 'blocked', 'overheat', 'ui', 'charging_loop')
+    'baiye_energy_matter_condenser' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'no_coolant', 'blocked', 'overheat', 'ui')
     'baiye_matter_analyzer' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'overheat', 'ui')
     'baiye_mass_crusher' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'blocked', 'ui')
     'baiye_matter_compiler' = @('off', 'idle', 'working_pre', 'working_loop', 'working_pst', 'working_pst_complete', 'no_coolant', 'blocked', 'ui')
@@ -41,11 +43,15 @@ $sourceFolders = @{
     'baiye_matter_analyzer' = 'matter_analyzer'
     'baiye_mass_crusher' = 'mass_crusher'
     'baiye_matter_compiler' = 'matter_compiler'
+    'baiye_proto_annihilation_reactor' = 'proto_annihilation_reactor'
+    'baiye_energy_matter_condenser' = 'energy_matter_condenser'
 }
 $buildingCanvasSizes = @{
     'baiye_matter_analyzer' = 300
     'baiye_mass_crusher' = 400
     'baiye_matter_compiler' = 500
+    'baiye_proto_annihilation_reactor' = 500
+    'baiye_energy_matter_condenser' = 400
 }
 
 $actualNames = @($manifest.PSObject.Properties.Name | Sort-Object)
@@ -97,6 +103,45 @@ foreach ($name in $expected.Keys) {
         }
         if ([double]$bodyFile[0].pivot_y -ne 0.0) {
             throw "SCML '$scmlPath' body sprite must be bottom-anchored so it cannot extend below the floor."
+        }
+
+        $working = @($sourceAnimations | Where-Object name -eq 'working_loop')[0]
+        $bodyTimeline = @($working.timeline | Where-Object name -eq 'body')[0]
+        if (@($working.timeline).Count -lt 3) {
+            throw "'$name' needs a fixed shell and independent working components."
+        }
+        foreach ($bodyKey in $bodyTimeline.key) {
+            $bodyObject = $bodyKey.object
+            if ([double]$bodyObject.x -ne 0 -or [double]$bodyObject.y -ne 0 -or
+                [double]$bodyObject.angle -ne 0 -or [double]$bodyObject.scale_x -ne 1 -or
+                [double]$bodyObject.scale_y -ne 1 -or [double]$bodyObject.a -ne 1) {
+                throw "'$name' must not animate its entire shell as a breathing sticker."
+            }
+        }
+        $movingTimelines = @($working.timeline | Where-Object {
+            $_.name -ne 'body' -and @($_.key | ForEach-Object {
+                "$($_.object.x)|$($_.object.y)|$($_.object.angle)"
+            } | Select-Object -Unique).Count -gt 1
+        })
+        if ($movingTimelines.Count -lt 1) { throw "'$name' has no mechanical working motion." }
+
+        if ($name -in @('baiye_proto_annihilation_reactor','baiye_energy_matter_condenser')) {
+            foreach ($state in $sourceAnimations | Where-Object name -ne 'ui') {
+                foreach ($timeline in $state.timeline | Where-Object name -ne 'body') {
+                    foreach ($key in $timeline.key) {
+                        $object = $key.object
+                        $file = @($files | Where-Object id -eq $object.file)[0]
+                        $halfWidth = [double]$file.width / 2
+                        $halfHeight = [double]$file.height / 2
+                        $x = [double]$object.x + $buildingCanvasSizes[$name] / 2
+                        $y = [double]$object.y
+                        if ([double]$object.angle -ne 0 -or $x-$halfWidth -lt 0 -or $x+$halfWidth -gt $buildingCanvasSizes[$name] -or
+                                $y-$halfHeight -lt 0 -or $y+$halfHeight -gt $buildingCanvasSizes[$name]) {
+                            throw "'$name/$($state.name)' working component '$($timeline.name)' crosses its footprint."
+                        }
+                    }
+                }
+            }
         }
 
         $uiAnimation = @($sourceAnimations | Where-Object { $_.name -eq 'ui' })[0]

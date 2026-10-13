@@ -25,8 +25,5 @@ namespace ForbiddenTechnologyPack.Core {
             return visible;
         }
 
-        public static bool ShouldConsumeSample(ResolvedOptions options) {
-            return options != null && options.ConsumeSamples;
-        }
     }
 }

@@ -30,6 +30,8 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
 
         public override void ConfigureBuildingTemplate(GameObject gameObject, Tag prefabTag) {
             var fabricator = gameObject.AddOrGet<MatterAnalyzer>();
+            fabricator.labelByResult = false;
+            gameObject.AddOrGet<FabricatorStatus>();
             fabricator.heatedTemperature = 293.15f;
             fabricator.sideScreenStyle = ComplexFabricatorSideScreen.StyleSetting.ListQueueHybrid;
             fabricator.storeProduced = true;
@@ -48,7 +50,6 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Analyzer {
             gameObject.AddOrGet<ComplexFabricatorWorkable>();
             gameObject.AddOrGet<Operational>();
             gameObject.AddOrGet<LogicOperationalController>();
-            gameObject.AddOrGetDef<PoweredActiveController.Def>();
         }
     }
 }

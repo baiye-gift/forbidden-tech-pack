@@ -68,6 +68,11 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
 
         public override void ConfigureBuildingTemplate(GameObject gameObject, Tag prefabTag) {
             var fabricator = gameObject.AddOrGet<MassCrusher>();
+            fabricator.duplicantOperated = false;
+            fabricator.showProgressBar = true;
+            fabricator.labelByResult = false;
+            gameObject.AddOrGet<FabricatorPowerBudget>();
+            gameObject.AddOrGet<FabricatorStatus>();
             fabricator.heatedTemperature = 293.15f;
             fabricator.sideScreenStyle = ComplexFabricatorSideScreen.StyleSetting.ListQueueHybrid;
             fabricator.storeProduced = true;
@@ -102,7 +107,6 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Crusher {
             gameObject.AddOrGet<ComplexFabricatorWorkable>();
             gameObject.AddOrGet<Operational>();
             gameObject.AddOrGet<LogicOperationalController>();
-            gameObject.AddOrGetDef<PoweredActiveController.Def>();
         }
     }
 }

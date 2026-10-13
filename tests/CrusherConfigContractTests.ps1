@@ -86,6 +86,45 @@ internal static class CrusherRailProbe {
         try {
             var game = Assembly.LoadFrom(Path.Combine(args[0], "Assembly-CSharp.dll"));
             var mod = Assembly.LoadFrom(args[1]);
+            var payment = mod.GetType("ForbiddenTechnologyPack.Game.Buildings.Common.FabricatorPaymentPatch", true);
+            var targets = (IEnumerable<MethodBase>)payment.GetMethod("TargetMethods", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            var methods = targets.ToArray();
+            Check(methods.Length == 2 && methods.All(m => m != null && m.DeclaringType == game.GetType("CircuitManager")), "Payment hooks must resolve against the current native CircuitManager.");
+            foreach (var method in methods) {
+                Check(((MethodInfo)method).ReturnType == typeof(float), "Native payment methods must return unpaid joules.");
+                var parameters = method.GetParameters();
+                Check(parameters.Any(p => p.Name == "joules_needed" && p.ParameterType == typeof(float)) &&
+                    parameters.Any(p => p.Name == "c" && p.ParameterType.Name == "IEnergyConsumer"), "Payment hook parameter names/types changed.");
+            }
+            var nativeFlags=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance;
+            var circuit=game.GetType("CircuitManager",true);
+            Check(circuit.GetMethod("Sim200msLast",nativeFlags)!=null,"The native power epoch hook must exist.");
+            var energyStatus=game.GetType("EnergyConsumer",true).GetMethod("SetConnectionStatus",nativeFlags);
+            Check(energyStatus.GetParameters().Any(p=>p.Name=="connection_status"),"Native power status hook parameter must match Harmony binding.");
+            var clock=game.GetType("GameClock",true);
+            Check(clock.GetMethod("GetCycle",nativeFlags).ReturnType==typeof(int) && clock.GetMethod("GetTimeSinceStartOfCycle",nativeFlags).ReturnType==typeof(float),"Long-colony time must use stable native cycle components.");
+            var nativeDispenser=game.GetType("ConduitDispenser",true);
+            Check(nativeDispenser.GetMethod("FindSuitableElement",nativeFlags).ReturnType.Name=="PrimaryElement" && nativeDispenser.GetMethod("Dispense",nativeFlags)!=null,
+                "Liquid batching must preserve current native candidate and transport hooks.");
+            var coolant = mod.GetType("ForbiddenTechnologyPack.Game.Buildings.Compiler.CoolantController", true);
+            var latch = coolant.GetField("releasingHeatedPacket", BindingFlags.Instance | BindingFlags.NonPublic);
+            Check(latch != null && latch.GetCustomAttributesData().Any(a => a.AttributeType.Name == "Serialize" || a.AttributeType.Name == "SerializeAttribute"), "The old coolant save latch must remain serialized.");
+            var process = coolant.GetMethod("TryProcessWork", BindingFlags.Instance | BindingFlags.NonPublic);
+            Check(Calls(process).OfType<MethodInfo>().Any(m => m.DeclaringType.Name == "Storage" && m.Name == "Transfer" &&
+                m.ReturnType == typeof(float) && m.GetParameters().Length == 5), "Paid work must split through the current native storage transfer API.");
+            Console.WriteLine("Native payment API and coolant transfer/save contract passed (reflection/IL; no Unity/Sim).");
+            var reactor = mod.GetType("ForbiddenTechnologyPack.Game.Buildings.MassEnergy.ProtoAnnihilationReactor", true);
+            var reactorCalls = Calls(reactor.GetMethod("Sim200ms")).OfType<MethodInfo>().ToArray();
+            var consumeFuel = reactorCalls.Single(m => m.DeclaringType.Name == "Storage" && m.Name == "ConsumeAndGetDisease");
+            Check(consumeFuel.GetParameters()[2].IsOut && consumeFuel.GetParameters()[2].ParameterType == typeof(float).MakeByRefType(), "Reactor fuel receipt must use the native actual-mass out parameter.");
+            Check(reactorCalls.Any(m => m.DeclaringType.Name == "Generator" && m.Name == "GenerateJoules"), "Reactor must supply the native generator buffer.");
+            foreach (string field in new[] { "ignitionJoules", "totalFuelKg", "totalGrossJoules" })
+                Check(reactor.GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).GetCustomAttributesData().Any(a => a.AttributeType.Name.StartsWith("Serialize")), "Reactor save field must remain serialized: " + field);
+            var condenser = mod.GetType("ForbiddenTechnologyPack.Game.Buildings.MassEnergy.EnergyMatterCondenser", true);
+            Check(condenser.BaseType == game.GetType("ComplexFabricator"), "Condenser must retain the native queue and progress owner.");
+            foreach (string type in new[] { "BaiyeProtoAnnihilationReactorConfig", "BaiyeEnergyMatterCondenserConfig" })
+                Check(mod.GetType("ForbiddenTechnologyPack.Game.Buildings.MassEnergy." + type, true).BaseType == game.GetType("IBuildingConfig"), "Mass-energy building must use the native prefab contract.");
+            Console.WriteLine("Native mass-energy fuel/generator, save fields and fabricator/prefab contracts passed (reflection/IL; no Unity/Sim).");
             var patch = mod.GetType("ForbiddenTechnologyPack.Game.Buildings.Crusher.MassCrusherRailInputPatch");
             Check(patch != null, "Crusher must filter rail packets before SolidConduitConsumer removes them.");
             var attribute = patch.GetCustomAttributesData().Single(a => a.AttributeType.Name == "HarmonyPatch");
@@ -127,6 +166,6 @@ internal static class CrusherRailProbe {
 $compiler = Get-ForbiddenTechnologyCSharpCompiler -ProjectRoot $ProjectRoot
 & $compiler /nologo /target:exe /langversion:7.3 "/out:$probeAssembly" $probeSource
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-[System.IO.File]::WriteAllText((Join-Path $probeDirectory 'CrusherRailProbe.runtimeconfig.json'), '{"runtimeOptions":{"tfm":"net10.0","framework":{"name":"Microsoft.NETCore.App","version":"10.0.0"}}}')
+[System.IO.File]::WriteAllText((Join-Path $probeDirectory 'CrusherRailProbe.runtimeconfig.json'), '{"runtimeOptions":{"tfm":"net6.0","rollForward":"Major","framework":{"name":"Microsoft.NETCore.App","version":"6.0.0"}}}')
 & dotnet $probeAssembly (Join-Path $gamePath 'OxygenNotIncluded_Data\Managed') (Join-Path $ProjectRoot 'obj\ForbiddenTechnologyPack.raw.dll') (Join-Path $ProjectRoot 'lib')
 exit $LASTEXITCODE

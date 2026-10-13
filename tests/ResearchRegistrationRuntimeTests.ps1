@@ -339,10 +339,10 @@ if ($LASTEXITCODE -ne 0) {
 $runtimeConfigBody = @'
 {
   "runtimeOptions": {
-    "tfm": "net10.0",
+    "tfm": "net6.0", "rollForward": "Major",
     "framework": {
       "name": "Microsoft.NETCore.App",
-      "version": "10.0.0"
+      "version": "6.0.0"
     }
   }
 }

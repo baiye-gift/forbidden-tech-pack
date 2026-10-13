@@ -11,12 +11,15 @@ using HarmonyLib;
 namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
     public sealed class MatterCompiler : ComplexFabricator {
         private bool pendingRecipeRefresh;
+        private ForbiddenTechSaveData subscribedSave;
         private readonly HashSet<SimHashes> dispensableProducts = new HashSet<SimHashes>();
 
         private static readonly Operational.Flag RecipeListStable =
             new Operational.Flag("CompilerRecipeListStable", Operational.Flag.Type.Requirement);
         private static readonly Operational.Flag RecipesAvailable =
             new Operational.Flag("CompilerRecipesAvailable", Operational.Flag.Type.Requirement);
+        internal static readonly Operational.Flag OutputSpace =
+            new Operational.Flag("CompilerOutputSpace", Operational.Flag.Type.Requirement);
 
         protected override void OnSpawn() {
             var hadSavedIngredients = buildStorage != null && buildStorage.MassStored() > 0f;
@@ -24,6 +27,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             operational.SetFlag(RecipeListStable, true);
             SubscribeToUnlocks();
             ApplyRecipeFilter(hadSavedIngredients || OrderProgress > 0f);
+            RefreshOutputSpace();
             Subscribe((int)GameHashes.DeconstructComplete, OnDeconstructComplete);
         }
 
@@ -33,7 +37,41 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             base.OnCleanUp();
         }
 
+        public override void Sim1000ms(float dt) {
+            SubscribeToUnlocks();
+            if (pendingRecipeRefresh && CurrentWorkingOrder == null) {
+                ApplyRecipeFilter(false);
+            }
+            // U59 ValidateNextOrder reads recipe_list[0] even when nothing is unlocked.
+            if (CurrentWorkingOrder == null && GetRecipes().Length == 0) {
+                return;
+            }
+            base.Sim1000ms(dt);
+        }
+
+        protected override float ComputeWorkProgress(float dt, ComplexRecipe recipe) {
+            var power = GetComponent<FabricatorPowerBudget>();
+            var cooling = GetComponent<CoolantController>();
+            if (recipe == null || !HasIntactActiveBatch() || !HasOutputSpace(recipe) ||
+                    power == null || cooling == null) {
+                if (power != null) power.Clear();
+                return 0f;
+            }
+            var seconds = power.TakeWorkSeconds(Math.Min(dt,
+                Math.Max(0f, 1f - OrderProgress) * recipe.time));
+            // Heat is committed exactly once for the same paid work interval.
+            if (seconds <= 0f || !cooling.TryProcessWork(seconds)) {
+                power.Clear();
+                return 0f;
+            }
+            return seconds / recipe.time;
+        }
+
         public override void CompleteWorkingOrder() {
+            if (CurrentWorkingOrder == null || !HasIntactActiveBatch() ||
+                    !HasOutputSpace(CurrentWorkingOrder)) {
+                return;
+            }
             EnsureCurrentRecipeCanCompleteOnce();
             var refreshAfterBatch = pendingRecipeRefresh;
             if (refreshAfterBatch) {
@@ -79,6 +117,16 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             return dispensableProducts.Contains(elementId);
         }
 
+        internal void RefreshOutputSpace() {
+            var recipe = CurrentWorkingOrder ?? GetRecipes().FirstOrDefault(
+                candidate => GetRecipeQueueCount(candidate) != 0);
+            var hasRoom = recipe == null || HasOutputSpace(recipe);
+            if (operational != null && operational.GetFlag(OutputSpace) != hasRoom) {
+                operational.SetFlag(OutputSpace, hasRoom);
+                SetQueueDirty();
+            }
+        }
+
         private void ApplyRecipeFilter(bool includeSavedBatch) {
             if (CurrentWorkingOrder != null) {
                 pendingRecipeRefresh = true;
@@ -111,7 +159,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             var recipes = visibleIds.Where(RecipeRegistry.CompilerRecipes.ContainsKey)
                 .Select(id => RecipeRegistry.CompilerRecipes[id]).ToArray();
             FabricatorSupport.SetRecipeList(this, recipes);
-            UpdateProductFilters(visibleIds);
+            UpdateProductFilters();
             operational.SetFlag(RecipesAvailable, recipes.Length > 0);
             if (!includeSavedBatch) {
                 pendingRecipeRefresh = false;
@@ -128,8 +176,9 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
                 outStorage.RemainingCapacity());
         }
 
-        private void UpdateProductFilters(IEnumerable<string> visibleIds) {
-            var idArray = visibleIds.ToArray();
+        private void UpdateProductFilters() {
+            // Recipe visibility is an unlock rule, not a rule for removing old products.
+            var idArray = RecipeRegistry.CompilerRecipes.Keys.ToArray();
             var productTags = idArray.Select(id => new Tag(id)).ToArray();
             FabricatorSupport.SetStorageFilters(outStorage, productTags);
             dispensableProducts.Clear();
@@ -150,15 +199,17 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
         }
 
         private void SubscribeToUnlocks() {
-            if (ForbiddenTechSaveData.Instance != null) {
-                ForbiddenTechSaveData.Instance.UnlocksChanged += RequestRecipeRefresh;
-            }
+            if (subscribedSave == ForbiddenTechSaveData.Instance) return;
+            UnsubscribeFromUnlocks();
+            subscribedSave = ForbiddenTechSaveData.Instance;
+            if (subscribedSave == null) return;
+            subscribedSave.UnlocksChanged += RequestRecipeRefresh;
+            pendingRecipeRefresh = true;
         }
 
         private void UnsubscribeFromUnlocks() {
-            if (ForbiddenTechSaveData.Instance != null) {
-                ForbiddenTechSaveData.Instance.UnlocksChanged -= RequestRecipeRefresh;
-            }
+            if (subscribedSave != null) subscribedSave.UnlocksChanged -= RequestRecipeRefresh;
+            subscribedSave = null;
         }
 
         private void OnDeconstructComplete(object data) {
@@ -167,6 +218,7 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
             DropStorage(outStorage);
             var coolant = GetComponent<CoolantController>();
             DropStorage(coolant == null ? null : coolant.storage);
+            DropStorage(coolant == null ? null : coolant.heatedStorage);
         }
 
         private static void DropStorage(Storage storage) {
@@ -176,10 +228,19 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
         }
     }
 
+    [HarmonyPatch(typeof(ComplexFabricator), "Sim200ms")]
+    internal static class MatterCompilerOutputSpacePatch {
+        private static void Prefix(ComplexFabricator __instance) {
+            var compiler = __instance as MatterCompiler;
+            if (compiler != null) compiler.RefreshOutputSpace();
+        }
+    }
+
     [HarmonyPatch(typeof(SolidConduitConsumer), "ConduitUpdate")]
     internal static class MatterCompilerRailInputPatch {
         private static bool Prefix(SolidConduitConsumer __instance) {
-            if (__instance.GetComponent<MatterCompiler>() == null || !__instance.IsConnected) {
+            if ((__instance.GetComponent<MatterCompiler>() == null &&
+                    __instance.GetComponent<MassEnergy.ProtoAnnihilationReactor>() == null) || !__instance.IsConnected) {
                 return true;
             }
 
@@ -209,11 +270,4 @@ namespace ForbiddenTechnologyPack.Game.Buildings.Compiler {
         }
     }
 
-    [HarmonyPatch(typeof(ComplexFabricator), "CancelWorkingOrder")]
-    internal static class MatterCompilerCancellationPatch {
-        private static bool Prefix(ComplexFabricator __instance) {
-            var compiler = __instance as MatterCompiler;
-            return compiler == null || !compiler.HasIntactActiveBatch();
-        }
-    }
 }

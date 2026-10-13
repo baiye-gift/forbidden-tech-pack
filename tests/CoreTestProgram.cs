@@ -15,6 +15,8 @@ internal static class CoreTestProgram {
                 { "RecipeRegistryTests", RecipeRegistryTests.Run },
                 { "AnalyzerPolicyTests", AnalyzerPolicyTests.Run },
                 { "CoolingMathTests", CoolingMathTests.Run },
+                { "PaidWorkLedgerTests", PaidWorkLedgerTests.Run },
+                { "MassEnergyBalanceTests", MassEnergyBalanceTests.Run },
                 { "CompilerPolicyTests", CompilerPolicyTests.Run },
                 { "RegistrationPolicyTests", RegistrationPolicyTests.Run },
                 { "SafeRemovalTests", SafeRemovalTests.Run }

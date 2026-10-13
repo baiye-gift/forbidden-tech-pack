@@ -55,6 +55,9 @@ foreach ($referenceName in $referenceNames) {
 
 New-Item -ItemType Directory -Force -Path $objDirectory | Out-Null
 if (Test-Path -LiteralPath $packageDirectory) {
+    if ([IO.Path]::GetFullPath($packageDirectory) -ne [IO.Path]::GetFullPath((Join-Path $projectRoot 'dist\ForbiddenTechnologyPack'))) {
+        throw 'Unexpected package output path.'
+    }
     Remove-Item -LiteralPath $packageDirectory -Recurse -Force
 }
 New-Item -ItemType Directory -Force -Path $packageDirectory | Out-Null

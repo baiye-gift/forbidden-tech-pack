@@ -7,9 +7,10 @@ namespace ForbiddenTechnologyPack.Game {
             // resolve building/research keys directly. Register that tree explicitly;
             // PLib's assembly scanner now trips on a null namespace under U59.
             LocString.CreateLocStringKeys(typeof(global::STRINGS), null);
+            Localization.TranslationLoader.ContentPath = mod.ContentPath;
             new PeterHan.PLib.Options.POptions().RegisterOptions(this, typeof(Options.ForbiddenTechOptions));
             Options.ForbiddenTechOptions.Load();
-            UnityEngine.Debug.Log("[ForbiddenTechnologyPack] 0.1.0 loaded");
+            UnityEngine.Debug.Log("[ForbiddenTechnologyPack] 0.2.0 loaded");
         }
     }
 }

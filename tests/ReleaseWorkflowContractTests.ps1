@@ -73,7 +73,7 @@ if ($install -match [regex]::Escape("Klei\OxygenNotIncluded\mods\Dev")) {
 }
 
 $release = Get-Content -LiteralPath (Join-Path $ProjectRoot 'pack-release.ps1') -Raw
-foreach ($required in @('build.ps1', 'verify-package.ps1', 'ForbiddenTechnologyPack-0.1.0.zip', 'Get-FileHash', 'Expand-Archive')) {
+foreach ($required in @('build.ps1', 'verify-package.ps1', 'ForbiddenTechnologyPack-{0}.zip', 'mod_info.yaml', 'Get-FileHash', 'Expand-Archive')) {
     if ($release -notmatch [regex]::Escape($required)) {
         throw "pack-release.ps1 is missing required release behavior '$required'."
     }

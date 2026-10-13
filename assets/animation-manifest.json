@@ -1,7 +1,9 @@
 {
   "baiye_proto_matter": [
-    "idle"
+    "idle", "ui"
   ],
+  "baiye_proto_annihilation_reactor": ["off", "idle", "working_pre", "working_loop", "working_pst", "working_pst_complete", "no_coolant", "blocked", "overheat", "ui", "charging_loop"],
+  "baiye_energy_matter_condenser": ["off", "idle", "working_pre", "working_loop", "working_pst", "working_pst_complete", "no_coolant", "blocked", "overheat", "ui"],
   "baiye_matter_analyzer": [
     "off",
     "idle",

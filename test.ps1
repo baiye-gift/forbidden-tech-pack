@@ -10,6 +10,14 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $suiteCatalog = [ordered]@{
+    'ResearchTopologyRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ResearchTopologyRuntimeTests.ps1')
+        RequiresGame = $false
+    }
+    'ProductionRuntimeTests' = [pscustomobject]@{
+        Path = (Join-Path $projectRoot 'tests\ProductionRuntimeTests.ps1')
+        RequiresGame = $false
+    }
     'ElementYamlTests' = [pscustomobject]@{
         Path = (Join-Path $projectRoot 'tests\ElementYamlTests.ps1')
         RequiresGame = $false
@@ -154,7 +162,7 @@ $outputAssembly = Join-Path $outputDirectory 'ForbiddenTechnologyPack.CoreTests.
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 $sources = @(
     Get-ChildItem -LiteralPath (Join-Path $projectRoot 'src\Core') -Filter '*.cs' -Recurse -File -ErrorAction SilentlyContinue
-    Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tests') -Filter '*.cs' -Recurse -File -ErrorAction Stop
+    Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tests') -Filter '*.cs' -File -ErrorAction Stop
 ) | ForEach-Object { $_.FullName }
 
 if ($sources.Count -eq 0) {
